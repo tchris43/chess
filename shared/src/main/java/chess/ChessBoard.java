@@ -1,5 +1,7 @@
 package chess;
 
+import java.util.Arrays;
+
 /**
  * A chessboard that can hold and rearrange chess pieces.
  * <p>
@@ -45,5 +47,20 @@ public class ChessBoard {
      */
     public void resetBoard() {
 
+    }
+
+    @Override
+    public String toString() {
+        String boardRep = "";
+        for (int row = 0; row < 8; row++){
+            String rowRep = "";
+            for (int col = 0; col < 8; col++){
+                rowRep += board[row][col];
+                rowRep += " | ";
+            }
+            boardRep += rowRep;
+            boardRep += "\n";
+        }
+        return boardRep;
     }
 }
