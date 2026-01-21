@@ -45,19 +45,26 @@ public class ChessBoard {
      * Sets the board to the default starting board
      * (How the game of chess normally starts)
      */
+
+    public void initializePiece(ChessPiece.PieceType type, ChessGame.TeamColor color, int row, int col){
+        ChessPiece piece = new ChessPiece(color, type);
+        ChessPosition position = new ChessPosition(row,col);
+        addPiece(position, piece);
+    }
+
     public void resetBoard() {
         //Add white pawns
         for (int col = 1; col < 9; col++){
-            ChessPiece whitePawn = new ChessPiece(ChessGame.TeamColor.WHITE, ChessPiece.PieceType.PAWN);
-            ChessPosition position = new ChessPosition(2,col);
-            addPiece(position, whitePawn);
+            initializePiece(ChessPiece.PieceType.PAWN, ChessGame.TeamColor.WHITE, 2, col);
         }
         //Add black pawns
-        for (int col = 1; col < 9; col++){
-            ChessPiece whitePawn = new ChessPiece(ChessGame.TeamColor.BLACK, ChessPiece.PieceType.PAWN);
-            ChessPosition position = new ChessPosition(7,col);
-            addPiece(position, whitePawn);
+        for (int col = 1; col < 9; col++) {
+            initializePiece(ChessPiece.PieceType.PAWN, ChessGame.TeamColor.BLACK, 7, col);
         }
+        //Add white rook
+//        ChessPiece whiteRook = new ChessPiece(ChessGame.TeamColor.WHITE, ChessPiece.PieceType.ROOK);
+//        ChessPosition position = new ChessPosition(1,1);
+//        addPiece(position, whitePawn);
     }
 
     @Override
