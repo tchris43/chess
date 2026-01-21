@@ -1,6 +1,7 @@
 package chess;
 
 import java.util.Arrays;
+import java.util.Objects;
 
 /**
  * A chessboard that can hold and rearrange chess pieces.
@@ -61,10 +62,35 @@ public class ChessBoard {
         for (int col = 1; col < 9; col++) {
             initializePiece(ChessPiece.PieceType.PAWN, ChessGame.TeamColor.BLACK, 7, col);
         }
-        //Add white rook
-//        ChessPiece whiteRook = new ChessPiece(ChessGame.TeamColor.WHITE, ChessPiece.PieceType.ROOK);
-//        ChessPosition position = new ChessPosition(1,1);
-//        addPiece(position, whitePawn);
+        //white rooks
+        initializePiece(ChessPiece.PieceType.ROOK, ChessGame.TeamColor.WHITE, 1, 1);
+        initializePiece(ChessPiece.PieceType.ROOK, ChessGame.TeamColor.WHITE, 1, 8);
+        //black rooks
+        initializePiece(ChessPiece.PieceType.ROOK, ChessGame.TeamColor.BLACK, 8, 1);
+        initializePiece(ChessPiece.PieceType.ROOK, ChessGame.TeamColor.BLACK, 8, 8);
+        //white knights
+        initializePiece(ChessPiece.PieceType.KNIGHT, ChessGame.TeamColor.WHITE, 1, 2);
+        initializePiece(ChessPiece.PieceType.KNIGHT, ChessGame.TeamColor.WHITE, 1, 5);
+        initializePiece(ChessPiece.PieceType.KNIGHT, ChessGame.TeamColor.WHITE, 1, 7);
+        //black knights
+        initializePiece(ChessPiece.PieceType.KNIGHT, ChessGame.TeamColor.BLACK, 8, 2);
+        initializePiece(ChessPiece.PieceType.KNIGHT, ChessGame.TeamColor.BLACK, 8, 5);
+        initializePiece(ChessPiece.PieceType.KNIGHT, ChessGame.TeamColor.BLACK, 8, 7);
+        //white bishops
+        initializePiece(ChessPiece.PieceType.BISHOP, ChessGame.TeamColor.WHITE, 1, 3);
+        initializePiece(ChessPiece.PieceType.BISHOP, ChessGame.TeamColor.WHITE, 1, 6);
+        //black bishops
+        initializePiece(ChessPiece.PieceType.BISHOP, ChessGame.TeamColor.BLACK, 8, 3);
+        initializePiece(ChessPiece.PieceType.BISHOP, ChessGame.TeamColor.BLACK, 8, 6);
+        //white king
+        initializePiece(ChessPiece.PieceType.KING, ChessGame.TeamColor.WHITE, 1, 5);
+        //black king
+        initializePiece(ChessPiece.PieceType.KING, ChessGame.TeamColor.BLACK, 8, 5);
+        //white queen
+        initializePiece(ChessPiece.PieceType.QUEEN, ChessGame.TeamColor.WHITE, 1, 4);
+        //black queen
+        initializePiece(ChessPiece.PieceType.QUEEN, ChessGame.TeamColor.BLACK, 8, 4);
+
     }
 
     @Override
@@ -80,5 +106,9 @@ public class ChessBoard {
             boardRep += "\n";
         }
         return boardRep;
+    }
+
+
+
     }
 }
