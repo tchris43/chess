@@ -59,7 +59,8 @@ public class MoveCalculator {
                 if (isEnemy(enemy, piece)) {
                     addMoves(newRow, newCol);
                 }
-            } else {
+            }
+            else {
                 addMoves(newRow, newCol);
             }
         }

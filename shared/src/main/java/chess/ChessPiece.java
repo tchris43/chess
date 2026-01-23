@@ -73,6 +73,11 @@ public class ChessPiece {
             moves.calculateMoves();
             return moves.possibleMoves;
         }
+        else if (type == PieceType.PAWN){
+            PawnMoves moves = new PawnMoves(board, myPosition);
+            moves.calculateMoves();
+            return moves.possibleMoves;
+        }
         else{
             return null;
         }
@@ -82,10 +87,7 @@ public class ChessPiece {
 //            RookMoves moves = new RookMoves(board, myPosition);
 //            return moves.possibleMoves;
 //        }
-//        else if (type == PieceType.PAWN){
-//            PawnMoves moves = new PawnMoves(board, myPosition);
-//            return moves.possibleMoves;
-//        }
+
     }
 
 
