@@ -57,6 +57,9 @@ public class ChessPiece {
             KingMoves moves = new KingMoves(board, myPosition);
             return moves.possibleMoves;
         }
+        else {
+            return null;
+        }
 //        elif (type == PieceType.QUEEN){
 //            QueenMoves moves = new QueenMoves(board, myPosition);
 //            return moves.possibleMoves;
