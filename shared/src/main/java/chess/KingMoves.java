@@ -23,8 +23,4 @@ public class KingMoves extends MoveCalculator{
         addMoves(X-1, Y+1);
     }
 
-    @Override
-    public void addMoves(int X, int Y) {
-        super.addMoves(X, Y);
-    }
 }

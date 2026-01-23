@@ -41,6 +41,15 @@ public class MoveCalculator {
         addMoves(currCol + 1, Row);
     }
 
+    public boolean isImpeded(ChessPiece enemy, ChessPiece piece){
+        return enemy != null;
+    }
+
+    public boolean isEnemy(ChessPiece enemy, ChessPiece piece){
+        return enemy.getTeamColor() != piece.getTeamColor();
+
+    }
+
     public void moveDiagonally(){
         int Row = position.getRow();
         int Col = position.getColumn();
@@ -51,8 +60,8 @@ public class MoveCalculator {
             currRow = currRow +1;
             currCol = currCol +1;
             ChessPiece enemy = board.board[currRow - 1][currCol - 1];
-            if (enemy != null) {
-                if (enemy.getTeamColor() != piece.getTeamColor()){
+            if (isImpeded(enemy,piece)) {
+                if (isEnemy(enemy,piece)){
                    addMoves(currRow, currCol);
                 }
                 break;
@@ -64,12 +73,9 @@ public class MoveCalculator {
         while(currCol > 1 && currRow > 1){
             currRow = currRow -1;
             currCol = currCol -1;
-            if (board.board[currRow-1][currCol-1] != null){
-                break;
-            }
             ChessPiece enemy = board.board[currRow - 1][currCol - 1];
-            if ( enemy != null) {
-                if (enemy.getTeamColor() != piece.getTeamColor()){
+            if (isImpeded(enemy,piece)) {
+                if (isEnemy(enemy,piece)){
                     addMoves(currRow, currCol);
                 }
                 break;
@@ -82,8 +88,8 @@ public class MoveCalculator {
             currRow = currRow-1;
             currCol = currCol+1;
             ChessPiece enemy = board.board[currRow - 1][currCol - 1];
-            if ( enemy != null) {
-                if (enemy.getTeamColor() != piece.getTeamColor()){
+            if (isImpeded(enemy,piece)) {
+                if (isEnemy(enemy,piece)){
                     addMoves(currRow, currCol);
                 }
                 break;
@@ -99,8 +105,8 @@ public class MoveCalculator {
                 break;
             }
             ChessPiece enemy = board.board[currRow - 1][currCol - 1];
-            if ( enemy != null) {
-                if (enemy.getTeamColor() != piece.getTeamColor()){
+            if (isImpeded(enemy,piece)) {
+                if (isEnemy(enemy,piece)){
                     addMoves(currRow, currCol);
                 }
                 break;
