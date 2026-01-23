@@ -17,78 +17,101 @@ public class MoveCalculator {
     public void calculateMoves(){}
 
     public void moveOrthogonally(){
-        int X = position.getRow()+1;
-        int Y = position.getColumn()+1;
-        int currX = X;
-        int currY = Y;
-        while (currX > 1){
-            currX = currX-1;
+        int Row = position.getRow()+1;
+        int Col = position.getColumn()+1;
+        int currRow = Row;
+        int currCol = Col;
+        while (currRow > 1){
+            currRow = currRow-1;
         }
-        addMoves(currX-1, Y);
-        currX = X;
-        while (currX < 8){
-            currX = currX + 1;
+        addMoves(currRow-1, Col);
+        currRow = Row;
+        while (currRow < 8){
+            currRow = currRow + 1;
         }
-        addMoves(currX + 1, Y);
-        while (currY > 1){
-            currY = currY - 1;
+        addMoves(currRow + 1, Col);
+        while (currCol > 1){
+            currCol = currCol - 1;
         }
-        addMoves(currY-1, X);
-        currY = Y;
-        while (currY < 8){
-            currY = currY + 1;
+        addMoves(currCol-1, Row);
+        currCol = Col;
+        while (currCol < 8){
+            currCol = currCol + 1;
         }
-        addMoves(currY + 1, X);
+        addMoves(currCol + 1, Row);
     }
 
     public void moveDiagonally(){
-        int X = position.getRow();
-        int Y = position.getColumn();
-        int currY = Y;
-        int currX = X;
-        while(currY < 8 && currX < 8){
-            currX = currX +1;
-            currY = currY +1;
-            if (board.board[currX - 1][currY - 1] != null) {
+        int Row = position.getRow();
+        int Col = position.getColumn();
+        ChessPiece piece = board.board[Row-1][Col-1];
+        int currCol = Col;
+        int currRow = Row;
+        while(currCol < 8 && currRow < 8){
+            currRow = currRow +1;
+            currCol = currCol +1;
+            ChessPiece enemy = board.board[currRow - 1][currCol - 1];
+            if (enemy != null) {
+                if (enemy.getTeamColor() != piece.getTeamColor()){
+                   addMoves(currRow, currCol);
+                }
                 break;
             }
-            addMoves(currX, currY);
+            addMoves(currRow, currCol);
         }
-        currX = X;
-        currY = Y;
-        while(currY > 1 && currX > 1){
-            currX = currX -1;
-            currY = currY -1;
-            if (board.board[currX-1][currY-1] != null){
+        currRow = Row;
+        currCol = Col;
+        while(currCol > 1 && currRow > 1){
+            currRow = currRow -1;
+            currCol = currCol -1;
+            if (board.board[currRow-1][currCol-1] != null){
                 break;
             }
-            addMoves(currX, currY);
+            ChessPiece enemy = board.board[currRow - 1][currCol - 1];
+            if ( enemy != null) {
+                if (enemy.getTeamColor() != piece.getTeamColor()){
+                    addMoves(currRow, currCol);
+                }
+                break;
+            }
+            addMoves(currRow, currCol);
         }
-        currX = X;
-        currY = Y;
-        while(currY < 8 && currX > 1){
-            currX = currX-1;
-            currY = currY+1;
-            if (board.board[currX-1][currY-1] != null){
+        currRow = Row;
+        currCol = Col;
+        while(currCol < 8 && currRow > 1){
+            currRow = currRow-1;
+            currCol = currCol+1;
+            ChessPiece enemy = board.board[currRow - 1][currCol - 1];
+            if ( enemy != null) {
+                if (enemy.getTeamColor() != piece.getTeamColor()){
+                    addMoves(currRow, currCol);
+                }
                 break;
             }
-            addMoves(currX, currY);
+            addMoves(currRow, currCol);
         }
-        currX = X;
-        currY = Y;
-        while(currY > 1 && currX < 8){
-            currX = currX +1;
-            currY = currY-1;
-            if (board.board[currX-1][currY-1] != null){
+        currRow = Row;
+        currCol = Col;
+        while(currCol > 1 && currRow < 8){
+            currRow = currRow +1;
+            currCol = currCol-1;
+            if (board.board[currRow-1][currCol-1] != null){
                 break;
             }
-            addMoves(currX, currY);
+            ChessPiece enemy = board.board[currRow - 1][currCol - 1];
+            if ( enemy != null) {
+                if (enemy.getTeamColor() != piece.getTeamColor()){
+                    addMoves(currRow, currCol);
+                }
+                break;
+            }
+            addMoves(currRow, currCol);
         }
 
     }
 
-    public void addMoves(int X, int Y){
-        ChessPosition newPosition = new ChessPosition(X, Y);
+    public void addMoves(int Row, int Col){
+        ChessPosition newPosition = new ChessPosition(Row, Col);
         ChessMove move = new ChessMove(position, newPosition, null);
         possibleMoves.add(move);
     }
