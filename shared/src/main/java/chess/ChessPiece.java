@@ -68,14 +68,16 @@ public class ChessPiece {
             moves.calculateMoves();
             return moves.possibleMoves;
         }
+        else if (type == PieceType.KNIGHT){
+            KnightMoves moves = new KnightMoves(board, myPosition);
+            moves.calculateMoves();
+            return moves.possibleMoves;
+        }
         else{
             return null;
         }
 
-//        else if (type == PieceType.KNIGHT){
-//            KnightMoves moves = new KnightMoves(board, myPosition);
-//            return moves.possibleMoves;
-//        }
+
 //        else if (type == PieceType.ROOK){
 //            RookMoves moves = new RookMoves(board, myPosition);
 //            return moves.possibleMoves;
