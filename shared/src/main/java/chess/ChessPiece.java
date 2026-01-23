@@ -53,7 +53,30 @@ public class ChessPiece {
      * @return Collection of valid moves
      */
     public Collection<ChessMove> pieceMoves(ChessBoard board, ChessPosition myPosition) {
-        throw new RuntimeException("Not implemented");
+        if (type == PieceType.KING){
+            KingMoves moves = new KingMoves(board, myPosition);
+            return moves.possibleMoves;
+        }
+//        elif (type == PieceType.QUEEN){
+//            QueenMoves moves = new QueenMoves(board, myPosition);
+//            return moves.possibleMoves;
+//        }
+//        elif (type == PieceType.BISHOP){
+//            BishopMoves moves = new BishopMoves(board, myPosition);
+//            return moves.possibleMoves;
+//        }
+//        elif (type == PieceType.KNIGHT){
+//            KnightMoves moves = new KnightMoves(board, myPosition);
+//            return moves.possibleMoves;
+//        }
+//        elif (type == PieceType.ROOK){
+//            RookMoves moves = new RookMoves(board, myPosition);
+//            return moves.possibleMoves;
+//        }
+//        elif (type == PieceType.PAWN){
+//            PawnMoves moves = new PawnMoves(board, myPosition);
+//            return moves.possibleMoves;
+//        }
     }
 
 
