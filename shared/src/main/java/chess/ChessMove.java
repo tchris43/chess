@@ -8,10 +8,15 @@ package chess;
  */
 public class ChessMove {
 
-
+    ChessPosition start;
+    ChessPosition end;
+    ChessPiece.PieceType promotion;
 
     public ChessMove(ChessPosition startPosition, ChessPosition endPosition,
                      ChessPiece.PieceType promotionPiece) {
+        start = startPosition;
+        end = endPosition;
+        promotion = promotionPiece;
     }
 
     /**
@@ -40,6 +45,6 @@ public class ChessMove {
 
     @Override
     public String toString() {
-        return "ChessMove{}";
+        return String.format("%s --> %s : %s", start, end, promotion);
     }
 }
