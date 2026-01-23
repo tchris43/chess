@@ -50,6 +50,19 @@ public class MoveCalculator {
 
     }
 
+    public void checkAdd(int row, int col, int newRow, int newCol){
+        ChessPiece piece = board.board[row-1][col-1];
+        ChessPiece enemy = board.board[newRow-1][newCol-1];
+        if (isImpeded(enemy, piece)){
+            if (isEnemy(enemy, piece)){
+               addMoves(newRow, newCol);
+            }
+        }
+        else {
+            addMoves(newRow, newCol);
+        }
+    }
+
     public void moveDiagonally(){
         int Row = position.getRow();
         int Col = position.getColumn();

@@ -11,16 +11,16 @@ public class KingMoves extends MoveCalculator{
 
     @Override
     public void calculateMoves() {
-        int X = position.getRow();
-        int Y = position.getColumn();
-        addMoves(X, Y+1);
-        addMoves(X+1, Y+1);
-        addMoves(X+1, Y);
-        addMoves(X+1, Y-1);
-        addMoves(X, Y-1);
-        addMoves(X-1, Y-1);
-        addMoves(X-1, Y);
-        addMoves(X-1, Y+1);
+        int row = position.getRow();
+        int col = position.getColumn();
+        checkAdd(row, col, row, col+1);
+        checkAdd(row, col, row+1, col+1);
+        checkAdd(row, col, row+1, col);
+        checkAdd(row, col, row+1, col-1);
+        checkAdd(row, col, row, col-1);
+        checkAdd(row, col, row-1, col-1);
+        checkAdd(row, col, row-1, col);
+        checkAdd(row, col, row-1, col+1);
     }
 
 }
