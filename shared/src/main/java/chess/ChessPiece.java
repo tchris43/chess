@@ -55,16 +55,23 @@ public class ChessPiece {
     public Collection<ChessMove> pieceMoves(ChessBoard board, ChessPosition myPosition) {
         if (type == PieceType.KING) {
             KingMoves moves = new KingMoves(board, myPosition);
+            moves.calculateMoves();
             return moves.possibleMoves;
         }
         else if (type == PieceType.QUEEN){
             QueenMoves moves = new QueenMoves(board, myPosition);
+            moves.calculateMoves();
             return moves.possibleMoves;
         }
-//        else if (type == PieceType.BISHOP){
-//            BishopMoves moves = new BishopMoves(board, myPosition);
-//            return moves.possibleMoves;
-//        }
+        else if (type == PieceType.BISHOP){
+            BishopMoves moves = new BishopMoves(board, myPosition);
+            moves.calculateMoves();
+            return moves.possibleMoves;
+        }
+        else{
+            return null;
+        }
+
 //        else if (type == PieceType.KNIGHT){
 //            KnightMoves moves = new KnightMoves(board, myPosition);
 //            return moves.possibleMoves;
@@ -76,7 +83,7 @@ public class ChessPiece {
 //        else if (type == PieceType.PAWN){
 //            PawnMoves moves = new PawnMoves(board, myPosition);
 //            return moves.possibleMoves;
-        }
+//        }
     }
 
 

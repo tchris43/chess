@@ -4,9 +4,6 @@ import java.util.Collection;
 
 public class QueenMoves extends MoveCalculator{
 
-    ChessBoard board;
-    ChessPosition position;
-    Collection<ChessMove> possibleMoves;
 
     public QueenMoves(ChessBoard board, ChessPosition position){
         super(board, position);

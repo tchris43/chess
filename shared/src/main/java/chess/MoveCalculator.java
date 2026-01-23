@@ -1,17 +1,17 @@
 package chess;
 
-import java.util.Collection;
+import java.util.ArrayList;
+import java.util.List;
 
 public class MoveCalculator {
 
     ChessBoard board;
     ChessPosition position;
-    Collection<ChessMove> possibleMoves;
+    List<ChessMove> possibleMoves = new ArrayList<>();
 
     public MoveCalculator(ChessBoard currentBoard, ChessPosition currentPosition){
         board = currentBoard;
         position = currentPosition;
-        possibleMoves = null;
     }
 
     public void calculateMoves(){}
