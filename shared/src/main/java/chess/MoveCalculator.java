@@ -41,6 +41,39 @@ public class MoveCalculator {
         }
     }
 
+    public void moveDiagonally(){
+        int X = position.getRow()+1;
+        int Y = position.getColumn()+1;
+        int currY = Y;
+        int currX = X;
+        while(currY < 8){
+            addMoves(currX+1, currY+1);
+            currX = currX +1;
+            currY = currY +1;
+        }
+        currX = X;
+        currY = Y;
+        while(currY > 1){
+            addMoves(currX-1, currY-1);
+            currX = currX -1;
+            currY = currY -1;
+        }
+        currX = X;
+        currY = Y;
+        while(currY < 8){
+            addMoves(currX-1, currY+1);
+            currX = currX-1;
+            currY = currY+1;
+        }
+        currX = X;
+        currY = Y;
+        while(currY > 1){
+            addMoves(currX+1, currY-1);
+            currX = currX +1;
+            currY = currY-1;
+        }
+    }
+
     public void addMoves(int X, int Y){
         ChessPosition newPosition = new ChessPosition(X, Y);
         ChessMove move = new ChessMove(position, newPosition, null);
