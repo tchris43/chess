@@ -28,4 +28,17 @@ public class PawnMoves extends MoveCalculator{
         }
     }
 
+    @Override
+    public void checkAdd(int row, int col, int newRow, int newCol){
+        //check in  bounds
+        if (newRow < 9 && newRow > 0 && newCol < 9 && newCol > 0) {
+            ChessPiece piece = board.board[row - 1][col - 1];
+            ChessPiece enemy = board.board[newRow - 1][newCol - 1];
+            if (!isImpeded(enemy, piece)) {
+                addMoves(newRow, newCol);
+            }
+        }
+    }
+
+
 }
