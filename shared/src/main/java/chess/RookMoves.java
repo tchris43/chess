@@ -1,17 +1,17 @@
 package chess;
 
+import java.util.Collection;
 
-public class QueenMoves extends MoveCalculator{
+public class RookMoves extends MoveCalculator{
 
 
-    public QueenMoves(ChessBoard board, ChessPosition position){
+    public RookMoves(ChessBoard board, ChessPosition position){
         super(board, position);
     }
 
     @Override
     public void calculateMoves() {
         moveOrthogonally();
-        moveDiagonally();
     }
 
 

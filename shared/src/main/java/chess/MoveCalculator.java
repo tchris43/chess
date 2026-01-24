@@ -17,28 +17,59 @@ public class MoveCalculator {
     public void calculateMoves(){}
 
     public void moveOrthogonally(){
-        int Row = position.getRow()+1;
-        int Col = position.getColumn()+1;
+        int Row = position.getRow();
+        int Col = position.getColumn();
+        ChessPiece piece = board.board[Row-1][Col-1];
         int currRow = Row;
         int currCol = Col;
         while (currRow > 1){
             currRow = currRow-1;
+            ChessPiece enemy = board.board[currRow - 1][currCol - 1];
+            if (isImpeded(enemy,piece)) {
+                if (isEnemy(enemy,piece)){
+                    addMoves(currRow, currCol);
+                }
+                break;
+            }
+            addMoves(currRow, currCol);
         }
-        addMoves(currRow-1, Col);
         currRow = Row;
         while (currRow < 8){
             currRow = currRow + 1;
+            ChessPiece enemy = board.board[currRow-1][currCol - 1];
+            if (isImpeded(enemy,piece)) {
+                if (isEnemy(enemy,piece)){
+                    addMoves(currRow, currCol);
+                }
+                break;
+            }
+            addMoves(currRow, currCol);
         }
-        addMoves(currRow + 1, Col);
+        currRow = Row;
         while (currCol > 1){
             currCol = currCol - 1;
+            ChessPiece enemy = board.board[currRow - 1][currCol-1];
+            if (isImpeded(enemy,piece)) {
+                if (isEnemy(enemy,piece)){
+                    addMoves(currRow, currCol);
+                }
+                break;
+            }
+            addMoves(currRow, currCol);
         }
-        addMoves(currCol-1, Row);
         currCol = Col;
         while (currCol < 8){
             currCol = currCol + 1;
+            ChessPiece enemy = board.board[currRow - 1][currCol - 1];
+            if (isImpeded(enemy,piece)) {
+                if (isEnemy(enemy,piece)){
+                    addMoves(currRow, currCol);
+                }
+                break;
+            }
+            addMoves(currRow, currCol);
         }
-        addMoves(currCol + 1, Row);
+
     }
 
     public boolean isImpeded(ChessPiece enemy, ChessPiece piece){
