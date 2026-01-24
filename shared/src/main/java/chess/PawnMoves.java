@@ -19,11 +19,28 @@ public class PawnMoves extends MoveCalculator{
             if (row == 7){
                 checkAdd(row,col,row+2,col);
             }
+            checkCapture(row,col,row+1, col+1);
+            checkCapture(row,col,row+1, col-1);
+
         }
         else if (piece.getTeamColor() == ChessGame.TeamColor.BLACK){
             checkAdd(row,col,row-1,col);
             if (row == 2){
                 checkAdd(row,col,row-2,col);
+            }
+            checkCapture(row, col, row-1, col+1);
+            checkCapture(row,col,row-1, col-1);
+        }
+    }
+
+    public void checkCapture(int row, int col, int newRow, int newCol){
+        if (newRow < 9 && newRow > 0 && newCol < 9 && newCol > 0) {
+            ChessPiece piece = board.board[row - 1][col - 1];
+            ChessPiece enemy = board.board[newRow - 1][newCol - 1];
+            if (isImpeded(enemy,piece)){
+                if (isEnemy(enemy, piece)) {
+                    addMoves(newRow, newCol);
+                }
             }
         }
     }
