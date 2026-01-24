@@ -16,8 +16,10 @@ public class PawnMoves extends MoveCalculator{
         ChessPiece piece = board.board[row-1][col-1];
         if (piece.getTeamColor() == ChessGame.TeamColor.WHITE){
             checkAdd(row,col,row+1,col);
-            if (row == 7){
-                checkAdd(row,col,row+2,col);
+            if (row == 2){
+                if (board.board[row][col-1] == null){
+                    checkAdd(row,col,row+2,col);
+                }
             }
             checkCapture(row,col,row+1, col+1);
             checkCapture(row,col,row+1, col-1);
@@ -25,8 +27,10 @@ public class PawnMoves extends MoveCalculator{
         }
         else if (piece.getTeamColor() == ChessGame.TeamColor.BLACK){
             checkAdd(row,col,row-1,col);
-            if (row == 2){
-                checkAdd(row,col,row-2,col);
+            if (row == 7){
+                if (board.board[row - 2][col - 1] == null) {
+                    checkAdd(row, col, row - 2, col);
+                }
             }
             checkCapture(row, col, row-1, col+1);
             checkCapture(row,col,row-1, col-1);
