@@ -70,11 +70,9 @@ public class ChessBoard {
         initializePiece(ChessPiece.PieceType.ROOK, ChessGame.TeamColor.BLACK, 8, 8);
         //white knights
         initializePiece(ChessPiece.PieceType.KNIGHT, ChessGame.TeamColor.WHITE, 1, 2);
-        initializePiece(ChessPiece.PieceType.KNIGHT, ChessGame.TeamColor.WHITE, 1, 5);
         initializePiece(ChessPiece.PieceType.KNIGHT, ChessGame.TeamColor.WHITE, 1, 7);
         //black knights
         initializePiece(ChessPiece.PieceType.KNIGHT, ChessGame.TeamColor.BLACK, 8, 2);
-        initializePiece(ChessPiece.PieceType.KNIGHT, ChessGame.TeamColor.BLACK, 8, 5);
         initializePiece(ChessPiece.PieceType.KNIGHT, ChessGame.TeamColor.BLACK, 8, 7);
         //white bishops
         initializePiece(ChessPiece.PieceType.BISHOP, ChessGame.TeamColor.WHITE, 1, 3);
