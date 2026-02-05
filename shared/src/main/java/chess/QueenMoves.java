@@ -1,7 +1,7 @@
 package chess;
 
 
-public class QueenMoves extends MoveCalculator{
+public class        QueenMoves extends MoveCalculator{
 
 
     public QueenMoves(ChessBoard board, ChessPosition position){
