@@ -11,10 +11,11 @@ import java.util.Collection;
 public class ChessGame {
 
     private TeamColor teamTurn;
-    private ChessBoard gameBoard;
+    private ChessBoard gameBoard = new ChessBoard();
 
 
     public ChessGame() {
+        gameBoard.resetBoard();
     }
 
     /**
