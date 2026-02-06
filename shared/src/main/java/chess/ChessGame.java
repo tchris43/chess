@@ -65,22 +65,37 @@ public class ChessGame {
         return kingPosition;
     }
 
-//    private Collection<ChessMove> getEnemyMoves(ChessBoard testBoard){
-//        //change team turn
-//        //loop through each piece in turn
-//        //add its moves to enemyMoves
-//        //return enemy moves
-//        TeamColor enemyColor;
-//        if (getTeamTurn() == TeamColor.WHITE){
-//            enemyColor = TeamColor.BLACK;
-//        }
-//        else {
-//            enemyColor = TeamColor.WHITE;
-//        }
-//
-//
-//
-//    }
+    private ChessBoard testMove(ChessMove move){
+        
+    }
+
+    private Collection<ChessMove> getEnemyMoves(ChessBoard testBoard){
+        //change team turn
+        //loop through each piece in turn
+        //add its moves to enemyMoves
+        //return enemy moves
+
+        Collection<ChessMove> enemyMoves = new ArrayList<>();
+
+        TeamColor enemyColor;
+        if (getTeamTurn() == TeamColor.WHITE){
+            enemyColor = TeamColor.BLACK;
+        }
+        else {
+            enemyColor = TeamColor.WHITE;
+        }
+
+        for (int row = 1; row < 9; row++){
+            for (int col = 1; col < 9; col ++){
+                ChessPosition position = new ChessPosition(row,col);
+                ChessPiece piece = testBoard.getPiece(position);
+                enemyMoves.addAll(piece.pieceMoves(testBoard, position));
+            }
+        }
+
+        return enemyMoves;
+
+    }
     
     private boolean kingInDanger(ChessPosition kingPosition, Collection<ChessMove> enemyMoves){
         //return whether the king is in the enemy moves
