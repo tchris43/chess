@@ -65,8 +65,8 @@ public class ChessGame {
         return kingPosition;
     }
 
-    private ChessBoard testMove(ChessMove move){
-
+    private ChessBoard testMove(ChessMove move) throws CloneNotSupportedException {
+        return (ChessBoard) gameBoard.clone();
     }
 
     private Collection<ChessMove> getEnemyMoves(ChessBoard testBoard){
