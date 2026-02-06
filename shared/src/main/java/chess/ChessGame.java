@@ -46,7 +46,7 @@ public class ChessGame {
         BLACK
     }
 
-    private ChessPosition getKingPosition(){
+    private ChessPosition findKingPosition(){
         //check every spot
         int kingRow = 0;
         int kingCol = 0;
@@ -65,10 +65,33 @@ public class ChessGame {
         return kingPosition;
     }
 
-    private boolean isBlockingKing(ChessPosition position){
-
+//    private Collection<ChessMove> getEnemyMoves(ChessBoard testBoard){
+//        //change team turn
+//        //loop through each piece in turn
+//        //add its moves to enemyMoves
+//        //return enemy moves
+//        TeamColor enemyColor;
+//        if (getTeamTurn() == TeamColor.WHITE){
+//            enemyColor = TeamColor.BLACK;
+//        }
+//        else {
+//            enemyColor = TeamColor.WHITE;
+//        }
+//
+//
+//
+//    }
+    
+    private boolean kingInDanger(ChessPosition kingPosition, Collection<ChessMove> enemyMoves){
+        //return whether the king is in the enemy moves
+        for (ChessMove move: enemyMoves){
+            if (move.getEndPosition() == kingPosition){
+                return true;
+            }
+        }
+        return false;
     }
-
+    
     /**
      * Gets a valid moves for a piece at the given location
      *
@@ -82,21 +105,28 @@ public class ChessGame {
             return null;
         }
         Collection<ChessMove> possibleMoves = piece.pieceMoves(gameBoard, startPosition);
+
+        //If I move, will an enemy be able to attack
+        //hypothetically move
+        //hypothetically switch team turn
+        //go through all possible moves looking for king's spot
+        //** King is in danger if his spot exists
+        
         Collection<ChessMove> safeMoves = new ArrayList<>();
         //find where the king is
-        ChessPiece kingPosition = getKingPosition();
+        ChessPosition kingPosition = findKingPosition();
         for (ChessMove move : possibleMoves){
-            //check if it is blocking for the king
-            if (isBlockingKing(startPosition)) {
-                //hypothetically move it to next spot
-                if (!endangersKing(move.getEndPosition())) {
-                    safeMoves.add(move);
-                }
-            }
-            else{
+            //test out the move on a board copy
+            ChessBoard testBoard = testMove(move);
+            //examine enemy's possible moves
+            Collection<ChessMove> enemyMoves = getEnemyMoves(testBoard);
+            //only add the move if not in enemy moves
+            if (!kingInDanger(kingPosition, enemyMoves)){
                 safeMoves.add(move);
             }
         }
+        
+        return safeMoves;
     }
 
     /**
