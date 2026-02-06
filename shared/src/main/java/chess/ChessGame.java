@@ -65,8 +65,9 @@ public class ChessGame {
         return kingPosition;
     }
 
-    private ChessBoard testMove(ChessMove move) throws CloneNotSupportedException {
-        return (ChessBoard) gameBoard.clone();
+    private ChessBoard testMove(ChessMove move) {
+        ChessBoard testBoard = new ChessBoard(gameBoard);
+        return testBoard;
     }
 
     private Collection<ChessMove> getEnemyMoves(ChessBoard testBoard){
@@ -130,13 +131,13 @@ public class ChessGame {
         Collection<ChessMove> safeMoves = new ArrayList<>();
         //find where the king is
         ChessPosition kingPosition = findKingPosition();
-        for (ChessMove move : possibleMoves){
+        for (ChessMove move : possibleMoves) {
             //test out the move on a board copy
             ChessBoard testBoard = testMove(move);
             //examine enemy's possible moves
             Collection<ChessMove> enemyMoves = getEnemyMoves(testBoard);
             //only add the move if not in enemy moves
-            if (!kingInDanger(kingPosition, enemyMoves)){
+            if (!kingInDanger(kingPosition, enemyMoves)) {
                 safeMoves.add(move);
             }
         }
