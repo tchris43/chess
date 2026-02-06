@@ -66,7 +66,7 @@ public class ChessGame {
     }
 
     private ChessBoard testMove(ChessMove move){
-        
+
     }
 
     private Collection<ChessMove> getEnemyMoves(ChessBoard testBoard){
