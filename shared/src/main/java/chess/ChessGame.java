@@ -48,16 +48,22 @@ public class ChessGame {
 
     private ChessPiece getKing(){
         //check every spot
+        int kingRow = 0;
+        int kingCol = 0;
         for (int row = 1; row < 9; row ++) {
-            for (int col = 1; col < 9; col ++){
+            for (int col = 1; col < 9; col ++) {
                 ChessPosition position = new ChessPosition(row, col);
                 ChessPiece piece = gameBoard.getPiece(position);
-                if (piece.getPieceType() == ChessPiece.PieceType.KING && piece.getTeamColor() == getTeamTurn()){
+                if (piece.getPieceType() == ChessPiece.PieceType.KING && piece.getTeamColor() == getTeamTurn()) {
                     //This is the king
-                    return piece;
+                    kingRow = row;
+                    kingCol = col;
                 }
-            ]
+            }
         }
+        ChessPosition kingPosition = new ChessPosition(kingRow, kingCol);
+        ChessPiece king = gameBoard.getPiece(kingPosition);
+        return king;
     }
 
     private boolean isBlockingKing(ChessPosition position){
