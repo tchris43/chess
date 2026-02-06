@@ -46,7 +46,7 @@ public class ChessGame {
         BLACK
     }
 
-    private ChessPiece getKing(){
+    private ChessPosition getKingPosition(){
         //check every spot
         int kingRow = 0;
         int kingCol = 0;
@@ -62,8 +62,7 @@ public class ChessGame {
             }
         }
         ChessPosition kingPosition = new ChessPosition(kingRow, kingCol);
-        ChessPiece king = gameBoard.getPiece(kingPosition);
-        return king;
+        return kingPosition;
     }
 
     private boolean isBlockingKing(ChessPosition position){
@@ -85,7 +84,7 @@ public class ChessGame {
         Collection<ChessMove> possibleMoves = piece.pieceMoves(gameBoard, startPosition);
         Collection<ChessMove> safeMoves = new ArrayList<>();
         //find where the king is
-        ChessPiece king = getKing();
+        ChessPiece kingPosition = getKingPosition();
         for (ChessMove move : possibleMoves){
             //check if it is blocking for the king
             if (isBlockingKing(startPosition)) {
