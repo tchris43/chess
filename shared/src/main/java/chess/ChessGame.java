@@ -1,6 +1,8 @@
 package chess;
 
+import java.util.ArrayList;
 import java.util.Collection;
+import java.util.List;
 import java.util.Objects;
 
 /**
@@ -44,6 +46,24 @@ public class ChessGame {
         BLACK
     }
 
+    private ChessPiece getKing(){
+        //check every spot
+        for (int row = 1; row < 9; row ++) {
+            for (int col = 1; col < 9; col ++){
+                ChessPosition position = new ChessPosition(row, col);
+                ChessPiece piece = gameBoard.getPiece(position);
+                if (piece.getPieceType() == ChessPiece.PieceType.KING && piece.getTeamColor() == getTeamTurn()){
+                    //This is the king
+                    return piece;
+                }
+            ]
+        }
+    }
+
+    private boolean isBlockingKing(ChessPosition position){
+
+    }
+
     /**
      * Gets a valid moves for a piece at the given location
      *
@@ -56,7 +76,22 @@ public class ChessGame {
         if (piece == null){
             return null;
         }
-        return piece.pieceMoves(gameBoard, startPosition);
+        Collection<ChessMove> possibleMoves = piece.pieceMoves(gameBoard, startPosition);
+        Collection<ChessMove> safeMoves = new ArrayList<>();
+        //find where the king is
+        ChessPiece king = getKing();
+        for (ChessMove move : possibleMoves){
+            //check if it is blocking for the king
+            if (isBlockingKing(startPosition)) {
+                //hypothetically move it to next spot
+                if (!endangersKing(move.getEndPosition())) {
+                    safeMoves.add(move);
+                }
+            }
+            else{
+                safeMoves.add(move);
+            }
+        }
     }
 
     /**
