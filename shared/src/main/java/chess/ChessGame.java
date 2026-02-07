@@ -136,6 +136,7 @@ public class ChessGame {
                 for (ChessMove enemyMove : enemyMoves){
                     if (enemyMove.getEndPosition().equals(move.getEndPosition())){
                         safeMove = false;
+                        break;
                     }
                 }
                 if (safeMove){
@@ -232,6 +233,34 @@ public class ChessGame {
         return false;
     }
 
+    private Collection<ChessMove> getTeamMoves(TeamColor teamColor){
+        //loop through the board and find team pieces
+        Collection<ChessMove> possibleMoves = new ArrayList<>();
+        for (int row=1; row < 9; row++){
+            for (int col=1; col < 9; col++){
+                ChessPosition position = new ChessPosition(row,col);
+                ChessPiece piece = gameBoard.getPiece(position);
+                if (piece != null && piece.getTeamColor() == teamColor){
+                    possibleMoves.addAll(validMoves(position));
+                }
+            }
+        }
+        return possibleMoves;
+    }
+
+    private boolean stillInCheck(ChessBoard board, TeamColor teamColor){
+        //look at the possible moves of the enemy team
+        Collection<ChessMove> enemyMoves = getEnemyMoves(board, teamColor);
+        ChessPosition kingPosition = findKingPosition(teamColor);
+        //see if any of their moves will put them in the same spot as the king
+        for (ChessMove enemyMove : enemyMoves){
+            if (enemyMove.getEndPosition().equals(kingPosition)){
+                return true;
+            }
+        }
+        return false;
+    }
+
     /**
      * Determines if the given team is in checkmate
      *
@@ -239,10 +268,23 @@ public class ChessGame {
      * @return True if the specified team is in checkmate
      */
     public boolean isInCheckmate(TeamColor teamColor) {
-        //identify the spot that needs to be blocked
-        //gather the possible moves I can make
-        //see if the need to block spot is a possible move. If not return true for checkmate
-        throw new RuntimeException("Not implemented");
+        //identify that I am currently in check
+        if (isInCheck(teamColor)) {
+            //think of my possible moves
+            Collection<ChessMove> possibleMoves = getTeamMoves(teamColor);
+            //hypothetically do all the possibleMoves
+            for (ChessMove move : possibleMoves){
+                ChessBoard testBoard = testMove(move);
+                //see if I am in check
+                if (!stillInCheck(testBoard, teamColor)){
+                    return false;
+                }
+            }
+            return true;
+        }
+        else{
+            return false;
+        }
     }
 
     /**
@@ -253,7 +295,19 @@ public class ChessGame {
      * @return True if the specified team is in stalemate, otherwise false
      */
     public boolean isInStalemate(TeamColor teamColor) {
-        throw new RuntimeException("Not implemented");
+        //verify that I cannot move any piece
+        Collection<ChessMove> possibleMoves = new ArrayList<>();
+        for (int row = 1; row < 9; row++){
+            for (int col = 1; col < 9; col++){
+                ChessPosition position = new ChessPosition(row,col);
+                ChessPiece piece = gameBoard.getPiece(position);
+                if (piece != null){
+                    possibleMoves.addAll(validMoves(position));
+                }
+            }
+        }
+        //verify that king is not in danger and there are no moves
+        return !isInCheck(teamColor) && possibleMoves.size() == 1;
     }
 
     /**
