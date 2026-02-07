@@ -170,6 +170,7 @@ public class ChessGame {
         return safeMoves;
     }
 
+
     /**
      * Makes a move in a chess game
      *
@@ -184,7 +185,16 @@ public class ChessGame {
         }
         else {
             gameBoard.addPiece(move.start, null);
-            gameBoard.addPiece(move.getEndPosition(), piece);
+            TeamColor color = piece.getTeamColor();
+            ChessPiece.PieceType promotion;
+            if (move.getPromotionPiece() == null){
+                promotion = piece.getPieceType();
+            }
+            else {
+                promotion = move.getPromotionPiece();
+            }
+            ChessPiece newPiece = new ChessPiece(color, promotion);
+            gameBoard.addPiece(move.getEndPosition(), newPiece);
         }
     }
 
