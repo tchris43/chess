@@ -220,17 +220,16 @@ public class ChessGame {
      * @return True if the specified team is in check
      */
     public boolean isInCheck(TeamColor teamColor) {
-        //find king
-        ChessPosition kingPosition = findKingPosition(TeamColor.WHITE);//UPDATE THIS
-        ChessPiece king = gameBoard.getPiece(kingPosition);
-        TeamColor kingColor = king.getTeamColor();
-        //examine enemy's possible moves
-        Collection<ChessMove> enemyMoves = getEnemyMoves(gameBoard, kingColor);
-        //king is safe in not in enemy moves
-        if (!kingInDanger(kingPosition, enemyMoves)) {
-            return false;
+       //look at the possible moves of the enemy team
+        Collection<ChessMove> enemyMoves = getEnemyMoves(gameBoard, teamColor);
+        ChessPosition kingPosition = findKingPosition(teamColor);
+       //see if any of their moves will put them in the same spot as the king
+        for (ChessMove enemyMove : enemyMoves){
+            if (enemyMove.getEndPosition().equals(kingPosition)){
+                return true;
+            }
         }
-        return true;
+        return false;
     }
 
     /**
