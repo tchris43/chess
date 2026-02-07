@@ -46,7 +46,7 @@ public class ChessGame {
         BLACK
     }
 
-    private ChessPosition findKingPosition(){
+    private ChessPosition findKingPosition(TeamColor pieceColor){
         //check every spot
         int kingRow = 0;
         int kingCol = 0;
@@ -55,7 +55,7 @@ public class ChessGame {
                 ChessPosition position = new ChessPosition(row, col);
                 ChessPiece piece = gameBoard.getPiece(position);
                 if (piece != null) {
-                    if (piece.getPieceType() == ChessPiece.PieceType.KING && piece.getTeamColor() == getTeamTurn()) {
+                    if (piece.getPieceType() == ChessPiece.PieceType.KING && piece.getTeamColor() == pieceColor) {
                         //This is the king
                         kingRow = row;
                         kingCol = col;
@@ -69,10 +69,16 @@ public class ChessGame {
 
     private ChessBoard testMove(ChessMove move) {
         ChessBoard testBoard = new ChessBoard(gameBoard);
+        ChessPiece piece = testBoard.getPiece(move.getStartPosition());
+        Collection<ChessMove> possibleMoves = piece.pieceMoves(gameBoard, move.getStartPosition());
+
+        testBoard.addPiece(move.start, null);
+        testBoard.addPiece(move.getEndPosition(), piece);
+
         return testBoard;
     }
 
-    private Collection<ChessMove> getEnemyMoves(ChessBoard testBoard){
+    private Collection<ChessMove> getEnemyMoves(ChessBoard testBoard, TeamColor kingColor){
         //change team turn
         //loop through each piece in turn
         //add its moves to enemyMoves
@@ -84,7 +90,7 @@ public class ChessGame {
             for (int col = 1; col < 9; col ++){
                 ChessPosition position = new ChessPosition(row,col);
                 ChessPiece piece = testBoard.getPiece(position);
-                if (piece != null && piece.getTeamColor() != teamTurn) {
+                if (piece != null && piece.getTeamColor() != kingColor) {
                     enemyMoves.addAll(piece.pieceMoves(testBoard, position));
                 }
             }
@@ -97,7 +103,7 @@ public class ChessGame {
     private boolean kingInDanger(ChessPosition kingPosition, Collection<ChessMove> enemyMoves){
         //return whether the king is in the enemy moves
         for (ChessMove move: enemyMoves){
-            if (move.getEndPosition() == kingPosition){
+            if (move.getEndPosition().getRow() == kingPosition.getRow() && move.getEndPosition().getColumn() == kingPosition.getColumn()){
                 return true;
             }
         }
@@ -113,6 +119,7 @@ public class ChessGame {
      */
     public Collection<ChessMove> validMoves(ChessPosition startPosition) {
         ChessPiece piece = gameBoard.getPiece(startPosition);
+        TeamColor pieceColor = piece.getTeamColor();
         if (piece == null){
             return null;
         }
@@ -126,12 +133,14 @@ public class ChessGame {
         
         Collection<ChessMove> safeMoves = new ArrayList<>();
         //find where the king is
-        ChessPosition kingPosition = findKingPosition();
+        ChessPosition kingPosition = findKingPosition(pieceColor);
+        ChessPiece king = gameBoard.getPiece(kingPosition);
+        TeamColor kingColor = king.getTeamColor();
         for (ChessMove move : possibleMoves) {
             //test out the move on a board copy
             ChessBoard testBoard = testMove(move);
             //examine enemy's possible moves
-            Collection<ChessMove> enemyMoves = getEnemyMoves(testBoard);
+            Collection<ChessMove> enemyMoves = getEnemyMoves(testBoard, kingColor);
             //only add the move if not in enemy moves
             if (!kingInDanger(kingPosition, enemyMoves)) {
                 safeMoves.add(move);
@@ -167,9 +176,11 @@ public class ChessGame {
      */
     public boolean isInCheck(TeamColor teamColor) {
         //find king
-        ChessPosition kingPosition = findKingPosition();
+        ChessPosition kingPosition = findKingPosition(TeamColor.WHITE);//UPDATE THIS
+        ChessPiece king = gameBoard.getPiece(kingPosition);
+        TeamColor kingColor = king.getTeamColor();
         //examine enemy's possible moves
-        Collection<ChessMove> enemyMoves = getEnemyMoves(gameBoard);
+        Collection<ChessMove> enemyMoves = getEnemyMoves(gameBoard, kingColor);
         //king is safe in not in enemy moves
         if (!kingInDanger(kingPosition, enemyMoves)) {
             return false;
@@ -184,6 +195,9 @@ public class ChessGame {
      * @return True if the specified team is in checkmate
      */
     public boolean isInCheckmate(TeamColor teamColor) {
+        //identify the spot that needs to be blocked
+        //gather the possible moves I can make
+        //see if the need to block spot is a possible move. If not return true for checkmate
         throw new RuntimeException("Not implemented");
     }
 
