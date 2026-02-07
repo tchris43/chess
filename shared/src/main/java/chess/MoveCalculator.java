@@ -148,9 +148,6 @@ public class MoveCalculator {
         while(currCol > 1 && currRow < 8){
             currRow = currRow +1;
             currCol = currCol-1;
-            if (board.board[currRow-1][currCol-1] != null){
-                break;
-            }
             ChessPiece enemy = board.board[currRow - 1][currCol - 1];
             if (isImpeded(enemy,piece)) {
                 if (isEnemy(enemy,piece)){
