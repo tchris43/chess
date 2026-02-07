@@ -132,6 +132,8 @@ public class ChessGame {
             Collection<ChessMove> enemyMoves = getEnemyMoves(gameBoard, kingColor);
             for (ChessMove move : possibleMoves) {
                 //only add the move if not in enemy moves
+                ChessBoard testBoard = testMove(move);
+                enemyMoves.addAll(getEnemyMoves(testBoard, kingColor));
                 boolean safeMove = true;
                 for (ChessMove enemyMove : enemyMoves){
                     if (enemyMove.getEndPosition().equals(move.getEndPosition())){
@@ -180,6 +182,9 @@ public class ChessGame {
      * @throws InvalidMoveException if move is invalid
      */
     public void makeMove(ChessMove move) throws InvalidMoveException {
+        //think of whether the move is legal
+        //throw an error if not valid or it's not my turn
+        //otherwise move the piece from this spot to the next
         Collection<ChessMove> possibleMoves = validMoves(move.getStartPosition());
         ChessPiece piece = gameBoard.getPiece(move.getStartPosition());
         if (piece == null){
@@ -187,20 +192,25 @@ public class ChessGame {
         }
         TeamColor color = piece.getTeamColor();
 
-        if (!possibleMoves.contains(move) || piece.getTeamColor() != teamTurn){
-            throw new InvalidMoveException("This move is invalid");
+
+        boolean valid = false;
+        for (ChessMove possibility: possibleMoves){
+            if (possibility.equals(move) && piece.getTeamColor() == teamTurn){
+                valid = true;
+                gameBoard.addPiece(move.start, null);
+                ChessPiece.PieceType promotion;
+                if (move.getPromotionPiece() == null){
+                    promotion = piece.getPieceType();
+                }
+                else {
+                    promotion = move.getPromotionPiece();
+                }
+                ChessPiece newPiece = new ChessPiece(color, promotion);
+                gameBoard.addPiece(move.getEndPosition(), newPiece);
+            }
         }
-        else {
-            gameBoard.addPiece(move.start, null);
-            ChessPiece.PieceType promotion;
-            if (move.getPromotionPiece() == null){
-                promotion = piece.getPieceType();
-            }
-            else {
-                promotion = move.getPromotionPiece();
-            }
-            ChessPiece newPiece = new ChessPiece(color, promotion);
-            gameBoard.addPiece(move.getEndPosition(), newPiece);
+        if (!valid){
+            throw new InvalidMoveException("This move is invalid");
         }
 
         TeamColor enemyColor;
@@ -301,13 +311,13 @@ public class ChessGame {
             for (int col = 1; col < 9; col++){
                 ChessPosition position = new ChessPosition(row,col);
                 ChessPiece piece = gameBoard.getPiece(position);
-                if (piece != null){
+                if (piece != null && piece.getTeamColor() == teamColor){
                     possibleMoves.addAll(validMoves(position));
                 }
             }
         }
         //verify that king is not in danger and there are no moves
-        return !isInCheck(teamColor) && possibleMoves.size() == 1;
+        return !isInCheck(teamColor) && possibleMoves.isEmpty();
     }
 
     /**
