@@ -119,10 +119,11 @@ public class ChessGame {
      */
     public Collection<ChessMove> validMoves(ChessPosition startPosition) {
         ChessPiece piece = gameBoard.getPiece(startPosition);
-        TeamColor pieceColor = piece.getTeamColor();
         if (piece == null){
             return null;
         }
+        TeamColor pieceColor = piece.getTeamColor();
+
         Collection<ChessMove> possibleMoves = piece.pieceMoves(gameBoard, startPosition);
         Collection<ChessMove> safeMoves = new ArrayList<>();
 
@@ -180,12 +181,16 @@ public class ChessGame {
     public void makeMove(ChessMove move) throws InvalidMoveException {
         Collection<ChessMove> possibleMoves = validMoves(move.getStartPosition());
         ChessPiece piece = gameBoard.getPiece(move.getStartPosition());
+        if (piece == null){
+            throw new InvalidMoveException("You can't move a piece that doesn't exist");
+        }
+        TeamColor color = piece.getTeamColor();
+
         if (!possibleMoves.contains(move) || piece.getTeamColor() != teamTurn){
             throw new InvalidMoveException("This move is invalid");
         }
         else {
             gameBoard.addPiece(move.start, null);
-            TeamColor color = piece.getTeamColor();
             ChessPiece.PieceType promotion;
             if (move.getPromotionPiece() == null){
                 promotion = piece.getPieceType();
@@ -196,6 +201,16 @@ public class ChessGame {
             ChessPiece newPiece = new ChessPiece(color, promotion);
             gameBoard.addPiece(move.getEndPosition(), newPiece);
         }
+
+        TeamColor enemyColor;
+        if (color == TeamColor.BLACK){
+            enemyColor = TeamColor.WHITE;
+        }
+        else {
+            enemyColor = TeamColor.BLACK;
+        }
+        setTeamTurn(enemyColor);
+
     }
 
     /**
