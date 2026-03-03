@@ -1,8 +1,11 @@
 package server;
 
+
 import com.google.gson.Gson;
 import io.javalin.*;
 import io.javalin.http.Context;
+
+import model.UserData;
 
 
 public class Server {
@@ -15,9 +18,9 @@ public class Server {
     }
 
     private void registerUser(Context ctx) {
-        RegisterRequest registerRequest = new Gson().fromJson(ctx.body(), RegisterRequest.class);
-        registerRequest = RegisterService(registerRequest);
-        ctx.result(new Gson().toJson(registerRequest));
+        UserData registerRequest = new Gson().fromJson(ctx.body(), UserData.class);
+        registerResult = RegisterService(registerRequest);
+        ctx.result(new Gson().toJson(registerResult));
     }
 
     public int run(int desiredPort) {
