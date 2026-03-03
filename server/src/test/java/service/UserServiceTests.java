@@ -127,4 +127,52 @@ public class UserServiceTests {
 
     }
 
+    @Test
+    void listGamesUnauthorized() throws DataAccessException {
+        UserData user = new UserData("taylor", "password", "tchris.gmail.com");
+        LoginResult registerResult = userService.register(user);
+        String authToken = registerResult.authToken();
+        userService.logout(authToken);
+
+
+        assertThrows(DataAccessException.class, () ->
+                userService.listGames(authToken));
+
+    }
+
+
+
+
+
+    @Test
+    void createGame() throws DataAccessException {
+        UserData user = new UserData("taylor", "password", "tchris.gmail.com");
+        LoginResult registerResult = userService.register(user);
+        String authToken = registerResult.authToken();
+
+        GameList games = userService.listGames(authToken);
+        assertEquals(0, games.size());
+
+        userService.createGame(authToken,"game");
+
+        GameList newGames = userService.listGames(authToken);
+        assertEquals(1, newGames.size());
+
+
+
+    }
+
+    @Test
+    void createGamesUnauthorized() throws DataAccessException {
+        UserData user = new UserData("taylor", "password", "tchris.gmail.com");
+        LoginResult registerResult = userService.register(user);
+        String authToken = registerResult.authToken();
+        userService.logout(authToken);
+
+
+        assertThrows(DataAccessException.class, () ->
+                userService.createGame(authToken,"game"));
+
+    }
+
 }
