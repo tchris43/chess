@@ -9,6 +9,7 @@ import java.util.List;
 public class MemoryDataAccess implements DataAccess {
     private final HashMap<String, UserData> users = new HashMap<>();
     private final HashMap<String, AuthData> auths = new HashMap<>();
+    private final HashMap<String, GameData> games = new HashMap<>();
 
     public String createUser(String username, UserData registerRequest){
         users.put(registerRequest.username(), registerRequest);
@@ -38,4 +39,8 @@ public class MemoryDataAccess implements DataAccess {
     public void deleteAuth(String authToken) {
         auths.remove(authToken);
     }
+
+//    public void deleteAllGames(){
+//        games.clear();
+//    }
 }

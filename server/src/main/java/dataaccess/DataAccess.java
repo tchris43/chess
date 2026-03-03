@@ -13,4 +13,8 @@ public interface DataAccess {
     UserData getUser(String username) throws DataAccessException;
     AuthData getAuth(String username) throws DataAccessException;
     void deleteAuth(String authToken) throws DataAccessException;
+//    void deleteAllGames() throws DataAccessException;
+//    void deleteAllUsers() throws DataAccessException;
+//    void deleteAllAuths() throws DataAccessException;
+
 }

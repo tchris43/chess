@@ -22,7 +22,9 @@ public class Server {
             .post("/user", this::registerUser)
             .post("/session", this::loginUser)
             .delete("/session", this::logoutUser)
-            .clear("/db", this::clearApplication);
+            .get("/game", this::listGames)
+            .post("/game", this::createGame);
+//            .clear("/db", this::clearApplication);
     }
 
     private void registerUser(Context ctx) throws DataAccessException {
@@ -53,10 +55,24 @@ public class Server {
         ctx.status(200);
     }
 
-    private void clearApplication(Context ctx) throws DataAccessException{
-        userService.clear();
-        ctx.status(200);
+    private void listGames(Context ctx) throws DataAccessException {
+        String authToken = new Gson().fromJson(ctx.body(), String.class);
+        GameList gameList = userService.listGames(authToken);
+        ctx.result(new Gson().toJson(gameList));
     }
+
+    private void createGame(Context ctx) throws DataAccessException {
+        GameRequest = new Gson().fromJson(ctx.body(), String.class);
+        GameResult = userService.createGame(GameRequest);
+        ctx.result(new Gson().toJson(GameResult));
+    }
+
+
+
+//    private void clearApplication(Context ctx) throws DataAccessException{
+//        userService.clear();
+//        ctx.status(200);
+//    }
 
     public int run(int desiredPort) {
         javalin.start(desiredPort);
