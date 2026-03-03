@@ -3,12 +3,12 @@ package service;
 import dataaccess.DataAccessException;
 import dataaccess.MemoryDataAccess;
 import model.*;
+import org.eclipse.jetty.util.log.Log;
 import org.junit.jupiter.api.Test;
 
 import java.util.Collection;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.junit.jupiter.api.Assertions.*;
 
 public class UserServiceTests {
 
@@ -23,8 +23,82 @@ public class UserServiceTests {
         Collection<AuthData> auths = userService.getAuths();
 
         assertEquals(1, users.size());
+        assertEquals(1, auths.size());
         assertTrue(users.contains(newUser));
     }
+
+    @Test
+    void newUsernameOnly() throws DataAccessException {
+        UserData user = new UserData("taylor", "password", "tchris.gmail.com");
+        userService.register(user);
+
+        UserData newUser = new UserData("taylor", "password", "tchris.gmail.com");
+
+        assertThrows(DataAccessException.class, () ->
+                userService.register(newUser));
+    }
+
+    @Test
+    void login() throws DataAccessException {
+        UserData user = new UserData("taylor", "password", "tchris.gmail.com");
+        LoginResult registerResult = userService.register(user);
+        String authToken = registerResult.authToken();
+
+        userService.logout(authToken);
+
+        Collection<UserData> users = userService.getUsers();
+        Collection<AuthData> auths = userService.getAuths();
+
+        assertEquals(1, users.size());
+        assertEquals(0, auths.size());
+
+        LoginRequest loginRequest = new LoginRequest("taylor", "password");
+        LoginResult loginResult = userService.login(loginRequest);
+
+        Collection<UserData> newUsers = userService.getUsers();
+        Collection<AuthData> newAuths = userService.getAuths();
+
+        assertEquals(1, newUsers.size());
+        assertEquals(1, newAuths.size());
+
+    }
+
+    @Test
+    void invalidLoginAttempt() throws DataAccessException {
+        UserData user = new UserData("taylor", "password", "tchris.gmail.com");
+        userService.register(user);
+
+        LoginRequest loginRequest = new LoginRequest("tay", "pass");
+        assertThrows(DataAccessException.class, () ->
+                userService.login(loginRequest));
+    }
+
+    @Test
+    void logoutSuccessful() throws DataAccessException {
+        UserData user = new UserData("taylor", "password", "tchris.gmail.com");
+        LoginResult registerResult = userService.register(user);
+        String authToken = registerResult.authToken();
+
+        userService.logout(authToken);
+        Collection<UserData> users = userService.getUsers();
+        Collection<AuthData> auths = userService.getAuths();
+
+        assertEquals(1, users.size());
+        assertEquals(0, auths.size());
+    }
+
+    @Test
+    void logoutInvalid() throws DataAccessException {
+        UserData user = new UserData("taylor", "password", "tchris.gmail.com");
+        LoginResult registerResult = userService.register(user);
+        String authToken = registerResult.authToken();
+
+        userService.logout(authToken);
+
+        assertThrows(DataAccessException.class, () ->
+                userService.logout(authToken));
+    }
+
 
 
 }
