@@ -2,11 +2,9 @@ package service;
 
 import dataaccess.DataAccess;
 import dataaccess.DataAccessException;
-import model.AuthData;
-import model.LoginRequest;
-import model.UserData;
-import model.LoginResult;
+import model.*;
 
+import java.util.Collection;
 import java.util.List;
 import java.util.UUID;
 
@@ -58,18 +56,19 @@ public class UserService {
         }
     }
 
-    public void listGames(String authToken) throws DataAccessException {
+    public GameList listGames(String authToken) throws DataAccessException {
         if (isAuthorized(authToken)){
-            dataAccess.listGames();
+            return dataAccess.listGames();
         }
         else {
             throw new DataAccessException("Expired AuthToken");
         }
     }
 
-    public void createGame(String authToken, String gameName) throws DataAccessException {
+    public GameResult createGame(String authToken, String gameName) throws DataAccessException {
         if (isAuthorized(authToken)){
             dataAccess.createGame(gameName);
+            return new GameResult(gameName);
         }
         else {
             throw new DataAccessException("Expired Auth Token");

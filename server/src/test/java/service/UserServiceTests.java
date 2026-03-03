@@ -119,9 +119,9 @@ public class UserServiceTests {
         LoginResult registerResult = userService.register(user);
         String authToken = registerResult.authToken();
 
-        userService.createGame("game");
+        userService.createGame(authToken,"game");
 
-        Collection<AuthData> games = userService.listGames();
+        GameList games = userService.listGames(authToken);
 
         assertEquals(1, games.size());
 

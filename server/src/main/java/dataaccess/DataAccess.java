@@ -1,8 +1,6 @@
 package dataaccess;
 
-import model.AuthData;
-import model.GameData;
-import model.UserData;
+import model.*;
 
 import java.util.List;
 
@@ -14,8 +12,8 @@ public interface DataAccess {
     UserData getUser(String username) throws DataAccessException;
     AuthData getAuth(String username) throws DataAccessException;
     void deleteAuth(String authToken) throws DataAccessException;
-    List<GameData> listGames() throws DataAccessException;
-    GameData createGame(String gameName) throws DataAccessException;
+    GameList listGames() throws DataAccessException;
+    String createGame(String gameName) throws DataAccessException;
 //    void deleteAllGames() throws DataAccessException;
 //    void deleteAllUsers() throws DataAccessException;
 //    void deleteAllAuths() throws DataAccessException;
