@@ -18,6 +18,11 @@ public class UserService {
         this.dataAccess = dataAccess;
     }
 
+    public boolean isAuthorized(String authToken) throws DataAccessException{
+        AuthData authData = dataAccess.getAuth(authToken);
+        return authData != null;
+    }
+
     public static String generateToken(){
         return UUID.randomUUID().toString();
     }
@@ -45,13 +50,31 @@ public class UserService {
     }
 
     public void logout(String authToken) throws DataAccessException{
-        AuthData authData = dataAccess.getAuth(authToken);
-        if (authData != null) {
+        if (isAuthorized(authToken)) {
             dataAccess.deleteAuth(authToken);
         }
         else {
             throw new DataAccessException("Expired AuthToken");
         }
+    }
+
+    public void listGames(String authToken) throws DataAccessException {
+        if (isAuthorized(authToken)){
+            dataAccess.listGames();
+        }
+        else {
+            throw new DataAccessException("Expired AuthToken");
+        }
+    }
+
+    public void createGame(String authToken, String gameName) throws DataAccessException {
+        if (isAuthorized(authToken)){
+            dataAccess.createGame(gameName);
+        }
+        else {
+            throw new DataAccessException("Expired Auth Token");
+        }
+
     }
 
 //    public void clear() throws DataAccessException{

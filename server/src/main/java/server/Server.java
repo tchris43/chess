@@ -62,8 +62,8 @@ public class Server {
     }
 
     private void createGame(Context ctx) throws DataAccessException {
-        GameRequest = new Gson().fromJson(ctx.body(), String.class);
-        GameResult = userService.createGame(GameRequest);
+        GameRequest gameRequest = new Gson().fromJson(ctx.body(), String.class);
+        GameResult gameResult = userService.createGame(GameRequest);
         ctx.result(new Gson().toJson(GameResult));
     }
 

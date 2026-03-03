@@ -3,6 +3,7 @@ package dataaccess;
 import model.*;
 
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.HashMap;
 import java.util.List;
 
@@ -38,6 +39,14 @@ public class MemoryDataAccess implements DataAccess {
 
     public void deleteAuth(String authToken) {
         auths.remove(authToken);
+    }
+
+    public List<GameData> listGames(){
+        return new GameList(games.values());
+    }
+
+    public GameData createGame(String gameName){
+        games.put()
     }
 
 //    public void deleteAllGames(){
