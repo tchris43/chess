@@ -3,6 +3,7 @@ package dataaccess;
 import chess.ChessGame;
 import model.*;
 import server.ServerException;
+import service.UnauthorizedException;
 
 import java.util.List;
 
@@ -12,7 +13,7 @@ public interface DataAccess {
     List<UserData> getUsers() throws DataAccessException;
     List<AuthData> getAuths() throws DataAccessException;
     UserData getUser(String username) throws DataAccessException;
-    AuthData getAuth(String username) throws DataAccessException;
+    AuthData getAuth(String username) throws UnauthorizedException;
     void deleteAuth(String authToken) throws DataAccessException;
     GameList listGames() throws DataAccessException;
     String createGame(String gameName) throws DataAccessException;

@@ -17,7 +17,7 @@ public class UserService {
         this.dataAccess = dataAccess;
     }
 
-    public boolean isAuthorized(String authToken) throws DataAccessException{
+    public boolean isAuthorized(String authToken) throws UnauthorizedException {
         AuthData authData = dataAccess.getAuth(authToken);
         return authData != null;
     }
@@ -64,31 +64,39 @@ public class UserService {
         throw new UnauthorizedException("Error: unauthorized");
     }
 
-    public void logout(String authToken) throws DataAccessException{
+    public void logout(String authToken) throws UnauthorizedException, DataAccessException{
         if (isAuthorized(authToken)) {
             dataAccess.deleteAuth(authToken);
         }
         else {
-            throw new DataAccessException("Expired AuthToken");
+            throw new UnauthorizedException("Error: unauthorized");
         }
     }
 
-    public GameList listGames(String authToken) throws DataAccessException {
+    public GameList listGames(String authToken) throws UnauthorizedException, DataAccessException {
         if (isAuthorized(authToken)){
             return dataAccess.listGames();
         }
         else {
-            throw new DataAccessException("Expired AuthToken");
+            throw new UnauthorizedException("Error: unauthorized");
         }
     }
 
-    public GameResult createGame(String authToken, String gameName) throws DataAccessException {
+    public boolean gameMalformed(String authToken, String gameName){
+        return (authToken == null || gameName == null);
+    }
+
+    public GameResult createGame(String authToken, String gameName) throws DataAccessException, BadRequestException {
+        if (gameMalformed(authToken, gameName)){
+            throw new BadRequestException("Error: bad request");
+        }
+
         if (isAuthorized(authToken)){
             dataAccess.createGame(gameName);
             return new GameResult(gameName);
         }
         else {
-            throw new DataAccessException("Expired Auth Token");
+            throw new UnauthorizedException("Error: unauthorized");
         }
 
     }

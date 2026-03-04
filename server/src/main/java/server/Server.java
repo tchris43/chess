@@ -74,25 +74,20 @@ public class Server {
         ctx.result(new Gson().toJson(loginResult));
     }
 
-    private void logoutUser(Context ctx) throws DataAccessException {
-        String authToken = new Gson().fromJson(ctx.body(), String.class);
-        userService.logout(authToken);
+    private void logoutUser(Context ctx) throws UnauthorizedException, ServerException, DataAccessException {
+        LogoutRequest logoutRequest = new Gson().fromJson(ctx.body(), LogoutRequest.class);
+        userService.logout(logoutRequest.authToken());
         ctx.status(200);
     }
 
-    private void listGames(Context ctx) throws DataAccessException {
+    private void listGames(Context ctx) throws ServerException, UnauthorizedException, DataAccessException {
         String authToken = new Gson().fromJson(ctx.body(), String.class);
-        try {
-            GameList gameList = userService.listGames(authToken);
-            ctx.result(new Gson().toJson(gameList));
-        }
-        catch(DataAccessException e) {
-            ctx.status(500).json(e.getMessage());
-        }
+        GameList gameList = userService.listGames(authToken);
+        ctx.result(new Gson().toJson(gameList));
 
     }
 
-    private void createGame(Context ctx) throws DataAccessException {
+    private void createGame(Context ctx) throws BadRequestException, UnauthorizedException, ServerException, DataAccessException {
         GameRequest gameRequest = new Gson().fromJson(ctx.body(), GameRequest.class);
         GameResult gameResult = userService.createGame(gameRequest.authToken(), gameRequest.gameName());
         ctx.result(new Gson().toJson(gameResult));

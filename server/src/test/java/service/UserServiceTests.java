@@ -30,18 +30,18 @@ public class UserServiceTests {
     }
 
     @Test
-    void newUsernameOnly() throws DataAccessException {
+    void newUsernameOnly() throws AlreadyTakenException, DataAccessException {
         UserData user = new UserData("taylor", "password", "tchris.gmail.com");
         userService.register(user);
 
         UserData newUser = new UserData("taylor", "password", "tchris.gmail.com");
 
-        assertThrows(DataAccessException.class, () ->
+        assertThrows(AlreadyTakenException.class, () ->
                 userService.register(newUser));
     }
 
     @Test
-    void login() throws DataAccessException {
+    void login() throws DataAccessException, ServerException {
         UserData user = new UserData("taylor", "password", "tchris.gmail.com");
         LoginResult registerResult = userService.register(user);
         String authToken = registerResult.authToken();
@@ -66,12 +66,12 @@ public class UserServiceTests {
     }
 
     @Test
-    void invalidLoginAttempt() throws DataAccessException {
+    void invalidLoginAttempt() throws UnauthorizedException, DataAccessException {
         UserData user = new UserData("taylor", "password", "tchris.gmail.com");
         userService.register(user);
 
         LoginRequest loginRequest = new LoginRequest("tay", "pass");
-        assertThrows(DataAccessException.class, () ->
+        assertThrows(UnauthorizedException.class, () ->
                 userService.login(loginRequest));
     }
 
@@ -90,14 +90,14 @@ public class UserServiceTests {
     }
 
     @Test
-    void logoutInvalid() throws DataAccessException {
+    void logoutInvalid() throws UnauthorizedException, DataAccessException {
         UserData user = new UserData("taylor", "password", "tchris.gmail.com");
         LoginResult registerResult = userService.register(user);
         String authToken = registerResult.authToken();
 
         userService.logout(authToken);
 
-        assertThrows(DataAccessException.class, () ->
+        assertThrows(UnauthorizedException.class, () ->
                 userService.logout(authToken));
     }
 
