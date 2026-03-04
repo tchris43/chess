@@ -24,8 +24,8 @@ public class Server {
             .delete("/session", this::logoutUser)
             .get("/game", this::listGames)
             .post("/game", this::createGame)
-            .put("/game", this::joinGame);
-//            .clear("/db", this::clearApplication);
+            .put("/game", this::joinGame)
+            .clear("/db", this::clearApplication);
     }
 
     private void registerUser(Context ctx) throws DataAccessException {
@@ -87,10 +87,10 @@ public class Server {
 
 
 
-//    private void clearApplication(Context ctx) throws DataAccessException{
-//        userService.clear();
-//        ctx.status(200);
-//    }
+    private void clearApplication(Context ctx) throws DataAccessException{
+        userService.clear();
+        ctx.status(200);
+    }
 
     public int run(int desiredPort) {
         javalin.start(desiredPort);

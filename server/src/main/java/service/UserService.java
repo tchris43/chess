@@ -102,11 +102,11 @@ public class UserService {
         }
     }
 
-//    public void clear() throws DataAccessException{
-//        dataAccess.deleteAllGames();
-//        dataAccess.deleteAllUsers();
-//        dataAccess.deleteAllAuths();
-//    }
+    public void clear() throws DataAccessException{
+        dataAccess.deleteAllGames();
+        dataAccess.deleteAllUsers();
+        dataAccess.deleteAllAuths();
+    }
 
     public List<UserData> getUsers() throws DataAccessException{
         return dataAccess.getUsers();

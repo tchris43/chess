@@ -91,7 +91,15 @@ public class MemoryDataAccess implements DataAccess {
 
     }
 
-//    public void deleteAllGames(){
-//        games.clear();
-//    }
+    public void deleteAllGames(){
+        games.clear();
+    }
+
+    public void deleteAllUsers() {
+        users.clear();
+    }
+
+    public void deleteAllAuths() {
+        auths.clear();
+    }
 }
