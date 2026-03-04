@@ -52,11 +52,12 @@ public class MemoryDataAccess implements DataAccess {
         return new GameList(games.values());
     }
 
-    public String createGame(String gameName){
+    public int createGame(String gameName){
         ChessGame newGame = new ChessGame();
-        GameData newGameData = new GameData(gameID++, null, null, gameName, newGame);
-        games.put(gameID++, newGameData);
-        return gameName;
+        gameID += 1;
+        GameData newGameData = new GameData(gameID, null, null, gameName, newGame);
+        games.put(gameID, newGameData);
+        return gameID;
     }
 
     public GameData getGame(int gameID){
@@ -98,6 +99,7 @@ public class MemoryDataAccess implements DataAccess {
 
     public void deleteAllGames(){
         games.clear();
+        gameID = 0;
     }
 
     public void deleteAllUsers() {

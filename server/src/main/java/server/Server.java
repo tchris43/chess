@@ -75,28 +75,40 @@ public class Server {
     }
 
     private void logoutUser(Context ctx) throws UnauthorizedException, ServerException, DataAccessException {
-        LogoutRequest logoutRequest = new Gson().fromJson(ctx.body(), LogoutRequest.class);
-        userService.logout(logoutRequest.authToken());
+        String authToken = ctx.header("authorization");
+        userService.logout(authToken);
         ctx.status(200);
     }
 
     private void listGames(Context ctx) throws ServerException, UnauthorizedException, DataAccessException {
-        String authToken = new Gson().fromJson(ctx.body(), String.class);
+        String authToken = ctx.header("authorization");
         GameList gameList = userService.listGames(authToken);
-        ctx.result(new Gson().toJson(gameList));
+        GameListResult gameListResult = new GameListResult(gameList);
+        ctx.result(new Gson().toJson(gameListResult));
 
     }
 
     private void createGame(Context ctx) throws BadRequestException, UnauthorizedException, ServerException, DataAccessException {
+        String authToken = ctx.header("authorization");
         GameRequest gameRequest = new Gson().fromJson(ctx.body(), GameRequest.class);
-        GameResult gameResult = userService.createGame(gameRequest.authToken(), gameRequest.gameName());
+        GameResult gameResult = userService.createGame(authToken, gameRequest.gameName());
         ctx.result(new Gson().toJson(gameResult));
     }
 
     private void joinGame(Context ctx) throws DataAccessException, BadRequestException, UnauthorizedException, AlreadyTakenException, ServerException {
-        JoinRequest joinRequest = new Gson().fromJson(ctx.body(), JoinRequest.class);
-        String resultingGameName = userService.joinGame(joinRequest.authToken(), joinRequest.playerColor(), joinRequest.gameID());
-        ctx.result(new Gson().toJson(resultingGameName));
+        try {
+            String authToken = ctx.header("authorization");
+            JoinRequest joinRequest = new Gson().fromJson(ctx.body(), JoinRequest.class);
+            String resultingGameName = userService.joinGame(authToken, joinRequest.playerColor(), joinRequest.gameID());
+            UpdatedGameResult updatedGameResult = new UpdatedGameResult(resultingGameName);
+            ctx.result(new Gson().toJson(updatedGameResult));
+        }
+        catch(DataAccessException exception){
+            ctx.status(400);
+            ErrorResponse errorResponse = new ErrorResponse(exception.getMessage());
+            ctx.result(new Gson().toJson(errorResponse));
+        }
+
     }
 
 

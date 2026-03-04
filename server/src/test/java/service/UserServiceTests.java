@@ -194,7 +194,7 @@ public class UserServiceTests {
     }
 
     @Test
-    void joinGameAlreadyTaken() throws DataAccessException {
+    void joinGameAlreadyTaken() throws AlreadyTakenException, DataAccessException {
         UserData user = new UserData("taylor", "password", "tchris.gmail.com");
         LoginResult registerResult = userService.register(user);
         String authToken = registerResult.authToken();
@@ -207,7 +207,7 @@ public class UserServiceTests {
         LoginResult newRegisterResult = userService.register(newUser);
         String newAuthToken = newRegisterResult.authToken();
 
-        assertThrows(DataAccessException.class, () ->
+        assertThrows(AlreadyTakenException.class, () ->
                 userService.joinGame(authToken, ChessGame.TeamColor.WHITE, 1));
 
     }

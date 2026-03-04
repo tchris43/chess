@@ -17,7 +17,7 @@ public interface DataAccess {
     AuthData getAuth(String username) throws UnauthorizedException;
     void deleteAuth(String authToken) throws DataAccessException;
     GameList listGames() throws DataAccessException;
-    String createGame(String gameName) throws DataAccessException;
+    int createGame(String gameName) throws DataAccessException;
     GameData getGame(int gameID) throws DataAccessException;
     GameData updateGame(String username, int gameID, ChessGame.TeamColor playerColor, String whiteUsername,
                         String blackUsername, String gameName, ChessGame game) throws AlreadyTakenException;

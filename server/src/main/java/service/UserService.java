@@ -57,7 +57,7 @@ public class UserService {
         UserData user = dataAccess.getUser(loginRequest.username());
         String authToken = generateToken();
         dataAccess.createAuth(authToken, new AuthData(authToken, loginRequest.username()));
-        if (user != null) {
+        if (user != null && loginRequest.password().equals(user.password())) {
             AuthData authData = dataAccess.getAuth(authToken);
             return new LoginResult(user.username(), authData.authToken());
         }
@@ -92,8 +92,8 @@ public class UserService {
         }
 
         if (isAuthorized(authToken)){
-            dataAccess.createGame(gameName);
-            return new GameResult(gameName);
+            int gameID = dataAccess.createGame(gameName);
+            return new GameResult(gameID);
         }
         else {
             throw new UnauthorizedException("Error: unauthorized");
