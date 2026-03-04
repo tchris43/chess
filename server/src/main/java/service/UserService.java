@@ -6,7 +6,6 @@ import dataaccess.DataAccessException;
 import model.*;
 import server.ServerException;
 
-import java.util.Collection;
 import java.util.List;
 import java.util.UUID;
 
@@ -27,10 +26,18 @@ public class UserService {
         return UUID.randomUUID().toString();
     }
 
-    public LoginResult register(UserData registerRequest) throws DataAccessException {
+    public boolean registerMalformed(UserData registerRequest){
+        return registerRequest.username() == null || registerRequest.password() == null || registerRequest.email() == null;
+    }
+
+    public LoginResult register(UserData registerRequest) throws BadRequestException, AlreadyTakenException, DataAccessException {
+        //check for proper json
+        if (registerMalformed(registerRequest)){
+            throw new BadRequestException("Error: bad request");
+        }
         //check the name is not taken
         if (dataAccess.getUser(registerRequest.username()) != null){
-            throw new DataAccessException("Username already taken");
+            throw new AlreadyTakenException("Error: already taken");
         }
         String username = dataAccess.createUser(registerRequest.username(), registerRequest);
         String authToken = generateToken();
@@ -38,7 +45,15 @@ public class UserService {
         return new LoginResult(username, authToken);
     }
 
-    public LoginResult login(LoginRequest loginRequest) throws DataAccessException{
+    public boolean loginMalformed(LoginRequest loginRequest){
+        return (loginRequest.username() == null || loginRequest.password() == null);
+    }
+
+    public LoginResult login(LoginRequest loginRequest) throws BadRequestException, UnauthorizedException, DataAccessException, ServerException{
+        //check JSON
+        if (loginMalformed(loginRequest)){
+            throw new BadRequestException("Error: bad request");
+        }
         UserData user = dataAccess.getUser(loginRequest.username());
         String authToken = generateToken();
         dataAccess.createAuth(authToken, new AuthData(authToken, loginRequest.username()));
@@ -46,7 +61,7 @@ public class UserService {
             AuthData authData = dataAccess.getAuth(authToken);
             return new LoginResult(user.username(), authData.authToken());
         }
-        throw new DataAccessException("Invalid login attempt");
+        throw new UnauthorizedException("Error: unauthorized");
     }
 
     public void logout(String authToken) throws DataAccessException{

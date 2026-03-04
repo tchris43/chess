@@ -31,7 +31,7 @@ public class MemoryDataAccess implements DataAccess {
         return new AuthList(auths.values());
     }
 
-    public UserData getUser(String username){
+    public UserData getUser(String username) {
         return users.get(username);
     }
 

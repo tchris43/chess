@@ -9,6 +9,9 @@ import io.javalin.http.Context;
 
 import io.javalin.http.UnauthorizedResponse;
 import model.*;
+import service.AlreadyTakenException;
+import service.BadRequestException;
+import service.UnauthorizedException;
 import service.UserService;
 
 
@@ -27,27 +30,45 @@ public class Server {
             .post("/game", this::createGame)
             .put("/game", this::joinGame)
             .delete("/db", this::clearApplication)
-            .exception(ServerException.class, this::ServerExceptionHandler);
+            .exception(ServerException.class, this::ServerExceptionHandler)
+            .exception(BadRequestException.class, this::BadRequestExceptionHandler)
+            .exception(AlreadyTakenException.class, this::AlreadyTakenExceptionHandler)
+            .exception(UnauthorizedException.class, this::UnauthorizedExceptionHandler);
     }
 
     private void ServerExceptionHandler(ServerException exception, Context ctx){
         ctx.status(500);
-        ErrorResponse errorResponse = new ErrorResponse("Error: (description of error)");
+        ErrorResponse errorResponse = new ErrorResponse(exception.getMessage());
         ctx.result(new Gson().toJson(errorResponse));
     }
 
-    private void registerUser(Context ctx) throws DataAccessException {
-        UserData registerRequest = new Gson().fromJson(ctx.body(), UserData.class);
-        try {
-            LoginResult registerResult = userService.register(registerRequest);
-            ctx.result(new Gson().toJson(registerResult));
-        }
-        catch(DataAccessException e) {
-            ctx.status(403).json(e.getMessage());
-        }
+    private void BadRequestExceptionHandler(BadRequestException exception, Context ctx){
+        ctx.status(400);
+        ErrorResponse errorResponse = new ErrorResponse(exception.getMessage());
+        ctx.result(new Gson().toJson(errorResponse));
     }
 
-    private void loginUser(Context ctx) throws DataAccessException {
+    private void AlreadyTakenExceptionHandler(AlreadyTakenException exception, Context ctx){
+        ctx.status(403);
+        ErrorResponse errorResponse = new ErrorResponse(exception.getMessage());
+        ctx.result(new Gson().toJson(errorResponse));
+    }
+
+    private void UnauthorizedExceptionHandler(UnauthorizedException exception, Context ctx){
+        ctx.status(401);
+        ErrorResponse errorResponse = new ErrorResponse(exception.getMessage());
+        ctx.result(new Gson().toJson(errorResponse));
+    }
+
+
+
+    private void registerUser(Context ctx) throws BadRequestException, AlreadyTakenException, DataAccessException, ServerException {
+        UserData registerRequest = new Gson().fromJson(ctx.body(), UserData.class);
+        LoginResult registerResult = userService.register(registerRequest);
+        ctx.result(new Gson().toJson(registerResult));
+    }
+
+    private void loginUser(Context ctx) throws BadRequestException, UnauthorizedException, DataAccessException, ServerException{
         LoginRequest loginRequest = new Gson().fromJson(ctx.body(), LoginRequest.class);
         LoginResult loginResult = userService.login(loginRequest);
         ctx.result(new Gson().toJson(loginResult));
