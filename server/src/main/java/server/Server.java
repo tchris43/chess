@@ -30,31 +30,31 @@ public class Server {
             .post("/game", this::createGame)
             .put("/game", this::joinGame)
             .delete("/db", this::clearApplication)
-            .exception(ServerException.class, this::ServerExceptionHandler)
-            .exception(BadRequestException.class, this::BadRequestExceptionHandler)
-            .exception(AlreadyTakenException.class, this::AlreadyTakenExceptionHandler)
-            .exception(UnauthorizedException.class, this::UnauthorizedExceptionHandler);
+            .exception(ServerException.class, this::serverExceptionHandler)
+            .exception(BadRequestException.class, this::badRequestExceptionHandler)
+            .exception(AlreadyTakenException.class, this::alreadyTakenExceptionHandler)
+            .exception(UnauthorizedException.class, this::unauthorizedExceptionHandler);
     }
 
-    private void ServerExceptionHandler(ServerException exception, Context ctx){
+    private void serverExceptionHandler(ServerException exception, Context ctx){
         ctx.status(500);
         ErrorResponse errorResponse = new ErrorResponse(exception.getMessage());
         ctx.result(new Gson().toJson(errorResponse));
     }
 
-    private void BadRequestExceptionHandler(BadRequestException exception, Context ctx){
+    private void badRequestExceptionHandler(BadRequestException exception, Context ctx){
         ctx.status(400);
         ErrorResponse errorResponse = new ErrorResponse(exception.getMessage());
         ctx.result(new Gson().toJson(errorResponse));
     }
 
-    private void AlreadyTakenExceptionHandler(AlreadyTakenException exception, Context ctx){
+    private void alreadyTakenExceptionHandler(AlreadyTakenException exception, Context ctx){
         ctx.status(403);
         ErrorResponse errorResponse = new ErrorResponse(exception.getMessage());
         ctx.result(new Gson().toJson(errorResponse));
     }
 
-    private void UnauthorizedExceptionHandler(UnauthorizedException exception, Context ctx){
+    private void unauthorizedExceptionHandler(UnauthorizedException exception, Context ctx){
         ctx.status(401);
         ErrorResponse errorResponse = new ErrorResponse(exception.getMessage());
         ctx.result(new Gson().toJson(errorResponse));
@@ -95,7 +95,8 @@ public class Server {
         ctx.result(new Gson().toJson(gameResult));
     }
 
-    private void joinGame(Context ctx) throws DataAccessException, BadRequestException, UnauthorizedException, AlreadyTakenException, ServerException {
+    private void joinGame(Context ctx) throws DataAccessException, BadRequestException,
+            UnauthorizedException, AlreadyTakenException, ServerException {
         try {
             String authToken = ctx.header("authorization");
             JoinRequest joinRequest = new Gson().fromJson(ctx.body(), JoinRequest.class);

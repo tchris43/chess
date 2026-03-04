@@ -126,15 +126,4 @@ public class ChessBoard implements Cloneable{
         return Arrays.deepHashCode(board);
 
     }
-
-//    @Override
-//    protected Object clone() throws CloneNotSupportedException {
-//        var boardClone = new ChessBoard();
-//        //add a copy of the 2d array that holds chesspieces
-//        //so go into the 2d array itself and do array.copyof
-//        for (int row = 0; row < 8; row++) {
-//            boardClone.board[row] = Arrays.copyOf(board[row], board[row].length);
-//        }
-//        return boardClone;
-//    }
 }

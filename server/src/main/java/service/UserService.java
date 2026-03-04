@@ -105,7 +105,8 @@ public class UserService {
         return (authToken == null || playerColor == null || gameID < 1);
     }
 
-    public String joinGame(String authToken, ChessGame.TeamColor playerColor, int gameID) throws DataAccessException, BadRequestException, UnauthorizedException, AlreadyTakenException {
+    public String joinGame(String authToken, ChessGame.TeamColor playerColor, int gameID)
+            throws DataAccessException, BadRequestException, UnauthorizedException, AlreadyTakenException {
         if (joinMalformed(authToken, playerColor, gameID)){
             throw new BadRequestException("Error: bad request");
         }

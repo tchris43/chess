@@ -243,8 +243,7 @@ public class ChessGame {
         return false;
     }
 
-    private Collection<ChessMove> getTeamMoves(TeamColor teamColor){
-        //loop through the board and find team pieces
+    private Collection<ChessMove> loopBoard(TeamColor teamColor) {
         Collection<ChessMove> possibleMoves = new ArrayList<>();
         for (int row=1; row < 9; row++){
             for (int col=1; col < 9; col++){
@@ -256,6 +255,11 @@ public class ChessGame {
             }
         }
         return possibleMoves;
+    }
+
+    private Collection<ChessMove> getTeamMoves(TeamColor teamColor){
+        //loop through the board and find team pieces
+       return loopBoard(teamColor);
     }
 
     private boolean stillInCheck(ChessBoard board, TeamColor teamColor){
@@ -306,16 +310,7 @@ public class ChessGame {
      */
     public boolean isInStalemate(TeamColor teamColor) {
         //verify that I cannot move any piece
-        Collection<ChessMove> possibleMoves = new ArrayList<>();
-        for (int row = 1; row < 9; row++){
-            for (int col = 1; col < 9; col++){
-                ChessPosition position = new ChessPosition(row,col);
-                ChessPiece piece = gameBoard.getPiece(position);
-                if (piece != null && piece.getTeamColor() == teamColor){
-                    possibleMoves.addAll(validMoves(position));
-                }
-            }
-        }
+        Collection<ChessMove> possibleMoves = loopBoard(teamColor);
         //verify that king is not in danger and there are no moves
         return !isInCheck(teamColor) && possibleMoves.isEmpty();
     }

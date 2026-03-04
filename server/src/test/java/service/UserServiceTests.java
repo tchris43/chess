@@ -101,20 +101,6 @@ public class UserServiceTests {
                 userService.logout(authToken));
     }
 
-//    @Test
-//    void clear() throws DataAccessException {
-//        UserData user = new UserData("taylor", "password", "tchris.gmail.com");
-//        LoginResult registerResult = userService.register(user);
-//
-//        userService.clear();
-//
-//        Collection<UserData> users = userService.getUsers();
-//        Collection<AuthData> auths = userService.getAuths();
-//
-//        assertEquals(0, users.size());
-//        assertEquals(0, auths.size());
-//    }
-
     @Test
     void listGames() throws DataAccessException {
         UserData user = new UserData("taylor", "password", "tchris.gmail.com");

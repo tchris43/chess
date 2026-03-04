@@ -17,57 +17,57 @@ public class MoveCalculator {
     public void calculateMoves(){}
 
     public void moveOrthogonally(){
-        int Row = position.getRow();
-        int Col = position.getColumn();
-        ChessPiece piece = board.board[Row-1][Col-1];
-        int currRow = Row;
-        int currCol = Col;
-        while (currRow > 1){
-            currRow = currRow-1;
-            ChessPiece enemy = board.board[currRow - 1][currCol - 1];
+        int originalRow = position.getRow();
+        int originalCol = position.getColumn();
+        ChessPiece piece = board.board[originalRow-1][originalCol-1];
+        int curroriginalRow = originalRow;
+        int curroriginalCol = originalCol;
+        while (curroriginalRow > 1){
+            curroriginalRow = curroriginalRow-1;
+            ChessPiece enemy = board.board[curroriginalRow - 1][curroriginalCol - 1];
             if (isImpeded(enemy,piece)) {
                 if (isEnemy(enemy,piece)){
-                    addMoves(currRow, currCol);
+                    addMoves(curroriginalRow, curroriginalCol);
                 }
                 break;
             }
-            addMoves(currRow, currCol);
+            addMoves(curroriginalRow, curroriginalCol);
         }
-        currRow = Row;
-        while (currRow < 8){
-            currRow = currRow + 1;
-            ChessPiece enemy = board.board[currRow-1][currCol - 1];
+        curroriginalRow = originalRow;
+        while (curroriginalRow < 8){
+            curroriginalRow = curroriginalRow + 1;
+            ChessPiece enemy = board.board[curroriginalRow-1][curroriginalCol - 1];
             if (isImpeded(enemy,piece)) {
                 if (isEnemy(enemy,piece)){
-                    addMoves(currRow, currCol);
+                    addMoves(curroriginalRow, curroriginalCol);
                 }
                 break;
             }
-            addMoves(currRow, currCol);
+            addMoves(curroriginalRow, curroriginalCol);
         }
-        currRow = Row;
-        while (currCol > 1){
-            currCol = currCol - 1;
-            ChessPiece enemy = board.board[currRow - 1][currCol-1];
+        curroriginalRow = originalRow;
+        while (curroriginalCol > 1){
+            curroriginalCol = curroriginalCol - 1;
+            ChessPiece enemy = board.board[curroriginalRow - 1][curroriginalCol-1];
             if (isImpeded(enemy,piece)) {
                 if (isEnemy(enemy,piece)){
-                    addMoves(currRow, currCol);
+                    addMoves(curroriginalRow, curroriginalCol);
                 }
                 break;
             }
-            addMoves(currRow, currCol);
+            addMoves(curroriginalRow, curroriginalCol);
         }
-        currCol = Col;
-        while (currCol < 8){
-            currCol = currCol + 1;
-            ChessPiece enemy = board.board[currRow - 1][currCol - 1];
+        curroriginalCol = originalCol;
+        while (curroriginalCol < 8){
+            curroriginalCol = curroriginalCol + 1;
+            ChessPiece enemy = board.board[curroriginalRow - 1][curroriginalCol - 1];
             if (isImpeded(enemy,piece)) {
                 if (isEnemy(enemy,piece)){
-                    addMoves(currRow, currCol);
+                    addMoves(curroriginalRow, curroriginalCol);
                 }
                 break;
             }
-            addMoves(currRow, currCol);
+            addMoves(curroriginalRow, curroriginalCol);
         }
 
     }
@@ -81,87 +81,87 @@ public class MoveCalculator {
 
     }
 
-    public void checkAdd(int row, int col, int newRow, int newCol){
+    public void checkAdd(int originalRow, int originalCol, int neworiginalRow, int neworiginalCol){
         //check in  bounds
-        if (newRow < 9 && newRow > 0 && newCol < 9 && newCol > 0) {
-            ChessPiece piece = board.board[row - 1][col - 1];
-            ChessPiece enemy = board.board[newRow - 1][newCol - 1];
+        if (neworiginalRow < 9 && neworiginalRow > 0 && neworiginalCol < 9 && neworiginalCol > 0) {
+            ChessPiece piece = board.board[originalRow - 1][originalCol - 1];
+            ChessPiece enemy = board.board[neworiginalRow - 1][neworiginalCol - 1];
             if (isImpeded(enemy, piece)) {
                 if (isEnemy(enemy, piece)) {
-                    addMoves(newRow, newCol);
+                    addMoves(neworiginalRow, neworiginalCol);
                 }
             }
             else {
-                addMoves(newRow, newCol);
+                addMoves(neworiginalRow, neworiginalCol);
             }
         }
     }
 
     public void moveDiagonally(){
-        int Row = position.getRow();
-        int Col = position.getColumn();
-        ChessPiece piece = board.board[Row-1][Col-1];
-        int currCol = Col;
-        int currRow = Row;
-        while(currCol < 8 && currRow < 8){
-            currRow = currRow +1;
-            currCol = currCol +1;
-            ChessPiece enemy = board.board[currRow - 1][currCol - 1];
+        int originalRow = position.getRow();
+        int originalCol = position.getColumn();
+        ChessPiece piece = board.board[originalRow-1][originalCol-1];
+        int curroriginalCol = originalCol;
+        int curroriginalRow = originalRow;
+        while(curroriginalCol < 8 && curroriginalRow < 8){
+            curroriginalRow = curroriginalRow +1;
+            curroriginalCol = curroriginalCol +1;
+            ChessPiece enemy = board.board[curroriginalRow - 1][curroriginalCol - 1];
             if (isImpeded(enemy,piece)) {
                 if (isEnemy(enemy,piece)){
-                   addMoves(currRow, currCol);
+                   addMoves(curroriginalRow, curroriginalCol);
                 }
                 break;
             }
-            addMoves(currRow, currCol);
+            addMoves(curroriginalRow, curroriginalCol);
         }
-        currRow = Row;
-        currCol = Col;
-        while(currCol > 1 && currRow > 1){
-            currRow = currRow -1;
-            currCol = currCol -1;
-            ChessPiece enemy = board.board[currRow - 1][currCol - 1];
+        curroriginalRow = originalRow;
+        curroriginalCol = originalCol;
+        while(curroriginalCol > 1 && curroriginalRow > 1){
+            curroriginalRow = curroriginalRow -1;
+            curroriginalCol = curroriginalCol -1;
+            ChessPiece enemy = board.board[curroriginalRow - 1][curroriginalCol - 1];
             if (isImpeded(enemy,piece)) {
                 if (isEnemy(enemy,piece)){
-                    addMoves(currRow, currCol);
+                    addMoves(curroriginalRow, curroriginalCol);
                 }
                 break;
             }
-            addMoves(currRow, currCol);
+            addMoves(curroriginalRow, curroriginalCol);
         }
-        currRow = Row;
-        currCol = Col;
-        while(currCol < 8 && currRow > 1){
-            currRow = currRow-1;
-            currCol = currCol+1;
-            ChessPiece enemy = board.board[currRow - 1][currCol - 1];
+        curroriginalRow = originalRow;
+        curroriginalCol = originalCol;
+        while(curroriginalCol < 8 && curroriginalRow > 1){
+            curroriginalRow = curroriginalRow-1;
+            curroriginalCol = curroriginalCol+1;
+            ChessPiece enemy = board.board[curroriginalRow - 1][curroriginalCol - 1];
             if (isImpeded(enemy,piece)) {
                 if (isEnemy(enemy,piece)){
-                    addMoves(currRow, currCol);
+                    addMoves(curroriginalRow, curroriginalCol);
                 }
                 break;
             }
-            addMoves(currRow, currCol);
+            addMoves(curroriginalRow, curroriginalCol);
         }
-        currRow = Row;
-        currCol = Col;
-        while(currCol > 1 && currRow < 8){
-            currRow = currRow +1;
-            currCol = currCol-1;
-            ChessPiece enemy = board.board[currRow - 1][currCol - 1];
+        curroriginalRow = originalRow;
+        curroriginalCol = originalCol;
+        while(curroriginalCol > 1 && curroriginalRow < 8){
+            curroriginalRow = curroriginalRow +1;
+            curroriginalCol = curroriginalCol-1;
+            ChessPiece enemy = board.board[curroriginalRow - 1][curroriginalCol - 1];
             if (isImpeded(enemy,piece)) {
                 if (isEnemy(enemy,piece)){
-                    addMoves(currRow, currCol);
+                    addMoves(curroriginalRow, curroriginalCol);
                 }
                 break;
             }
-            addMoves(currRow, currCol);
+            addMoves(curroriginalRow, curroriginalCol);
         }
 
     }
 
-    public void addMoves(int Row, int Col){
-        ChessPosition newPosition = new ChessPosition(Row, Col);
+    public void addMoves(int originalRow, int originalCol){
+        ChessPosition newPosition = new ChessPosition(originalRow, originalCol);
         ChessMove move = new ChessMove(position, newPosition, null);
         possibleMoves.add(move);
     }

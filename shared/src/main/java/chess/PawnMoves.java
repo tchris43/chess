@@ -63,9 +63,9 @@ public class PawnMoves extends MoveCalculator{
 
 
     @Override
-    public void addMoves(int Row, int Col){
-        ChessPosition newPosition = new ChessPosition(Row, Col);
-        if (Row == 1 || Row == 8){
+    public void addMoves(int row, int col){
+        ChessPosition newPosition = new ChessPosition(row, col);
+        if (row == 1 || row == 8){
             ChessMove queenMove = new ChessMove(position, newPosition, ChessPiece.PieceType.QUEEN);
             ChessMove rookMove = new ChessMove(position, newPosition, ChessPiece.PieceType.ROOK);
             ChessMove bishopMove = new ChessMove(position, newPosition, ChessPiece.PieceType.BISHOP);
