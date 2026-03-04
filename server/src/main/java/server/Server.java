@@ -23,7 +23,8 @@ public class Server {
             .post("/session", this::loginUser)
             .delete("/session", this::logoutUser)
             .get("/game", this::listGames)
-            .post("/game", this::createGame);
+            .post("/game", this::createGame)
+            .put("/game", this::joinGame);
 //            .clear("/db", this::clearApplication);
     }
 
@@ -57,14 +58,31 @@ public class Server {
 
     private void listGames(Context ctx) throws DataAccessException {
         String authToken = new Gson().fromJson(ctx.body(), String.class);
-        GameList gameList = userService.listGames(authToken);
-        ctx.result(new Gson().toJson(gameList));
+        try {
+            GameList gameList = userService.listGames(authToken);
+            ctx.result(new Gson().toJson(gameList));
+        }
+        catch(DataAccessException e) {
+            ctx.status(500).json(e.getMessage());
+        }
+
     }
 
     private void createGame(Context ctx) throws DataAccessException {
         GameRequest gameRequest = new Gson().fromJson(ctx.body(), GameRequest.class);
         GameResult gameResult = userService.createGame(gameRequest.authToken(), gameRequest.gameName());
         ctx.result(new Gson().toJson(gameResult));
+    }
+
+    private void joinGame(Context ctx) throws DataAccessException {
+        try {
+            JoinRequest joinRequest = new Gson().fromJson(ctx.body(), JoinRequest.class);
+            String resultingGameName = userService.joinGame(joinRequest.authToken(), joinRequest.playerColor(), joinRequest.gameID());
+            ctx.result(new Gson().toJson(resultingGameName));
+        }
+        catch(DataAccessException e) {
+            ctx.status(500).json(e.getMessage());
+        }
     }
 
 

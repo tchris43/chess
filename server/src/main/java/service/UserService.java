@@ -1,5 +1,6 @@
 package service;
 
+import chess.ChessGame;
 import dataaccess.DataAccess;
 import dataaccess.DataAccessException;
 import model.*;
@@ -74,6 +75,31 @@ public class UserService {
             throw new DataAccessException("Expired Auth Token");
         }
 
+    }
+
+    public String joinGame(String authToken, ChessGame.TeamColor playerColor, int gameID) throws DataAccessException {
+        try {
+            if (isAuthorized(authToken)){
+                GameData game = dataAccess.getGame(gameID);
+                AuthData authData = dataAccess.getAuth(authToken);
+                String username = authData.username();
+                if (game != null){
+                    GameData updatedGame = dataAccess.updateGame(username, gameID, playerColor, game.whiteUsername(), game.blackUsername(),
+                            game.gameName(), game.game());
+                    return updatedGame.gameName();
+                }
+                else {
+                    throw new DataAccessException("Game does not exist");
+                }
+
+            }
+            else {
+                throw new DataAccessException("Expired Auth Token");
+            }
+        }
+        catch (DataAccessException e){
+            throw new DataAccessException(e.getMessage());
+        }
     }
 
 //    public void clear() throws DataAccessException{

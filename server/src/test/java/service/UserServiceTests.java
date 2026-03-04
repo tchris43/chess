@@ -1,5 +1,6 @@
 package service;
 
+import chess.ChessGame;
 import dataaccess.DataAccessException;
 import dataaccess.MemoryDataAccess;
 import model.*;
@@ -172,6 +173,41 @@ public class UserServiceTests {
 
         assertThrows(DataAccessException.class, () ->
                 userService.createGame(authToken,"game"));
+
+    }
+
+    @Test
+    void joinGame() throws DataAccessException {
+        UserData user = new UserData("taylor", "password", "tchris.gmail.com");
+        LoginResult registerResult = userService.register(user);
+        String authToken = registerResult.authToken();
+
+        userService.createGame(authToken, "newGame");
+
+        userService.joinGame(authToken, ChessGame.TeamColor.WHITE, 1);
+
+        GameList games = userService.listGames(authToken);
+
+        assertEquals("taylor", games.getFirst().whiteUsername());
+
+    }
+
+    @Test
+    void joinGameAlreadyTaken() throws DataAccessException {
+        UserData user = new UserData("taylor", "password", "tchris.gmail.com");
+        LoginResult registerResult = userService.register(user);
+        String authToken = registerResult.authToken();
+
+        userService.createGame(authToken, "newGame");
+
+        userService.joinGame(authToken, ChessGame.TeamColor.WHITE, 1);
+
+        UserData newUser = new UserData("tay", "password", "tchris.gmail.com");
+        LoginResult newRegisterResult = userService.register(newUser);
+        String newAuthToken = newRegisterResult.authToken();
+
+        assertThrows(DataAccessException.class, () ->
+                userService.joinGame(authToken, ChessGame.TeamColor.WHITE, 1));
 
     }
 

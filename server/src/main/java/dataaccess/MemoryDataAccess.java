@@ -54,6 +54,39 @@ public class MemoryDataAccess implements DataAccess {
         return gameName;
     }
 
+    public GameData getGame(int gameID){
+       return games.get(gameID);
+    }
+
+    public boolean notTaken(String username){
+        return username == null;
+    }
+
+    public GameData updateGame(String username, int gameID, ChessGame.TeamColor playerColor, String whiteUsername,
+                               String blackUsername, String gameName, ChessGame game) throws DataAccessException{
+        if (playerColor == ChessGame.TeamColor.WHITE){
+            if (notTaken(whiteUsername)) {
+                whiteUsername = username;
+            }
+            else {
+                throw new DataAccessException("Already Taken");
+            }
+        }
+        else {
+            if (notTaken(blackUsername)) {
+                blackUsername = username;
+            }
+            else {
+                throw new DataAccessException("Already Taken");
+            }
+
+        }
+
+        return new GameData(gameID, whiteUsername, blackUsername, gameName, game);
+
+
+    }
+
 //    public void deleteAllGames(){
 //        games.clear();
 //    }
