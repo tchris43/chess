@@ -7,6 +7,7 @@ import dataaccess.MemoryDataAccess;
 import io.javalin.*;
 import io.javalin.http.Context;
 
+import io.javalin.http.UnauthorizedResponse;
 import model.*;
 import service.UserService;
 
@@ -25,7 +26,14 @@ public class Server {
             .get("/game", this::listGames)
             .post("/game", this::createGame)
             .put("/game", this::joinGame)
-            .clear("/db", this::clearApplication);
+            .delete("/db", this::clearApplication)
+            .exception(ServerException.class, this::ServerExceptionHandler);
+    }
+
+    private void ServerExceptionHandler(ServerException exception, Context ctx){
+        ctx.status(500);
+        ErrorResponse errorResponse = new ErrorResponse("Error: (description of error)");
+        ctx.result(new Gson().toJson(errorResponse));
     }
 
     private void registerUser(Context ctx) throws DataAccessException {
@@ -41,13 +49,8 @@ public class Server {
 
     private void loginUser(Context ctx) throws DataAccessException {
         LoginRequest loginRequest = new Gson().fromJson(ctx.body(), LoginRequest.class);
-        try {
-            LoginResult loginResult = userService.login(loginRequest);
-            ctx.result(new Gson().toJson(loginResult));
-        }
-        catch(DataAccessException e) {
-            ctx.status(500).json(e.getMessage());
-        }
+        LoginResult loginResult = userService.login(loginRequest);
+        ctx.result(new Gson().toJson(loginResult));
     }
 
     private void logoutUser(Context ctx) throws DataAccessException {
@@ -87,7 +90,7 @@ public class Server {
 
 
 
-    private void clearApplication(Context ctx) throws DataAccessException{
+    private void clearApplication(Context ctx) throws ServerException{
         userService.clear();
         ctx.status(200);
     }

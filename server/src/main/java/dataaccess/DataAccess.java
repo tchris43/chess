@@ -2,6 +2,7 @@ package dataaccess;
 
 import chess.ChessGame;
 import model.*;
+import server.ServerException;
 
 import java.util.List;
 
@@ -18,8 +19,8 @@ public interface DataAccess {
     GameData getGame(int gameID) throws DataAccessException;
     GameData updateGame(String username, int gameID, ChessGame.TeamColor playerColor, String whiteUsername,
                         String blackUsername, String gameName, ChessGame game) throws DataAccessException;
-    void deleteAllGames() throws DataAccessException;
-    void deleteAllUsers() throws DataAccessException;
-    void deleteAllAuths() throws DataAccessException;
+    void deleteAllGames() throws ServerException;
+    void deleteAllUsers() throws ServerException;
+    void deleteAllAuths() throws ServerException;
 
 }

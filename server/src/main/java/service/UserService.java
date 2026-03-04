@@ -4,6 +4,7 @@ import chess.ChessGame;
 import dataaccess.DataAccess;
 import dataaccess.DataAccessException;
 import model.*;
+import server.ServerException;
 
 import java.util.Collection;
 import java.util.List;
@@ -102,7 +103,7 @@ public class UserService {
         }
     }
 
-    public void clear() throws DataAccessException{
+    public void clear() throws ServerException {
         dataAccess.deleteAllGames();
         dataAccess.deleteAllUsers();
         dataAccess.deleteAllAuths();

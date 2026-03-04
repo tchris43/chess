@@ -6,6 +6,7 @@ import dataaccess.MemoryDataAccess;
 import model.*;
 import org.eclipse.jetty.util.log.Log;
 import org.junit.jupiter.api.Test;
+import server.ServerException;
 
 import java.util.Collection;
 
@@ -208,6 +209,29 @@ public class UserServiceTests {
 
         assertThrows(DataAccessException.class, () ->
                 userService.joinGame(authToken, ChessGame.TeamColor.WHITE, 1));
+
+    }
+
+    @Test
+    void clear() throws ServerException, DataAccessException {
+        UserData user = new UserData("taylor", "password", "tchris.gmail.com");
+        LoginResult registerResult = userService.register(user);
+        String authToken = registerResult.authToken();
+        userService.createGame(authToken, "newGame");
+
+        userService.clear();
+
+        Collection<UserData> users = userService.getUsers();
+        Collection<AuthData> auths = userService.getAuths();
+
+        LoginResult newRegisterResult = userService.register(new UserData("taylor", "password", "tchris.gmail.com"));
+        GameList games = userService.listGames(newRegisterResult.authToken());
+
+        assertEquals(0, users.size());
+        assertEquals(0, auths.size());
+        assertEquals(0, games.size());
+
+
 
     }
 
