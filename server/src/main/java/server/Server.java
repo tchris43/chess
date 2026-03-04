@@ -93,15 +93,10 @@ public class Server {
         ctx.result(new Gson().toJson(gameResult));
     }
 
-    private void joinGame(Context ctx) throws DataAccessException {
-        try {
-            JoinRequest joinRequest = new Gson().fromJson(ctx.body(), JoinRequest.class);
-            String resultingGameName = userService.joinGame(joinRequest.authToken(), joinRequest.playerColor(), joinRequest.gameID());
-            ctx.result(new Gson().toJson(resultingGameName));
-        }
-        catch(DataAccessException e) {
-            ctx.status(500).json(e.getMessage());
-        }
+    private void joinGame(Context ctx) throws DataAccessException, BadRequestException, UnauthorizedException, AlreadyTakenException, ServerException {
+        JoinRequest joinRequest = new Gson().fromJson(ctx.body(), JoinRequest.class);
+        String resultingGameName = userService.joinGame(joinRequest.authToken(), joinRequest.playerColor(), joinRequest.gameID());
+        ctx.result(new Gson().toJson(resultingGameName));
     }
 
 

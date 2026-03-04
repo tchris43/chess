@@ -2,6 +2,7 @@ package dataaccess;
 
 import chess.ChessGame;
 import model.*;
+import service.AlreadyTakenException;
 import service.UnauthorizedException;
 
 import java.util.ArrayList;
@@ -67,13 +68,13 @@ public class MemoryDataAccess implements DataAccess {
     }
 
     public GameData updateGame(String username, int gameID, ChessGame.TeamColor playerColor, String whiteUsername,
-                               String blackUsername, String gameName, ChessGame game) throws DataAccessException{
+                               String blackUsername, String gameName, ChessGame game) throws AlreadyTakenException{
         if (playerColor == ChessGame.TeamColor.WHITE){
             if (notTaken(whiteUsername)) {
                 whiteUsername = username;
             }
             else {
-                throw new DataAccessException("Already Taken");
+                throw new AlreadyTakenException("Error: already taken");
             }
         }
         else {
@@ -81,7 +82,7 @@ public class MemoryDataAccess implements DataAccess {
                 blackUsername = username;
             }
             else {
-                throw new DataAccessException("Already Taken");
+                throw new AlreadyTakenException("Error: already taken");
             }
 
         }

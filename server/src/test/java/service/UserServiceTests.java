@@ -130,14 +130,14 @@ public class UserServiceTests {
     }
 
     @Test
-    void listGamesUnauthorized() throws DataAccessException {
+    void listGamesUnauthorized() throws DataAccessException, UnauthorizedException {
         UserData user = new UserData("taylor", "password", "tchris.gmail.com");
         LoginResult registerResult = userService.register(user);
         String authToken = registerResult.authToken();
         userService.logout(authToken);
 
 
-        assertThrows(DataAccessException.class, () ->
+        assertThrows(UnauthorizedException.class, () ->
                 userService.listGames(authToken));
 
     }
@@ -165,14 +165,14 @@ public class UserServiceTests {
     }
 
     @Test
-    void createGamesUnauthorized() throws DataAccessException {
+    void createGamesUnauthorized() throws DataAccessException, UnauthorizedException {
         UserData user = new UserData("taylor", "password", "tchris.gmail.com");
         LoginResult registerResult = userService.register(user);
         String authToken = registerResult.authToken();
         userService.logout(authToken);
 
 
-        assertThrows(DataAccessException.class, () ->
+        assertThrows(UnauthorizedException.class, () ->
                 userService.createGame(authToken,"game"));
 
     }

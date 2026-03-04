@@ -3,6 +3,7 @@ package dataaccess;
 import chess.ChessGame;
 import model.*;
 import server.ServerException;
+import service.AlreadyTakenException;
 import service.UnauthorizedException;
 
 import java.util.List;
@@ -19,7 +20,7 @@ public interface DataAccess {
     String createGame(String gameName) throws DataAccessException;
     GameData getGame(int gameID) throws DataAccessException;
     GameData updateGame(String username, int gameID, ChessGame.TeamColor playerColor, String whiteUsername,
-                        String blackUsername, String gameName, ChessGame game) throws DataAccessException;
+                        String blackUsername, String gameName, ChessGame game) throws AlreadyTakenException;
     void deleteAllGames() throws ServerException;
     void deleteAllUsers() throws ServerException;
     void deleteAllAuths() throws ServerException;

@@ -86,7 +86,7 @@ public class UserService {
         return (authToken == null || gameName == null);
     }
 
-    public GameResult createGame(String authToken, String gameName) throws DataAccessException, BadRequestException {
+    public GameResult createGame(String authToken, String gameName) throws UnauthorizedException, DataAccessException, BadRequestException {
         if (gameMalformed(authToken, gameName)){
             throw new BadRequestException("Error: bad request");
         }
@@ -101,28 +101,30 @@ public class UserService {
 
     }
 
-    public String joinGame(String authToken, ChessGame.TeamColor playerColor, int gameID) throws DataAccessException {
-        try {
-            if (isAuthorized(authToken)){
-                GameData game = dataAccess.getGame(gameID);
-                AuthData authData = dataAccess.getAuth(authToken);
-                String username = authData.username();
-                if (game != null){
-                    GameData updatedGame = dataAccess.updateGame(username, gameID, playerColor, game.whiteUsername(), game.blackUsername(),
-                            game.gameName(), game.game());
-                    return updatedGame.gameName();
-                }
-                else {
-                    throw new DataAccessException("Game does not exist");
-                }
+    public boolean joinMalformed(String authToken, ChessGame.TeamColor playerColor, int gameID) {
+        return (authToken == null || playerColor == null || gameID < 1);
+    }
 
+    public String joinGame(String authToken, ChessGame.TeamColor playerColor, int gameID) throws DataAccessException, BadRequestException, UnauthorizedException, AlreadyTakenException {
+        if (joinMalformed(authToken, playerColor, gameID)){
+            throw new BadRequestException("Error: bad request");
+        }
+        if (isAuthorized(authToken)){
+            GameData game = dataAccess.getGame(gameID);
+            AuthData authData = dataAccess.getAuth(authToken);
+            String username = authData.username();
+            if (game != null){
+                GameData updatedGame = dataAccess.updateGame(username, gameID, playerColor, game.whiteUsername(), game.blackUsername(),
+                        game.gameName(), game.game());
+                return updatedGame.gameName();
             }
             else {
-                throw new DataAccessException("Expired Auth Token");
+                throw new DataAccessException("Game does not exist");
             }
+
         }
-        catch (DataAccessException e){
-            throw new DataAccessException(e.getMessage());
+        else {
+            throw new UnauthorizedException("Error: unauthorized");
         }
     }
 
