@@ -50,7 +50,7 @@ public class MemoryDataAccess implements DataAccess {
     public String createGame(String gameName){
         ChessGame newGame = new ChessGame();
         GameData newGameData = new GameData(gameID++, null, null, gameName, newGame);
-        games.put(gameID, newGameData);
+        games.put(gameID++, newGameData);
         return gameName;
     }
 
@@ -82,7 +82,11 @@ public class MemoryDataAccess implements DataAccess {
 
         }
 
-        return new GameData(gameID, whiteUsername, blackUsername, gameName, game);
+        GameData updatedGame = new GameData(gameID, whiteUsername, blackUsername, gameName, game);
+
+        games.put(gameID, updatedGame);
+
+        return updatedGame;
 
 
     }
