@@ -58,6 +58,40 @@ public class DatabaseTests {
         assertGameCollectionEqual(expected, actual);
     }
 
+    @ParameterizedTest
+    @ValueSource(classes = {MySqlDataAccess.class, MemoryDataAccess.class})
+    void deleteAuth(Class<? extends DataAccess> dbClass) throws SQLException, DataAccessException {
+        DataAccess db = getDataAccess(dbClass);
+
+        List<AuthData> expected = new ArrayList<>();
+        expected.add(new AuthData("auth1", "taylor"));
+        expected.add(new AuthData("auth3", "tim"));
+
+        db.createAuth("auth1", new AuthData("auth1", "taylor"));
+        db.createAuth("auth2", new AuthData("auth2", "fred"));
+        db.createAuth("auth3", new AuthData("auth3", "tim"));
+        db.deleteAuth("auth2");
+
+        List<AuthData> actual = db.getAuths();
+        assertAuthCollectionEqual(expected, actual);
+    }
+
+    
+
+    public static void assertAuthEqual(AuthData expected, AuthData actual){
+        assertEquals(expected.authToken(), actual.authToken());
+        assertEquals(expected.username(), actual.username());
+    }
+
+    public static void assertAuthCollectionEqual(List<AuthData> actual, List<AuthData> expected){
+        AuthData[] actualList = actual.toArray(new AuthData[]{});
+        AuthData[] expectedList = expected.toArray(new AuthData[]{});
+        assertEquals(expectedList.length, actualList.length);
+        for (int i = 0; i < actualList.length; i++){
+            assertAuthEqual(expectedList[i], actualList[i]);
+        }
+    }
+
     public static void assertGameEqual(GameData expected, GameData actual) {
         assertEquals(expected.gameID(), actual.gameID());
         assertEquals(expected.whiteUsername(), actual.whiteUsername());
