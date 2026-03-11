@@ -74,6 +74,25 @@ public class DatabaseTests {
 
     @ParameterizedTest
     @ValueSource(classes = {MySqlDataAccess.class, MemoryDataAccess.class})
+    void getAuths(Class<? extends DataAccess> dbClass) throws SQLException, DataAccessException, ServerException {
+        DataAccess db = getDataAccess(dbClass);
+
+        AuthData auth1 = new AuthData("auth1", "user1");
+        AuthData auth2 = new AuthData("auth2", "user2");
+
+        List<AuthData> expected = new ArrayList<>();
+        expected.add(auth1);
+        expected.add(auth2);
+
+        db.createAuth("auth1", auth1);
+        db.createAuth("auth2", auth2);
+
+        List<AuthData> actual = db.getAuths();
+        assertAuthCollectionEqual(expected, actual);
+    }
+
+    @ParameterizedTest
+    @ValueSource(classes = {MySqlDataAccess.class, MemoryDataAccess.class})
     void listGames(Class<? extends DataAccess> dbClass) throws SQLException, DataAccessException, ServerException {
         DataAccess db = getDataAccess(dbClass);
 
