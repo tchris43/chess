@@ -156,6 +156,23 @@ public class DatabaseTests {
 
     @ParameterizedTest
     @ValueSource(classes = {MySqlDataAccess.class, MemoryDataAccess.class})
+    void getGame(Class<? extends DataAccess> dbClass) throws SQLException, DataAccessException, ServerException {
+        DataAccess db = getDataAccess(dbClass);
+
+        int gameID = 1;
+        String gameName = "game";
+        ChessGame game = new ChessGame();
+
+        GameData expected = new GameData(gameID, null, null, gameName, game);
+
+        db.createGame(gameName);
+
+        GameData actual = db.getGame(gameID);
+        assertGameEqual(actual, expected);
+    }
+
+    @ParameterizedTest
+    @ValueSource(classes = {MySqlDataAccess.class, MemoryDataAccess.class})
     void deleteAuth(Class<? extends DataAccess> dbClass) throws SQLException, DataAccessException, ServerException {
         DataAccess db = getDataAccess(dbClass);
 
