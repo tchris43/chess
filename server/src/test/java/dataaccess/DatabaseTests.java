@@ -5,6 +5,7 @@ import model.*;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.ValueSource;
 import server.ServerException;
+import service.AlreadyTakenException;
 
 import java.sql.SQLException;
 import java.util.ArrayList;
@@ -14,7 +15,7 @@ import java.util.List;
 import static org.junit.jupiter.api.Assertions.*;
 
 public class DatabaseTests {
-    private DataAccess getDataAccess(Class<? extends DataAccess> databaseClass) throws SQLException, DataAccessException, ServerException {
+    private DataAccess getDataAccess(Class<? extends DataAccess> databaseClass) throws AlreadyTakenException, SQLException, DataAccessException, ServerException {
         DataAccess db;
         if (databaseClass.equals(MySqlDataAccess.class)){
             db = new MySqlDataAccess();
@@ -61,7 +62,18 @@ public class DatabaseTests {
         assertDoesNotThrow(() -> db.createAuth(authToken, authData));
     }
 
-    
+    @ParameterizedTest
+    @ValueSource(classes = {MySqlDataAccess.class, MemoryDataAccess.class})
+    void createAuthFails(Class<? extends DataAccess> dbClass) throws SQLException, DataAccessException, ServerException {
+        //create the same auth twice
+        DataAccess db = getDataAccess(dbClass);
+
+        String authToken = "auth";
+        AuthData authData = new AuthData(authToken, "user");
+        db.createAuth(authToken, authData);
+
+        assertThrows(DataAccessException.class, () -> {db.createAuth(authToken, authData);});
+    }
 
     @ParameterizedTest
     @ValueSource(classes = {MySqlDataAccess.class, MemoryDataAccess.class})
@@ -86,6 +98,13 @@ public class DatabaseTests {
         assertUserCollectionEqual(expected, actual);
     }
 
+//    @ParameterizedTest
+//    @ValueSource(classes = {MySqlDataAccess.class, MemoryDataAccess.class})
+//    void getUsersFails(Class<? extends DataAccess> dbClass) throws SQLException, DataAccessException, ServerException {
+//        //getUsers with no users
+//        DataAccess db = getDataAccess(dbClass);
+//    }
+
     @ParameterizedTest
     @ValueSource(classes = {MySqlDataAccess.class, MemoryDataAccess.class})
     void getAuths(Class<? extends DataAccess> dbClass) throws SQLException, DataAccessException, ServerException {
@@ -104,6 +123,13 @@ public class DatabaseTests {
         List<AuthData> actual = db.getAuths();
         assertAuthCollectionEqual(expected, actual);
     }
+//
+//    @ParameterizedTest
+//    @ValueSource(classes = {MySqlDataAccess.class, MemoryDataAccess.class})
+//    void getAuthsFails(Class<? extends DataAccess> dbClass) throws SQLException, DataAccessException, ServerException {
+//        //create the same user twice fails
+//        DataAccess db = getDataAccess(dbClass);
+//    }
 
     @ParameterizedTest
     @ValueSource(classes = {MySqlDataAccess.class, MemoryDataAccess.class})
@@ -122,6 +148,18 @@ public class DatabaseTests {
 
     @ParameterizedTest
     @ValueSource(classes = {MySqlDataAccess.class, MemoryDataAccess.class})
+    void getUserFails(Class<? extends DataAccess> dbClass) throws SQLException, DataAccessException, ServerException {
+        //user does not exist
+        DataAccess db = getDataAccess(dbClass);
+
+        UserData user = new UserData("username", "pass", "email");
+        db.createUser("username", user);
+
+        assertThrows(DataAccessException.class, () -> {db.getUser("fakeUsername");});
+    }
+
+    @ParameterizedTest
+    @ValueSource(classes = {MySqlDataAccess.class, MemoryDataAccess.class})
     void getAuth(Class<? extends DataAccess> dbClass) throws SQLException, DataAccessException, ServerException {
         DataAccess db = getDataAccess(dbClass);
 
@@ -133,6 +171,19 @@ public class DatabaseTests {
 
         AuthData actual = db.getAuth(authToken);
         assertAuthEqual(actual, expected);
+    }
+
+    @ParameterizedTest
+    @ValueSource(classes = {MySqlDataAccess.class, MemoryDataAccess.class})
+    void getAuthFails(Class<? extends DataAccess> dbClass) throws SQLException, DataAccessException, ServerException {
+        //invalid auth token
+        DataAccess db = getDataAccess(dbClass);
+
+        String authToken = "auth";
+        AuthData authData = new AuthData(authToken, "username");
+        db.createAuth(authToken, authData);
+
+        assertThrows(DataAccessException.class, () -> {db.getAuth("invalidAuth");});
     }
 
     @ParameterizedTest
@@ -158,6 +209,13 @@ public class DatabaseTests {
         assertGameCollectionEqual(expected, actual);
     }
 
+//    @ParameterizedTest
+//    @ValueSource(classes = {MySqlDataAccess.class, MemoryDataAccess.class})
+//    void listGamesFails(Class<? extends DataAccess> dbClass) throws SQLException, DataAccessException, ServerException {
+//        //user does not exist
+//        DataAccess db = getDataAccess(dbClass);
+//    }
+
     @ParameterizedTest
     @ValueSource(classes = {MySqlDataAccess.class, MemoryDataAccess.class})
     void createGame(Class<? extends DataAccess> dbClass) throws SQLException, DataAccessException, ServerException {
@@ -166,6 +224,17 @@ public class DatabaseTests {
         String gameName = "game";
 
         assertDoesNotThrow(() -> db.createGame(gameName));
+    }
+
+    @ParameterizedTest
+    @ValueSource(classes = {MySqlDataAccess.class, MemoryDataAccess.class})
+    void createGameFails(Class<? extends DataAccess> dbClass) throws SQLException, DataAccessException, ServerException {
+        //same game name as existing
+        DataAccess db = getDataAccess(dbClass);
+
+        db.createGame("game");
+
+        assertThrows(DataAccessException.class, () -> {db.createGame("game");});
     }
 
     @ParameterizedTest
@@ -187,6 +256,17 @@ public class DatabaseTests {
 
     @ParameterizedTest
     @ValueSource(classes = {MySqlDataAccess.class, MemoryDataAccess.class})
+    void getGameFails(Class<? extends DataAccess> dbClass) throws SQLException, DataAccessException, ServerException {
+        //invalid id
+        DataAccess db = getDataAccess(dbClass);
+
+        db.createGame("game");
+
+        assertThrows(DataAccessException.class, () -> {db.getGame(10);});
+    }
+
+    @ParameterizedTest
+    @ValueSource(classes = {MySqlDataAccess.class, MemoryDataAccess.class})
     void updateGame(Class<? extends DataAccess> dbClass) throws SQLException, DataAccessException, ServerException {
         DataAccess db = getDataAccess(dbClass);
         ChessGame game = new ChessGame();
@@ -197,6 +277,19 @@ public class DatabaseTests {
 
         GameData actual = db.updateGame("newUser", 1, ChessGame.TeamColor.WHITE, "newUser", null, "game", game);
         assertEquals(actual, expected);
+    }
+
+    @ParameterizedTest
+    @ValueSource(classes = {MySqlDataAccess.class, MemoryDataAccess.class})
+    void updateGameFails(Class<? extends DataAccess> dbClass) throws SQLException, DataAccessException, ServerException, AlreadyTakenException {
+        //user already full
+        DataAccess db = getDataAccess(dbClass);
+        ChessGame game = new ChessGame();
+
+        db.createGame("game");
+        db.updateGame("user", 1, ChessGame.TeamColor.WHITE, "user", null, "game", game);
+
+        assertThrows(AlreadyTakenException.class, () -> {db.updateGame("taylor", 1, ChessGame.TeamColor.WHITE, "taylor", null, "game", game);});
     }
 
     @ParameterizedTest
@@ -215,6 +308,18 @@ public class DatabaseTests {
 
         List<AuthData> actual = db.getAuths();
         assertAuthCollectionEqual(expected, actual);
+    }
+
+    @ParameterizedTest
+    @ValueSource(classes = {MySqlDataAccess.class, MemoryDataAccess.class})
+    void deleteAuthFails(Class<? extends DataAccess> dbClass) throws SQLException, DataAccessException, ServerException {
+        //invalid auth token
+        DataAccess db = getDataAccess(dbClass);
+
+        AuthData authData = new AuthData("authToken", "user");
+        db.createAuth("authToken", authData);
+
+        assertThrows(DataAccessException.class, () -> {db.deleteAuth("invalidAuth");});
     }
 
     @ParameterizedTest
