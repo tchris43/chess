@@ -41,6 +41,16 @@ public class DatabaseTests {
 
     @ParameterizedTest
     @ValueSource(classes = {MySqlDataAccess.class, MemoryDataAccess.class})
+    void createAuth(Class<? extends DataAccess> dbClass) throws SQLException, DataAccessException, ServerException {
+        DataAccess db = getDataAccess(dbClass);
+
+        String authToken = "auth1";
+        AuthData authData = new AuthData(authToken, "taylor");
+        assertDoesNotThrow(() -> db.createAuth(authToken, authData));
+    }
+
+    @ParameterizedTest
+    @ValueSource(classes = {MySqlDataAccess.class, MemoryDataAccess.class})
     void listGames(Class<? extends DataAccess> dbClass) throws SQLException, DataAccessException, ServerException {
         DataAccess db = getDataAccess(dbClass);
 
