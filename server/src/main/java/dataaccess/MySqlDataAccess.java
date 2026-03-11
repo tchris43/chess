@@ -12,7 +12,7 @@ import java.util.List;
 public class MySqlDataAccess implements DataAccess{
     //This implementation will be very similar to MemoryDataAccess but will configureDatabase() and will have
     // to call a separate function to read the JSON into a GSON when querying the data
-    public MySqlDataAccess() throws DataAccessException{
+    public MySqlDataAccess() throws DataAccessException, SQLException{
         configureDataBase();
     }
 
