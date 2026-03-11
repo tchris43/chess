@@ -144,7 +144,15 @@ public class DatabaseTests {
         assertGameCollectionEqual(expected, actual);
     }
 
-    
+    @ParameterizedTest
+    @ValueSource(classes = {MySqlDataAccess.class, MemoryDataAccess.class})
+    void createGame(Class<? extends DataAccess> dbClass) throws SQLException, DataAccessException, ServerException {
+        DataAccess db = getDataAccess(dbClass);
+
+        String gameName = "game";
+
+        assertDoesNotThrow(() -> db.createGame(gameName));
+    }
 
     @ParameterizedTest
     @ValueSource(classes = {MySqlDataAccess.class, MemoryDataAccess.class})
