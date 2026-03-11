@@ -1,7 +1,7 @@
 package dataaccess;
 
 import chess.ChessGame;
-import model.*
+import model.*;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.ValueSource;
 import server.ServerException;
@@ -11,8 +11,7 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 
-import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
-import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.*;
 
 public class DatabaseTests {
     private DataAccess getDataAccess(Class<? extends DataAccess> databaseClass) throws SQLException, DataAccessException, ServerException {
@@ -41,6 +40,19 @@ public class DatabaseTests {
 
     @ParameterizedTest
     @ValueSource(classes = {MySqlDataAccess.class, MemoryDataAccess.class})
+    void createUserFails(Class<? extends DataAccess> dbClass) throws SQLException, DataAccessException, ServerException {
+        //create the same user twice fails
+        DataAccess db = getDataAccess(dbClass);
+
+        String username = "taylor";
+        UserData userData = new UserData(username, "password", "email");
+        db.createUser("taylor", userData);
+
+        assertThrows(DataAccessException.class, () -> {db.createUser(username, userData);});
+    }
+
+    @ParameterizedTest
+    @ValueSource(classes = {MySqlDataAccess.class, MemoryDataAccess.class})
     void createAuth(Class<? extends DataAccess> dbClass) throws SQLException, DataAccessException, ServerException {
         DataAccess db = getDataAccess(dbClass);
 
@@ -48,6 +60,8 @@ public class DatabaseTests {
         AuthData authData = new AuthData(authToken, "taylor");
         assertDoesNotThrow(() -> db.createAuth(authToken, authData));
     }
+
+    
 
     @ParameterizedTest
     @ValueSource(classes = {MySqlDataAccess.class, MemoryDataAccess.class})
