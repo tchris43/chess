@@ -4,6 +4,7 @@ import chess.ChessGame;
 import model.*
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.ValueSource;
+import server.ServerException;
 
 import java.sql.SQLException;
 import java.util.ArrayList;
@@ -14,7 +15,7 @@ import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
 public class DatabaseTests {
-    private DataAccess getDataAccess(Class<? extends DataAccess> databaseClass) throws SQLException, DataAccessException{
+    private DataAccess getDataAccess(Class<? extends DataAccess> databaseClass) throws SQLException, DataAccessException, ServerException {
         DataAccess db;
         if (databaseClass.equals(MySqlDataAccess.class)){
             db = new MySqlDataAccess();
@@ -22,12 +23,15 @@ public class DatabaseTests {
         else {
             db = new MemoryDataAccess();
         }
+        db.deleteAllGames();
+        db.deleteAllAuths();
+        db.deleteAllUsers();
         return db;
     }
 
     @ParameterizedTest
     @ValueSource(classes = {MySqlDataAccess.class, MemoryDataAccess.class})
-    void createUser(Class<? extends DataAccess> dbClass) throws SQLException, DataAccessException {
+    void createUser(Class<? extends DataAccess> dbClass) throws SQLException, DataAccessException, ServerException {
         DataAccess db = getDataAccess(dbClass);
 
         String username = "taylor";
@@ -37,7 +41,7 @@ public class DatabaseTests {
 
     @ParameterizedTest
     @ValueSource(classes = {MySqlDataAccess.class, MemoryDataAccess.class})
-    void listGames(Class<? extends DataAccess> dbClass) throws SQLException, DataAccessException {
+    void listGames(Class<? extends DataAccess> dbClass) throws SQLException, DataAccessException, ServerException {
         DataAccess db = getDataAccess(dbClass);
 
         ChessGame game = new ChessGame();
@@ -60,7 +64,7 @@ public class DatabaseTests {
 
     @ParameterizedTest
     @ValueSource(classes = {MySqlDataAccess.class, MemoryDataAccess.class})
-    void deleteAuth(Class<? extends DataAccess> dbClass) throws SQLException, DataAccessException {
+    void deleteAuth(Class<? extends DataAccess> dbClass) throws SQLException, DataAccessException, ServerException {
         DataAccess db = getDataAccess(dbClass);
 
         List<AuthData> expected = new ArrayList<>();
@@ -76,7 +80,19 @@ public class DatabaseTests {
         assertAuthCollectionEqual(expected, actual);
     }
 
-    
+    @ParameterizedTest
+    @ValueSource(classes = {MySqlDataAccess.class, MemoryDataAccess.class})
+    void deleteAllGames(Class<? extends DataAccess> dbClass) throws SQLException, DataAccessException, ServerException {
+        DataAccess db = getDataAccess(dbClass);
+
+        db.createGame("game1");
+        db.createGame("game2");
+
+        db.deleteAllGames();
+
+        GameList actual = db.listGames();
+        assertEquals(0, actual.size());
+    }
 
     public static void assertAuthEqual(AuthData expected, AuthData actual){
         assertEquals(expected.authToken(), actual.authToken());
