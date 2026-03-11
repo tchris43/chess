@@ -51,6 +51,29 @@ public class DatabaseTests {
 
     @ParameterizedTest
     @ValueSource(classes = {MySqlDataAccess.class, MemoryDataAccess.class})
+    void getUsers(Class<? extends DataAccess> dbClass) throws SQLException, DataAccessException, ServerException {
+        DataAccess db = getDataAccess(dbClass);
+
+        UserData user1 = new UserData("user1", "pass", "email");
+        UserData user2 = new UserData("user2", "pass", "email");
+        UserData user3 = new UserData("user3", "pass", "email");
+
+        List<UserData> expected = new ArrayList<>();
+        expected.add(user1);
+        expected.add(user2);
+        expected.add(user3);
+
+        db.createUser("user1", user1);
+        db.createUser("user2", user2);
+        db.createUser("user3", user3);
+
+
+        Collection<UserData> actual = db.getUsers();
+        assertUserCollectionEqual(expected, actual);
+    }
+
+    @ParameterizedTest
+    @ValueSource(classes = {MySqlDataAccess.class, MemoryDataAccess.class})
     void listGames(Class<? extends DataAccess> dbClass) throws SQLException, DataAccessException, ServerException {
         DataAccess db = getDataAccess(dbClass);
 
@@ -128,6 +151,15 @@ public class DatabaseTests {
 
 
     public static void assertGameCollectionEqual(Collection<GameData> expected, Collection<GameData> actual){
+        GameData[] actualList = actual.toArray(new GameData[]{});
+        GameData[] expectedList = expected.toArray(new GameData[]{});
+        assertEquals(expectedList.length, actualList.length);
+        for (int i = 0; i < actualList.length; i++){
+            assertGameEqual(expectedList[i], actualList[i]);
+        }
+    }
+
+    public static void assertUserCollectionEqual(Collection<GameData> expected, Collection<GameData> actual){
         GameData[] actualList = actual.toArray(new GameData[]{});
         GameData[] expectedList = expected.toArray(new GameData[]{});
         assertEquals(expectedList.length, actualList.length);
