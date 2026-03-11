@@ -108,6 +108,21 @@ public class DatabaseTests {
 
     @ParameterizedTest
     @ValueSource(classes = {MySqlDataAccess.class, MemoryDataAccess.class})
+    void getAuth(Class<? extends DataAccess> dbClass) throws SQLException, DataAccessException, ServerException {
+        DataAccess db = getDataAccess(dbClass);
+
+        String authToken = "authToken";
+
+        AuthData expected = new AuthData(authToken, "username");
+
+        db.createAuth(authToken, expected);
+
+        AuthData actual = db.getAuth(authToken);
+        assertAuthEqual(actual, expected);
+    }
+
+    @ParameterizedTest
+    @ValueSource(classes = {MySqlDataAccess.class, MemoryDataAccess.class})
     void listGames(Class<? extends DataAccess> dbClass) throws SQLException, DataAccessException, ServerException {
         DataAccess db = getDataAccess(dbClass);
 
@@ -128,6 +143,8 @@ public class DatabaseTests {
         Collection<GameData> actual = db.listGames();
         assertGameCollectionEqual(expected, actual);
     }
+
+    
 
     @ParameterizedTest
     @ValueSource(classes = {MySqlDataAccess.class, MemoryDataAccess.class})
