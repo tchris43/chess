@@ -173,6 +173,20 @@ public class DatabaseTests {
 
     @ParameterizedTest
     @ValueSource(classes = {MySqlDataAccess.class, MemoryDataAccess.class})
+    void updateGame(Class<? extends DataAccess> dbClass) throws SQLException, DataAccessException, ServerException {
+        DataAccess db = getDataAccess(dbClass);
+        ChessGame game = new ChessGame();
+
+        GameData expected = new GameData(1, "newUser", null, "game", game);
+
+        db.createGame("game");
+
+        GameData actual = db.updateGame("newUser", 1, ChessGame.TeamColor.WHITE, "newUser", null, "game", game);
+        assertEquals(actual, expected);
+    }
+
+    @ParameterizedTest
+    @ValueSource(classes = {MySqlDataAccess.class, MemoryDataAccess.class})
     void deleteAuth(Class<? extends DataAccess> dbClass) throws SQLException, DataAccessException, ServerException {
         DataAccess db = getDataAccess(dbClass);
 
@@ -200,6 +214,38 @@ public class DatabaseTests {
         db.deleteAllGames();
 
         GameList actual = db.listGames();
+        assertEquals(0, actual.size());
+    }
+
+    @ParameterizedTest
+    @ValueSource(classes = {MySqlDataAccess.class, MemoryDataAccess.class})
+    void deleteAllUsers(Class<? extends DataAccess> dbClass) throws SQLException, DataAccessException, ServerException {
+        DataAccess db = getDataAccess(dbClass);
+
+        UserData user1 = new UserData("user1", "pass", "email");
+        UserData user2 = new UserData("user2", "pass", "email");
+
+
+        db.createUser("user1", user1);
+        db.createUser("user2", user2);
+
+        db.deleteAllUsers();
+
+        List<UserData> actual = db.getUsers();
+        assertEquals(0, actual.size());
+    }
+
+    @ParameterizedTest
+    @ValueSource(classes = {MySqlDataAccess.class, MemoryDataAccess.class})
+    void deleteAllAuths(Class<? extends DataAccess> dbClass) throws SQLException, DataAccessException, ServerException {
+        DataAccess db = getDataAccess(dbClass);
+
+        AuthData auth1 = new AuthData("auth1", "user1");
+        AuthData auth2 = new AuthData("auth2", "user2");
+
+        db.deleteAllAuths();
+
+        List<AuthData> actual = db.getAuths();
         assertEquals(0, actual.size());
     }
 
