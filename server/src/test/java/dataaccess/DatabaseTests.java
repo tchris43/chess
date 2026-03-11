@@ -159,12 +159,18 @@ public class DatabaseTests {
         }
     }
 
-    public static void assertUserCollectionEqual(Collection<GameData> expected, Collection<GameData> actual){
-        GameData[] actualList = actual.toArray(new GameData[]{});
-        GameData[] expectedList = expected.toArray(new GameData[]{});
+    public static void assertUserEqual(UserData expected, UserData actual) {
+        assertEquals(expected.username(), actual.username());
+        assertEquals(expected.password(), actual.password());
+        assertEquals(expected.email(), actual.email());
+    }
+
+    public static void assertUserCollectionEqual(Collection<UserData> expected, Collection<UserData> actual){
+        UserData[] actualList = actual.toArray(new UserData[]{});
+        UserData[] expectedList = expected.toArray(new UserData[]{});
         assertEquals(expectedList.length, actualList.length);
         for (int i = 0; i < actualList.length; i++){
-            assertGameEqual(expectedList[i], actualList[i]);
+            assertUserEqual(expectedList[i], actualList[i]);
         }
     }
 
