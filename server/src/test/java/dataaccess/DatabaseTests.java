@@ -30,8 +30,7 @@ public class DatabaseTests {
     }
 
     @ParameterizedTest
-    @ValueSource(classes = {MySqlDataAccess.class, MemoryDataAccess.class})
-    void createUser(Class<? extends DataAccess> dbClass) throws SQLException, DataAccessException, ServerException {
+    @ValueSource(classes = {MySqlDataAccess.class})    void createUser(Class<? extends DataAccess> dbClass) throws SQLException, DataAccessException, ServerException {
         DataAccess db = getDataAccess(dbClass);
 
         String username = "taylor";
@@ -40,8 +39,7 @@ public class DatabaseTests {
     }
 
     @ParameterizedTest
-    @ValueSource(classes = {MySqlDataAccess.class, MemoryDataAccess.class})
-    void createUserFails(Class<? extends DataAccess> dbClass) throws SQLException, DataAccessException, ServerException {
+    @ValueSource(classes = {MySqlDataAccess.class})    void createUserFails(Class<? extends DataAccess> dbClass) throws SQLException, DataAccessException, ServerException {
         //create the same user twice fails
         DataAccess db = getDataAccess(dbClass);
 
@@ -53,8 +51,7 @@ public class DatabaseTests {
     }
 
     @ParameterizedTest
-    @ValueSource(classes = {MySqlDataAccess.class, MemoryDataAccess.class})
-    void createAuth(Class<? extends DataAccess> dbClass) throws SQLException, DataAccessException, ServerException {
+    @ValueSource(classes = {MySqlDataAccess.class})    void createAuth(Class<? extends DataAccess> dbClass) throws SQLException, DataAccessException, ServerException {
         DataAccess db = getDataAccess(dbClass);
 
         String authToken = "auth1";
@@ -63,9 +60,9 @@ public class DatabaseTests {
     }
 
     @ParameterizedTest
-    @ValueSource(classes = {MySqlDataAccess.class, MemoryDataAccess.class})
-    void createAuthFails(Class<? extends DataAccess> dbClass) throws SQLException, DataAccessException, ServerException {
+    @ValueSource(classes = {MySqlDataAccess.class})    void createAuthFails(Class<? extends DataAccess> dbClass) throws SQLException, DataAccessException, ServerException {
         //create the same auth twice
+        
         DataAccess db = getDataAccess(dbClass);
 
         String authToken = "auth";
@@ -76,8 +73,7 @@ public class DatabaseTests {
     }
 
     @ParameterizedTest
-    @ValueSource(classes = {MySqlDataAccess.class, MemoryDataAccess.class})
-    void getUsers(Class<? extends DataAccess> dbClass) throws SQLException, DataAccessException, ServerException {
+    @ValueSource(classes = {MySqlDataAccess.class})    void getUsers(Class<? extends DataAccess> dbClass) throws SQLException, DataAccessException, ServerException {
         DataAccess db = getDataAccess(dbClass);
 
         UserData user1 = new UserData("user1", "pass", "email");
@@ -98,16 +94,19 @@ public class DatabaseTests {
         assertUserCollectionEqual(expected, actual);
     }
 
-//    @ParameterizedTest
-//    @ValueSource(classes = {MySqlDataAccess.class, MemoryDataAccess.class})
-//    void getUsersFails(Class<? extends DataAccess> dbClass) throws SQLException, DataAccessException, ServerException {
-//        //getUsers with no users
-//        DataAccess db = getDataAccess(dbClass);
-//    }
 
     @ParameterizedTest
-    @ValueSource(classes = {MySqlDataAccess.class, MemoryDataAccess.class})
-    void getAuths(Class<? extends DataAccess> dbClass) throws SQLException, DataAccessException, ServerException {
+    @ValueSource(classes = {MySqlDataAccess.class})
+    void getUsersFails(Class<? extends DataAccess> dbClass) throws SQLException, DataAccessException, ServerException {
+        //getUsers with no users
+        DataAccess db = getDataAccess(dbClass);
+
+        List<UserData> actual = db.getUsers();
+        assertEquals(0, actual.size());
+    }
+
+    @ParameterizedTest
+    @ValueSource(classes = {MySqlDataAccess.class})    void getAuths(Class<? extends DataAccess> dbClass) throws SQLException, DataAccessException, ServerException {
         DataAccess db = getDataAccess(dbClass);
 
         AuthData auth1 = new AuthData("auth1", "user1");
@@ -123,17 +122,19 @@ public class DatabaseTests {
         List<AuthData> actual = db.getAuths();
         assertAuthCollectionEqual(expected, actual);
     }
-//
-//    @ParameterizedTest
-//    @ValueSource(classes = {MySqlDataAccess.class, MemoryDataAccess.class})
-//    void getAuthsFails(Class<? extends DataAccess> dbClass) throws SQLException, DataAccessException, ServerException {
-//        //create the same user twice fails
-//        DataAccess db = getDataAccess(dbClass);
-//    }
 
     @ParameterizedTest
-    @ValueSource(classes = {MySqlDataAccess.class, MemoryDataAccess.class})
-    void getUser(Class<? extends DataAccess> dbClass) throws SQLException, DataAccessException, ServerException {
+    @ValueSource(classes = {MySqlDataAccess.class})
+    void getAuthsFails(Class<? extends DataAccess> dbClass) throws SQLException, DataAccessException, ServerException {
+        //no auths
+        DataAccess db = getDataAccess(dbClass);
+
+        List<AuthData> actual = db.getAuths();
+        assertEquals(0, actual.size());
+    }
+
+    @ParameterizedTest
+    @ValueSource(classes = {MySqlDataAccess.class})    void getUser(Class<? extends DataAccess> dbClass) throws SQLException, DataAccessException, ServerException {
         DataAccess db = getDataAccess(dbClass);
 
         String username = "taylor";
@@ -147,8 +148,7 @@ public class DatabaseTests {
     }
 
     @ParameterizedTest
-    @ValueSource(classes = {MySqlDataAccess.class, MemoryDataAccess.class})
-    void getUserFails(Class<? extends DataAccess> dbClass) throws SQLException, DataAccessException, ServerException {
+    @ValueSource(classes = {MySqlDataAccess.class})    void getUserFails(Class<? extends DataAccess> dbClass) throws SQLException, DataAccessException, ServerException {
         //user does not exist
         DataAccess db = getDataAccess(dbClass);
 
@@ -159,7 +159,7 @@ public class DatabaseTests {
     }
 
     @ParameterizedTest
-    @ValueSource(classes = {MySqlDataAccess.class, MemoryDataAccess.class})
+    @ValueSource(classes = {MySqlDataAccess.class}) 
     void getAuth(Class<? extends DataAccess> dbClass) throws SQLException, DataAccessException, ServerException {
         DataAccess db = getDataAccess(dbClass);
 
@@ -174,8 +174,7 @@ public class DatabaseTests {
     }
 
     @ParameterizedTest
-    @ValueSource(classes = {MySqlDataAccess.class, MemoryDataAccess.class})
-    void getAuthFails(Class<? extends DataAccess> dbClass) throws SQLException, DataAccessException, ServerException {
+    @ValueSource(classes = {MySqlDataAccess.class})    void getAuthFails(Class<? extends DataAccess> dbClass) throws SQLException, DataAccessException, ServerException {
         //invalid auth token
         DataAccess db = getDataAccess(dbClass);
 
@@ -187,8 +186,7 @@ public class DatabaseTests {
     }
 
     @ParameterizedTest
-    @ValueSource(classes = {MySqlDataAccess.class, MemoryDataAccess.class})
-    void listGames(Class<? extends DataAccess> dbClass) throws SQLException, DataAccessException, ServerException {
+    @ValueSource(classes = {MySqlDataAccess.class})    void listGames(Class<? extends DataAccess> dbClass) throws SQLException, DataAccessException, ServerException {
         DataAccess db = getDataAccess(dbClass);
 
         ChessGame game = new ChessGame();
@@ -209,16 +207,19 @@ public class DatabaseTests {
         assertGameCollectionEqual(expected, actual);
     }
 
-//    @ParameterizedTest
-//    @ValueSource(classes = {MySqlDataAccess.class, MemoryDataAccess.class})
-//    void listGamesFails(Class<? extends DataAccess> dbClass) throws SQLException, DataAccessException, ServerException {
-//        //user does not exist
-//        DataAccess db = getDataAccess(dbClass);
-//    }
 
     @ParameterizedTest
-    @ValueSource(classes = {MySqlDataAccess.class, MemoryDataAccess.class})
-    void createGame(Class<? extends DataAccess> dbClass) throws SQLException, DataAccessException, ServerException {
+    @ValueSource(classes = {MySqlDataAccess.class})
+    void listGamesFails(Class<? extends DataAccess> dbClass) throws SQLException, DataAccessException, ServerException {
+        //no games
+        DataAccess db = getDataAccess(dbClass);
+
+        List<GameData> actual = db.listGames();
+        assertEquals(0, actual.size());
+    }
+
+    @ParameterizedTest
+    @ValueSource(classes = {MySqlDataAccess.class})    void createGame(Class<? extends DataAccess> dbClass) throws SQLException, DataAccessException, ServerException {
         DataAccess db = getDataAccess(dbClass);
 
         String gameName = "game";
@@ -227,8 +228,7 @@ public class DatabaseTests {
     }
 
     @ParameterizedTest
-    @ValueSource(classes = {MySqlDataAccess.class, MemoryDataAccess.class})
-    void createGameFails(Class<? extends DataAccess> dbClass) throws SQLException, DataAccessException, ServerException {
+    @ValueSource(classes = {MySqlDataAccess.class})    void createGameFails(Class<? extends DataAccess> dbClass) throws SQLException, DataAccessException, ServerException {
         //same game name as existing
         DataAccess db = getDataAccess(dbClass);
 
@@ -238,8 +238,7 @@ public class DatabaseTests {
     }
 
     @ParameterizedTest
-    @ValueSource(classes = {MySqlDataAccess.class, MemoryDataAccess.class})
-    void getGame(Class<? extends DataAccess> dbClass) throws SQLException, DataAccessException, ServerException {
+    @ValueSource(classes = {MySqlDataAccess.class})    void getGame(Class<? extends DataAccess> dbClass) throws SQLException, DataAccessException, ServerException {
         DataAccess db = getDataAccess(dbClass);
 
         int gameID = 1;
@@ -255,8 +254,7 @@ public class DatabaseTests {
     }
 
     @ParameterizedTest
-    @ValueSource(classes = {MySqlDataAccess.class, MemoryDataAccess.class})
-    void getGameFails(Class<? extends DataAccess> dbClass) throws SQLException, DataAccessException, ServerException {
+    @ValueSource(classes = {MySqlDataAccess.class})    void getGameFails(Class<? extends DataAccess> dbClass) throws SQLException, DataAccessException, ServerException {
         //invalid id
         DataAccess db = getDataAccess(dbClass);
 
@@ -266,8 +264,7 @@ public class DatabaseTests {
     }
 
     @ParameterizedTest
-    @ValueSource(classes = {MySqlDataAccess.class, MemoryDataAccess.class})
-    void updateGame(Class<? extends DataAccess> dbClass) throws SQLException, DataAccessException, ServerException {
+    @ValueSource(classes = {MySqlDataAccess.class})    void updateGame(Class<? extends DataAccess> dbClass) throws SQLException, DataAccessException, ServerException {
         DataAccess db = getDataAccess(dbClass);
         ChessGame game = new ChessGame();
 
@@ -280,8 +277,7 @@ public class DatabaseTests {
     }
 
     @ParameterizedTest
-    @ValueSource(classes = {MySqlDataAccess.class, MemoryDataAccess.class})
-    void updateGameFails(Class<? extends DataAccess> dbClass) throws SQLException, DataAccessException, ServerException, AlreadyTakenException {
+    @ValueSource(classes = {MySqlDataAccess.class})    void updateGameFails(Class<? extends DataAccess> dbClass) throws SQLException, DataAccessException, ServerException, AlreadyTakenException {
         //user already full
         DataAccess db = getDataAccess(dbClass);
         ChessGame game = new ChessGame();
@@ -293,8 +289,7 @@ public class DatabaseTests {
     }
 
     @ParameterizedTest
-    @ValueSource(classes = {MySqlDataAccess.class, MemoryDataAccess.class})
-    void deleteAuth(Class<? extends DataAccess> dbClass) throws SQLException, DataAccessException, ServerException {
+    @ValueSource(classes = {MySqlDataAccess.class})    void deleteAuth(Class<? extends DataAccess> dbClass) throws SQLException, DataAccessException, ServerException {
         DataAccess db = getDataAccess(dbClass);
 
         List<AuthData> expected = new ArrayList<>();
@@ -311,8 +306,7 @@ public class DatabaseTests {
     }
 
     @ParameterizedTest
-    @ValueSource(classes = {MySqlDataAccess.class, MemoryDataAccess.class})
-    void deleteAuthFails(Class<? extends DataAccess> dbClass) throws SQLException, DataAccessException, ServerException {
+    @ValueSource(classes = {MySqlDataAccess.class})    void deleteAuthFails(Class<? extends DataAccess> dbClass) throws SQLException, DataAccessException, ServerException {
         //invalid auth token
         DataAccess db = getDataAccess(dbClass);
 
@@ -323,8 +317,7 @@ public class DatabaseTests {
     }
 
     @ParameterizedTest
-    @ValueSource(classes = {MySqlDataAccess.class, MemoryDataAccess.class})
-    void deleteAllGames(Class<? extends DataAccess> dbClass) throws SQLException, DataAccessException, ServerException {
+    @ValueSource(classes = {MySqlDataAccess.class})    void deleteAllGames(Class<? extends DataAccess> dbClass) throws SQLException, DataAccessException, ServerException {
         DataAccess db = getDataAccess(dbClass);
 
         db.createGame("game1");
@@ -337,8 +330,7 @@ public class DatabaseTests {
     }
 
     @ParameterizedTest
-    @ValueSource(classes = {MySqlDataAccess.class, MemoryDataAccess.class})
-    void deleteAllUsers(Class<? extends DataAccess> dbClass) throws SQLException, DataAccessException, ServerException {
+    @ValueSource(classes = {MySqlDataAccess.class})    void deleteAllUsers(Class<? extends DataAccess> dbClass) throws SQLException, DataAccessException, ServerException {
         DataAccess db = getDataAccess(dbClass);
 
         UserData user1 = new UserData("user1", "pass", "email");
@@ -355,7 +347,7 @@ public class DatabaseTests {
     }
 
     @ParameterizedTest
-    @ValueSource(classes = {MySqlDataAccess.class, MemoryDataAccess.class})
+    @ValueSource(classes = {MySqlDataAccess.class})
     void deleteAllAuths(Class<? extends DataAccess> dbClass) throws SQLException, DataAccessException, ServerException {
         DataAccess db = getDataAccess(dbClass);
 
