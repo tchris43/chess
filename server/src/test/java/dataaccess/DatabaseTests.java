@@ -93,6 +93,21 @@ public class DatabaseTests {
 
     @ParameterizedTest
     @ValueSource(classes = {MySqlDataAccess.class, MemoryDataAccess.class})
+    void getUser(Class<? extends DataAccess> dbClass) throws SQLException, DataAccessException, ServerException {
+        DataAccess db = getDataAccess(dbClass);
+
+        String username = "taylor";
+
+        UserData expected = new UserData(username, "pass", "email");
+
+        db.createUser(username, expected);
+
+        UserData actual = db.getUser(username);
+        assertUserEqual(actual, expected);
+    }
+
+    @ParameterizedTest
+    @ValueSource(classes = {MySqlDataAccess.class, MemoryDataAccess.class})
     void listGames(Class<? extends DataAccess> dbClass) throws SQLException, DataAccessException, ServerException {
         DataAccess db = getDataAccess(dbClass);
 
