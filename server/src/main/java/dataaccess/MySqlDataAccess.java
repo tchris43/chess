@@ -262,7 +262,8 @@ public class MySqlDataAccess implements DataAccess{
         //TODO verify this is all I need to do and I can return the GameData like this
         var statement = "UPDATE games SET whiteUsername=?, blackUsername=?, gameName=?, game=? WHERE gameID=?";
         //TODO verify that it is ok that I changed the hierarchy
-        executeUpdate(statement, whiteUsername, blackUsername, gameName, game, gameID);
+        var gameJson = new Gson().toJson(game);
+        executeUpdate(statement, whiteUsername, blackUsername, gameName, gameJson, gameID);
 
         return new GameData(gameID, whiteUsername, blackUsername, gameName, game);
 

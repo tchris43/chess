@@ -119,8 +119,8 @@ public class Server {
             ctx.result(new Gson().toJson(updatedGameResult));
         }
         catch(DataAccessException exception){
-            ctx.status(400);
-            ErrorResponse errorResponse = new ErrorResponse(exception.getMessage());
+            ctx.status(500);
+            ErrorResponse errorResponse = new ErrorResponse("Error: DataAccess Error");
             ctx.result(new Gson().toJson(errorResponse));
         }
 
