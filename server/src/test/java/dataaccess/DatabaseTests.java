@@ -32,7 +32,8 @@ public class DatabaseTests {
         assertDoesNotThrow(() -> db2.getUser("Taylor"));
     }
 
-    private DataAccess getDataAccess(Class<? extends DataAccess> databaseClass) throws AlreadyTakenException, SQLException, DataAccessException, ServerException, UnauthorizedException {
+    private DataAccess getDataAccess(Class<? extends DataAccess> databaseClass)
+            throws AlreadyTakenException, SQLException, DataAccessException, ServerException, UnauthorizedException {
         DataAccess db;
         if (databaseClass.equals(MySqlDataAccess.class)){
             db = new MySqlDataAccess();

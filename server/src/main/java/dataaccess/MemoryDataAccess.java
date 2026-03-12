@@ -70,23 +70,11 @@ public class MemoryDataAccess implements DataAccess {
 
     public GameData updateGame(String username, int gameID, ChessGame.TeamColor playerColor, String whiteUsername,
                                String blackUsername, String gameName, ChessGame game) throws AlreadyTakenException{
-        if (playerColor == ChessGame.TeamColor.WHITE){
-            if (notTaken(whiteUsername)) {
-                whiteUsername = username;
-            }
-            else {
-                throw new AlreadyTakenException("Error: already taken");
-            }
-        }
-        else {
-            if (notTaken(blackUsername)) {
-                blackUsername = username;
-            }
-            else {
-                throw new AlreadyTakenException("Error: already taken");
-            }
 
-        }
+        String[] usernames = updatePlayers(ChessGame.TeamColor.WHITE, username, whiteUsername, blackUsername);
+
+        whiteUsername = usernames[0];
+        blackUsername = usernames[1];
 
         GameData updatedGame = new GameData(gameID, whiteUsername, blackUsername, gameName, game);
 

@@ -7,6 +7,7 @@ import service.AlreadyTakenException;
 import service.UnauthorizedException;
 
 import java.util.List;
+import java.util.function.Function;
 
 public interface DataAccess {
     String createUser(String username, UserData userData) throws DataAccessException;
@@ -25,4 +26,25 @@ public interface DataAccess {
     void deleteAllUsers() throws ServerException, DataAccessException;
     void deleteAllAuths() throws ServerException, DataAccessException;
 
+    default String[] updatePlayers(ChessGame.TeamColor playerColor, String username, String whiteUsername, String blackUsername){
+        if (playerColor == ChessGame.TeamColor.WHITE){
+            if (whiteUsername == null) {
+                whiteUsername = username;
+            }
+            else {
+                throw new AlreadyTakenException("Error: already taken");
+            }
+        }
+        else {
+            if (blackUsername == null) {
+                blackUsername = username;
+            }
+            else {
+                throw new AlreadyTakenException("Error: already taken");
+            }
+
+        }
+        String[] usernames = new String[]{whiteUsername, blackUsername};
+        return usernames;
+    }
 }

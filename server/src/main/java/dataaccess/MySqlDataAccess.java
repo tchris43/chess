@@ -15,7 +15,6 @@ import java.util.List;
 import static java.sql.Types.NULL;
 
 //TODO add better error messages
-//TODO verify DataAccessException is the right error and that it is being handled as a serverError and that SQLException is the right exception to catch
 
 //TODO intial testing
 
@@ -237,25 +236,13 @@ public class MySqlDataAccess implements DataAccess{
     public GameData updateGame(String username, int gameID, ChessGame.TeamColor playerColor, String whiteUsername,
                                String blackUsername, String gameName, ChessGame game) throws AlreadyTakenException, DataAccessException {
         //TODO verify that the user should be null when updating
-        if (playerColor == ChessGame.TeamColor.WHITE){
-            if (notTaken(whiteUsername)) {
-                whiteUsername = username;
-            }
-            else {
-                throw new AlreadyTakenException("Error: already taken");
-            }
-        }
-        else {
-            if (notTaken(blackUsername)) {
-                blackUsername = username;
-            }
-            else {
-                throw new AlreadyTakenException("Error: already taken");
-            }
 
-        }
+        updatePlayers(ChessGame.TeamColor.WHITE, username, whiteUsername, blackUsername);
 
-        GameData updatedGame = new GameData(gameID, whiteUsername, blackUsername, gameName, game);
+        String[] usernames = updatePlayers(ChessGame.TeamColor.WHITE, username, whiteUsername, blackUsername);
+
+        whiteUsername = usernames[0];
+        blackUsername = usernames[1];
 
         //TODO update the state with deserializing and modifying instead of doing this
         //TODO verify that I do not need to add gameID to update
