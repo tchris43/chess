@@ -7,13 +7,13 @@ import service.AlreadyTakenException;
 import service.UnauthorizedException;
 
 import javax.xml.transform.Result;
-import java.sql.Connection;
-import java.sql.PreparedStatement;
-import java.sql.ResultSet;
-import java.sql.SQLException;
+import java.sql.*;
 import java.util.List;
 
-//TODO will I run into issues if I just do basic functionality before doing negative cases?
+//TODO add better error messages
+//TODO verify DataAccessException is the right exception for connection fails (Petshop or TA?)
+//TODO go through error cases after
+//TODO add password hashing
 
 public class MySqlDataAccess implements DataAccess{
     //This implementation will be very similar to MemoryDataAccess but will configureDatabase() and will have
@@ -28,11 +28,6 @@ public class MySqlDataAccess implements DataAccess{
         var json = new Gson().toJson(registerRequest);
         //TODO: write executeUpdate helper
         executeUpdate(statement, username, registerRequest.password(), registerRequest.email(), json);
-        //TODO I need to add a json field to users? So just use JSON for things that aren't strings
-        //TODO I need to write my own executeUpdate method?
-
-        //TODO: Ask for walkthrough of executeUpdate() helper method
-        //ask about the ...
         return username;
     }
 
@@ -45,7 +40,7 @@ public class MySqlDataAccess implements DataAccess{
     public List<UserData> getUsers() throws DataAccessException {
         var result = new UserList();
         try(Connection conn = DatabaseManager.getConnection()) {
-            var statement  = "SELECT username, password, email FROM users";
+            var statement  = "SELECT * FROM users";
             try (PreparedStatement ps = conn.prepareStatement(statement)){
                 try (ResultSet rs = ps.executeQuery()){
                     while(rs.next()){
@@ -55,8 +50,7 @@ public class MySqlDataAccess implements DataAccess{
                 }
             }
         } catch (SQLException e) {
-            //TODO Understand what errors I am supposed to create and when to throw. Runtime wil crash. Follow Petshop.
-            throw new RuntimeException(e);
+            throw new DataAccessException(e.getMessage());
         }
 
         return result;
@@ -66,31 +60,26 @@ public class MySqlDataAccess implements DataAccess{
     public List<AuthData> getAuths() throws DataAccessException{
         var result = new AuthList();
         try(Connection conn = DatabaseManager.getConnection()) {
-            var statement  = "SELECT authToken, username FROM auths";
+            var statement  = "SELECT * FROM auths";
             try (PreparedStatement ps = conn.prepareStatement(statement)){
                 try (ResultSet rs = ps.executeQuery()){
                     while(rs.next()){
                         //TODO: Write readAuth
-                        //TODO: DO I need readAuth for these things because they are just strings, or do I only need readAuth for json?
-                        //TODO: If I do it this way, what is the point of json?
                         result.add(readAuth(rs));
                     }
                 }
             }
         } catch (SQLException e) {
-            throw new RuntimeException(e.getMessage());
+            throw new DataAccessException(e.getMessage());
         }
 
         return result;
     }
 
     public UserData getUser(String username) throws DataAccessException {
-        //TODO understand this from petshop: ps.setInt(1, id);
         try(Connection conn = DatabaseManager.getConnection()){
-            //TODO figure out if I am getting the json and converting before returning it
             var statement = "SELECT * FROM users WHERE username=?";
             try(PreparedStatement ps = conn.prepareStatement(statement)){
-                //TODO figure out if this the correct way to search for the user
                 ps.setString(1, username);
                 try(ResultSet rs = ps.executeQuery()){
                     if (rs.next()){
@@ -99,15 +88,14 @@ public class MySqlDataAccess implements DataAccess{
                 }
             }
         } catch (SQLException e) {
-            throw new RuntimeException(e.getMessage());
+            throw new DataAccessException(e.getMessage());
         }
         return null;
     }
 
-    public AuthData getAuth(String authToken) throws UnauthorizedException {
-        //TODO same as getUser
+    public AuthData getAuth(String authToken) throws DataAccessException, UnauthorizedException {
         try(Connection conn = DatabaseManager.getConnection()){
-            var statement = "SELECT json FROM auths WHERE authToken=?";
+            var statement = "SELECT * FROM auths WHERE authToken=?";
             try(PreparedStatement ps = conn.prepareStatement(statement)){
                 ps.setString(1, authToken);
                 try(ResultSet rs = ps.executeQuery()){
@@ -117,7 +105,7 @@ public class MySqlDataAccess implements DataAccess{
                 }
             }
         } catch (SQLException e) {
-            throw new RuntimeException(e.getMessage());
+            throw new DataAccessException(e.getMessage());
         }
         return null;
     }
@@ -127,11 +115,9 @@ public class MySqlDataAccess implements DataAccess{
         executeUpdate(statement, authToken);
     }
 
-    public GameList listGames(){
-        //TODO same as getAuths and getUsers
+    public GameList listGames() throws DataAccessException {
         var result = new GameList();
         try(Connection conn = DatabaseManager.getConnection()) {
-            //TODO do I want to select json or the individual params?
             var statement  = "SELECT json FROM games";
             try (PreparedStatement ps = conn.prepareStatement(statement)){
                 try (ResultSet rs = ps.executeQuery()){
@@ -141,67 +127,123 @@ public class MySqlDataAccess implements DataAccess{
                 }
             }
         } catch (SQLException e) {
-            throw new RuntimeException(e.getMessage());
+            throw new DataAccessException(e.getMessage());
         }
 
         return result;
     }
 
     public int createGame(String gameName){
-
-        return 0;
+        var statement = "INSERT INTO games (whiteUsername, blackUsername, gameName, game) VALUES (?,?,?,?)";
+        ChessGame game = new ChessGame();
+        //TODO: verify this is the correct way to get ID
+        int gameID = executeUpdate(statement, null, null, gameName, game);
+        return gameID;
     }
 
-    public GameData getGame(int gameID){
-
+    public GameData getGame(int gameID) throws DataAccessException{
+        try(Connection conn = DatabaseManager.getConnection()){
+            var statement = "SELECT * FROM games WHERE gameID=?";
+            try(PreparedStatement ps = conn.prepareStatement(statement)){
+                ps.setInt(1, gameID);
+                try(ResultSet rs = ps.executeQuery()){
+                    if (rs.next()){
+                        return readGame(rs);
+                    }
+                }
+            }
+        } catch (SQLException e) {
+            throw new DataAccessException(e.getMessage());
+        }
         return null;
     }
 
-    public boolean notTaken(String username){
+    private boolean notTaken(String username){
 
-        return false;
+        return username == null;
     }
 
     public GameData updateGame(String username, int gameID, ChessGame.TeamColor playerColor, String whiteUsername,
                                String blackUsername, String gameName, ChessGame game) throws AlreadyTakenException {
+        //TODO verify that the user should be null when updating
+        String statement;
+        if (playerColor == ChessGame.TeamColor.WHITE){
+            if (notTaken(whiteUsername)) {
+                whiteUsername = username;
+            }
+            else {
+                throw new AlreadyTakenException("Error: already taken");
+            }
+        }
+        else {
+            if (notTaken(blackUsername)) {
+                blackUsername = username;
+            }
+            else {
+                throw new AlreadyTakenException("Error: already taken");
+            }
 
-        return null;
+        }
+
+        GameData updatedGame = new GameData(gameID, whiteUsername, blackUsername, gameName, game);
+
+        //TODO verify that I do not need to add gameID to update
+        //TODO verify this is all I need to do and I can return the GameData like this
+        var statement = "UPDATE games SET whiteUsername=?, blackUsername=?, gameName=?, game=? WHERE gameID=?";
+        executeUpdate(statement, whiteUsername, blackUsername, gameName, game, gameID);
+
+        return new GameData(gameID, whiteUsername, blackUsername, gameName, game);
+
     }
 
+    //TODO verify this is all I need to do for deletion
     public void deleteAllGames(){
-
+        var statement = "TRUNCATE games";
+        executeUpdate(statement);
     }
 
     public void deleteAllUsers() {
+        var statement = "TRUNCATE users";
+        executeUpdate(statement);
     }
 
     public void deleteAllAuths() {
-
+        var statement = "TRUNCATE auths";
+        executeUpdate(statement);
     }
 
-    public UserData readUser(ResultSet rs){
+    private UserData readUser(ResultSet rs){
 
         return null;
     }
 
-    public AuthData readAuth(ResultSet rs){
+    private AuthData readAuth(ResultSet rs){
 
         return null;
     }
 
-    public GameData readGame(){
+    private GameData readGame(ResultSet rs){
 
         return null;
     }
 
-    //TODO: Figure out if adding the json field is correct and if the general schema is good
+    private int executeUpdate(String statement, Object... params) throws DataAccessException{
+        try(Connection conn = DatabaseManager.getConnection()) {
+            try(PreparedStatement ps = conn.prepareStatement(statement, Statement.RETURN_GENERATED_KEYS)){
+                for(int i = 0; i < params.length, i++){
+                    
+                }
+            }
+        }catch(SQLException e){
+            throw new DataAccessException(e.getMessage());
+        }
+
     private final String[] createUsersStatements = {
             """
             CREATE TABLE IF NOT EXISTS users (
             `username` varchar(256) NOT NULL,
             `password` varchar(256) NOT NULL,
-            `email` varchar(256) NOT NULL,
-            `json` TEXT DEFAULT NULL
+            `email` varchar(256) NOT NULL
             ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci
             """
     };
@@ -210,8 +252,7 @@ public class MySqlDataAccess implements DataAccess{
             """
             CREATE TABLE IF NOT EXISTS auths (
             `authToken` varchar(256) NOT NULL,
-            `username` varchar(256) NOT NULL,
-            `json` TEXT DEFAULT NULL
+            `username` varchar(256) NOT NULL
             ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci
             """
     };
@@ -223,18 +264,17 @@ public class MySqlDataAccess implements DataAccess{
             `whiteUsername` varchar(256) DEFAULT NULL,
             `blackUsername` varchar(256) DEFAULT NULL, 
             `gameName` varchar(256) NOT NULL, 
-            `game` TEXT DEFAULT NULL,
-            `json` TEXT DEFAULT NULL
+            `game` TEXT DEFAULT NULL
             ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci
             """
     };
 
-    public void createTable(Connection conn, String[] table) throws SQLException{
+    private void createTable(Connection conn, String[] table) throws SQLException, DataAccessException{
         for(String statement: table){
             try(var preparedStatement = conn.prepareStatement(statement)){
                 preparedStatement.executeUpdate();
             } catch (SQLException e) {
-                throw new SQLException(e.getMessage());
+                throw new DataAccessException(e.getMessage());
             }
         }
     }
@@ -242,7 +282,7 @@ public class MySqlDataAccess implements DataAccess{
 
 
 
-    public void configureDataBase() throws DataAccessException, SQLException {
+    private void configureDataBase() throws DataAccessException, SQLException {
         //This method will create the tables with all of their columns set up. The Database should be
         //created using the built-in CreateDatabase method in DatabaseManager.
         DatabaseManager.createDatabase();
@@ -251,7 +291,7 @@ public class MySqlDataAccess implements DataAccess{
             createTable(conn, createAuthsStatements);
             createTable(conn, createGamesStatements);
         } catch (SQLException ex) {
-            throw new SQLException(ex.getMessage());
+            throw new DataAccessException(ex.getMessage());
         }
     }
 }
