@@ -21,9 +21,14 @@ import java.sql.SQLException;
 public class Server {
 
     private final Javalin javalin;
-    private final UserService userService = new UserService(new MemoryDataAccess());
+    private final UserService userService;
 
     public Server() {
+        try {
+            userService = new UserService(new MySqlDataAccess());
+        } catch(DataAccessException e){
+            throw new RuntimeException(e.getMessage());
+        }
         javalin = Javalin.create(config -> config.staticFiles.add("web"))
             .post("/user", this::registerUser)
             .post("/session", this::loginUser)

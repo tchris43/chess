@@ -39,8 +39,7 @@ public class MySqlDataAccess implements DataAccess{
             }
         }
         var statement = "INSERT INTO users (username, password, email) VALUES (?,?,?)";
-        //TODO verify I hashed correctly
-        //TODO check if I need to unhash somewhere
+
         String password = registerRequest.password();
         String hashedPassword = BCrypt.hashpw(password, BCrypt.gensalt());
         executeUpdate(statement, username, hashedPassword, registerRequest.email());
@@ -65,7 +64,6 @@ public class MySqlDataAccess implements DataAccess{
             try (PreparedStatement ps = conn.prepareStatement(statement)){
                 try (ResultSet rs = ps.executeQuery()){
                     while(rs.next()){
-                        //TODO: Write readUser
                         result.add(readUser(rs));
                     }
                 }
@@ -107,7 +105,7 @@ public class MySqlDataAccess implements DataAccess{
             }
         }
         if (!exists){
-            throw new DataAccessException("Error: This user does not exist");
+            return null;
         }
 
         try(Connection conn = DatabaseManager.getConnection()){
