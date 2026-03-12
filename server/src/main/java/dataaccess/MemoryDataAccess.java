@@ -71,7 +71,7 @@ public class MemoryDataAccess implements DataAccess {
     public GameData updateGame(String username, int gameID, ChessGame.TeamColor playerColor, String whiteUsername,
                                String blackUsername, String gameName, ChessGame game) throws AlreadyTakenException{
 
-        String[] usernames = updatePlayers(ChessGame.TeamColor.WHITE, username, whiteUsername, blackUsername);
+        String[] usernames = updatePlayers(playerColor, username, whiteUsername, blackUsername);
 
         whiteUsername = usernames[0];
         blackUsername = usernames[1];
