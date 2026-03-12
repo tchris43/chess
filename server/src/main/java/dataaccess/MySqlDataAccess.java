@@ -32,6 +32,12 @@ public class MySqlDataAccess implements DataAccess{
 
     public String createUser(String username, UserData registerRequest) throws DataAccessException {
         //add the user to the database with key or primary key as username, and the rest of the data as well
+        var users = getUsers();
+        for (UserData user : users){
+            if (user.username().equals(username)){
+                throw new AlreadyTakenException("Error: Username already taken");
+            }
+        }
         var statement = "INSERT INTO users (username, password, email) VALUES (?,?,?)";
         //TODO verify I hashed correctly
         //TODO check if I need to unhash somewhere
@@ -42,6 +48,12 @@ public class MySqlDataAccess implements DataAccess{
     }
 
     public void createAuth(String authToken, AuthData authRequest) throws DataAccessException {
+        var auths = getAuths();
+        for (AuthData auth : auths){
+            if (auth.authToken().equals(authToken)){
+                throw new AlreadyTakenException("That auth is already created");
+            }
+        }
         var statement = "INSERT INTO auths (authToken, username) VALUES (?,?)";
         executeUpdate(statement, authToken, authRequest.username());
     }
@@ -67,6 +79,7 @@ public class MySqlDataAccess implements DataAccess{
     }
 
     public List<AuthData> getAuths() throws DataAccessException{
+
         var result = new AuthList();
         try(Connection conn = DatabaseManager.getConnection()) {
             var statement  = "SELECT * FROM auths";
@@ -86,6 +99,17 @@ public class MySqlDataAccess implements DataAccess{
     }
 
     public UserData getUser(String username) throws DataAccessException {
+        var users = getUsers();
+        boolean exists = false;
+        for (UserData user : users){
+            if (user.username().equals(username)){
+                exists = true;
+            }
+        }
+        if (!exists){
+            throw new DataAccessException("Error: This user does not exist");
+        }
+
         try(Connection conn = DatabaseManager.getConnection()){
             var statement = "SELECT * FROM users WHERE username=?";
             try(PreparedStatement ps = conn.prepareStatement(statement)){
@@ -103,6 +127,17 @@ public class MySqlDataAccess implements DataAccess{
     }
 
     public AuthData getAuth(String authToken) throws DataAccessException, UnauthorizedException {
+        var auths = getAuths();
+        boolean exists = false;
+        for (AuthData auth: auths){
+            if (auth.authToken().equals(authToken)){
+                exists = true;
+            }
+        }
+        if (!exists){
+            throw new UnauthorizedException("Error: Invalid authToken");
+        }
+
         try(Connection conn = DatabaseManager.getConnection()){
             var statement = "SELECT * FROM auths WHERE authToken=?";
             try(PreparedStatement ps = conn.prepareStatement(statement)){
@@ -119,9 +154,20 @@ public class MySqlDataAccess implements DataAccess{
         return null;
     }
 
-    public void deleteAuth(String authToken) throws DataAccessException {
+    public void deleteAuth(String authToken) throws UnauthorizedException, DataAccessException {
+        var auths = getAuths();
+        boolean valid = false;
+        for (AuthData auth : auths){
+            if (auth.authToken().equals(authToken)){
+                valid = true;
+            }
+        }
+        if (!valid){
+            throw new UnauthorizedException("Error: Unauthorized");
+        }
         var statement = "DELETE FROM auths WHERE authToken=?";
         executeUpdate(statement, authToken);
+
     }
 
     public GameList listGames() throws DataAccessException {
@@ -143,6 +189,12 @@ public class MySqlDataAccess implements DataAccess{
     }
 
     public int createGame(String gameName) throws DataAccessException {
+        var games = listGames();
+        for (GameData g : games) {
+            if (g.gameName().equals(gameName)){
+                throw new AlreadyTakenException("Error: game name already taken");
+            }
+        }
         var statement = "INSERT INTO games (whiteUsername, blackUsername, gameName, game) VALUES (?,?,?,?)";
         ChessGame newGame = new ChessGame();
         String game = new Gson().toJson(newGame);
@@ -152,6 +204,17 @@ public class MySqlDataAccess implements DataAccess{
     }
 
     public GameData getGame(int gameID) throws DataAccessException{
+        var games = listGames();
+        boolean exists = false;
+        for (GameData game : games){
+            if (game.gameID()==gameID){
+                exists = true;
+            }
+        }
+        if (!exists){
+            throw new DataAccessException("Error: This game does not exist");
+        }
+
         try(Connection conn = DatabaseManager.getConnection()){
             var statement = "SELECT * FROM games WHERE gameID=?";
             try(PreparedStatement ps = conn.prepareStatement(statement)){

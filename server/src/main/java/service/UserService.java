@@ -3,6 +3,7 @@ package service;
 import chess.ChessGame;
 import dataaccess.DataAccess;
 import dataaccess.DataAccessException;
+import dataaccess.MemoryDataAccess;
 import dataaccess.MySqlDataAccess;
 import model.*;
 import org.mindrot.jbcrypt.BCrypt;
@@ -61,17 +62,24 @@ public class UserService {
         dataAccess.createAuth(authToken, new AuthData(authToken, loginRequest.username()));
         //TODO check I have successfully unhashed the password
         boolean pwMatch;
-        if (user != null) {
-            pwMatch = BCrypt.checkpw(loginRequest.password(), user.password());
+        try {
+            if (dataAccess.getClass().equals(MemoryDataAccess.class)) {
+                pwMatch = loginRequest.password() == user.password();
+            } else {
+                if (user != null) {
+                    pwMatch = BCrypt.checkpw(loginRequest.password(), user.password());
+                } else {
+                    pwMatch = false;
+                }
+            }
+            if (user != null && pwMatch) {
+                AuthData authData = dataAccess.getAuth(authToken);
+                return new LoginResult(user.username(), authData.authToken());
+            }
+            throw new UnauthorizedException("Error: unauthorized");
+        } catch(NullPointerException e){
+            throw new UnauthorizedException("Error: unauthorized");
         }
-        else {
-            pwMatch = false;
-        }
-        if (user != null && pwMatch) {
-            AuthData authData = dataAccess.getAuth(authToken);
-            return new LoginResult(user.username(), authData.authToken());
-        }
-        throw new UnauthorizedException("Error: unauthorized");
     }
 
     public void logout(String authToken) throws UnauthorizedException, DataAccessException{
