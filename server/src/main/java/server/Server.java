@@ -4,6 +4,7 @@ package server;
 import com.google.gson.Gson;
 import dataaccess.DataAccessException;
 import dataaccess.MemoryDataAccess;
+import dataaccess.MySqlDataAccess;
 import io.javalin.*;
 import io.javalin.http.Context;
 
@@ -14,6 +15,7 @@ import service.BadRequestException;
 import service.UnauthorizedException;
 import service.UserService;
 
+import java.sql.SQLException;
 
 
 public class Server {
@@ -33,7 +35,14 @@ public class Server {
             .exception(ServerException.class, this::serverExceptionHandler)
             .exception(BadRequestException.class, this::badRequestExceptionHandler)
             .exception(AlreadyTakenException.class, this::alreadyTakenExceptionHandler)
-            .exception(UnauthorizedException.class, this::unauthorizedExceptionHandler);
+            .exception(UnauthorizedException.class, this::unauthorizedExceptionHandler)
+            .exception(DataAccessException.class, this::dataAccessExceptionHandler);
+    }
+
+    private void dataAccessExceptionHandler(DataAccessException exception, Context ctx){
+        ctx.status(500);
+        ErrorResponse errorResponse = new ErrorResponse("Error: Server failure");
+        ctx.result(new Gson().toJson(errorResponse));
     }
 
     private void serverExceptionHandler(ServerException exception, Context ctx){
@@ -114,7 +123,7 @@ public class Server {
 
 
 
-    private void clearApplication(Context ctx) throws ServerException{
+    private void clearApplication(Context ctx) throws ServerException, DataAccessException{
         userService.clear();
         ctx.status(200);
     }

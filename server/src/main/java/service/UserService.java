@@ -3,7 +3,9 @@ package service;
 import chess.ChessGame;
 import dataaccess.DataAccess;
 import dataaccess.DataAccessException;
+import dataaccess.MySqlDataAccess;
 import model.*;
+import org.mindrot.jbcrypt.BCrypt;
 import server.ServerException;
 
 import java.util.List;
@@ -13,11 +15,11 @@ public class UserService {
 
     private final DataAccess dataAccess;
 
-    public UserService(DataAccess dataAccess){
+    public UserService(DataAccess dataAccess) {
         this.dataAccess = dataAccess;
     }
 
-    public boolean isAuthorized(String authToken) throws UnauthorizedException {
+    public boolean isAuthorized(String authToken) throws UnauthorizedException, DataAccessException {
         AuthData authData = dataAccess.getAuth(authToken);
         return authData != null;
     }
@@ -57,7 +59,15 @@ public class UserService {
         UserData user = dataAccess.getUser(loginRequest.username());
         String authToken = generateToken();
         dataAccess.createAuth(authToken, new AuthData(authToken, loginRequest.username()));
-        if (user != null && loginRequest.password().equals(user.password())) {
+        //TODO check I have successfully unhashed the password
+        boolean pwMatch;
+        if (user != null) {
+            pwMatch = BCrypt.checkpw(loginRequest.password(), user.password());
+        }
+        else {
+            pwMatch = false;
+        }
+        if (user != null && pwMatch) {
             AuthData authData = dataAccess.getAuth(authToken);
             return new LoginResult(user.username(), authData.authToken());
         }
@@ -129,7 +139,7 @@ public class UserService {
         }
     }
 
-    public void clear() throws ServerException {
+    public void clear() throws ServerException, DataAccessException {
         dataAccess.deleteAllGames();
         dataAccess.deleteAllUsers();
         dataAccess.deleteAllAuths();

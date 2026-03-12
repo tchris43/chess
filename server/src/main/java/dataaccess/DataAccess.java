@@ -20,9 +20,9 @@ public interface DataAccess {
     int createGame(String gameName) throws DataAccessException;
     GameData getGame(int gameID) throws DataAccessException;
     GameData updateGame(String username, int gameID, ChessGame.TeamColor playerColor, String whiteUsername,
-                        String blackUsername, String gameName, ChessGame game) throws AlreadyTakenException;
-    void deleteAllGames() throws ServerException;
-    void deleteAllUsers() throws ServerException;
-    void deleteAllAuths() throws ServerException;
+                        String blackUsername, String gameName, ChessGame game) throws AlreadyTakenException, DataAccessException;
+    void deleteAllGames() throws ServerException, DataAccessException;
+    void deleteAllUsers() throws ServerException, DataAccessException;
+    void deleteAllAuths() throws ServerException, DataAccessException;
 
 }

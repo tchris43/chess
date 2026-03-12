@@ -4,6 +4,7 @@ import chess.ChessGame;
 import model.*;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.ValueSource;
+import org.mindrot.jbcrypt.BCrypt;
 import server.ServerException;
 import service.AlreadyTakenException;
 import service.UnauthorizedException;
@@ -18,6 +19,19 @@ import static org.junit.jupiter.api.Assertions.*;
 //TODO: verify I throw the right exceptions
 
 public class DatabaseTests {
+
+    @ParameterizedTest
+    @ValueSource(classes = {MySqlDataAccess.class})
+    void testPersistence() throws Exception{
+        DataAccess db = new MySqlDataAccess();
+
+        UserData user = new UserData("Taylor", "pass","email");
+        db.createUser("Taylor",user);
+
+        DataAccess db2 = new MySqlDataAccess();
+        assertDoesNotThrow(() -> db2.getUser("Taylor"));
+    }
+
     private DataAccess getDataAccess(Class<? extends DataAccess> databaseClass) throws AlreadyTakenException, SQLException, DataAccessException, ServerException, UnauthorizedException {
         DataAccess db;
         if (databaseClass.equals(MySqlDataAccess.class)){
@@ -154,7 +168,7 @@ public class DatabaseTests {
         db.createUser(username, expected);
 
         UserData actual = db.getUser(username);
-        assertUserEqual(actual, expected);
+        assertUserEqual(expected, actual);
     }
 
     @ParameterizedTest
@@ -301,8 +315,8 @@ public class DatabaseTests {
         DataAccess db = getDataAccess(dbClass);
         ChessGame game = new ChessGame();
 
-        db.createGame("game");
-        db.updateGame("user", 1, ChessGame.TeamColor.WHITE, "user", null, "game", game);
+        db.createGame("game1");
+        db.updateGame("user", 1, ChessGame.TeamColor.WHITE, null, null, "game", game);
 
         assertThrows(AlreadyTakenException.class, () -> {db.updateGame("taylor", 1, ChessGame.TeamColor.WHITE, "taylor", null, "game", game);});
     }
@@ -417,7 +431,7 @@ public class DatabaseTests {
 
     public static void assertUserEqual(UserData expected, UserData actual) {
         assertEquals(expected.username(), actual.username());
-        assertEquals(expected.password(), actual.password());
+        assertTrue(BCrypt.checkpw(expected.password(), actual.password()));
         assertEquals(expected.email(), actual.email());
     }
 
