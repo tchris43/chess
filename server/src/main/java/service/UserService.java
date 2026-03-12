@@ -53,7 +53,7 @@ public class UserService {
     }
 
     public LoginResult login(LoginRequest loginRequest) throws BadRequestException, UnauthorizedException, DataAccessException, ServerException{
-        //check JSON
+        //check JSONs
         if (loginMalformed(loginRequest)){
             throw new BadRequestException("Error: bad request");
         }
@@ -64,7 +64,7 @@ public class UserService {
         boolean pwMatch;
         try {
             if (dataAccess.getClass().equals(MemoryDataAccess.class)) {
-                pwMatch = loginRequest.password() == user.password();
+                pwMatch = loginRequest.password().equals(user.password());
             } else {
                 if (user != null) {
                     pwMatch = BCrypt.checkpw(loginRequest.password(), user.password());
