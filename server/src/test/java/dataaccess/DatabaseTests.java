@@ -16,7 +16,6 @@ import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.*;
 
-//TODO: verify I throw the right exceptions
 
 public class DatabaseTests {
 
@@ -304,7 +303,6 @@ public class DatabaseTests {
         GameData expected = new GameData(1, "newUser", null, "game", game);
 
         db.createGame("game");
-        //TODO: verify that the username should be null when updating
         GameData actual = db.updateGame("newUser", 1, ChessGame.TeamColor.WHITE, null, null, "game", game);
         assertEquals(actual, expected);
     }

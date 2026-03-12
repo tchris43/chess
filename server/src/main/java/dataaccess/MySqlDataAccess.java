@@ -220,10 +220,6 @@ public class MySqlDataAccess implements DataAccess{
         return null;
     }
 
-    private boolean notTaken(String username){
-
-        return username == null;
-    }
 
     public GameData updateGame(String username, int gameID, ChessGame.TeamColor playerColor, String whiteUsername,
                                String blackUsername, String gameName, ChessGame game) throws AlreadyTakenException, DataAccessException {
@@ -305,7 +301,7 @@ public class MySqlDataAccess implements DataAccess{
                     if (param instanceof String p){ ps.setString(i+1, p);}
                     else if (param instanceof Integer p){ ps.setInt(i+1, p);}
                     else if (param instanceof ChessGame p){ ps.setString(i+1, p.toString());}
-                    else if (param == null) ps.setNull(i+1, NULL);
+                    else if (param == null) {ps.setNull(i+1, NULL);}
                 }
                 ps.executeUpdate();
 

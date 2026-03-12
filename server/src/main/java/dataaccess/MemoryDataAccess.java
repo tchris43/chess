@@ -64,9 +64,7 @@ public class MemoryDataAccess implements DataAccess {
        return games.get(gameID);
     }
 
-    public boolean notTaken(String username){
-        return username == null;
-    }
+
 
     public GameData updateGame(String username, int gameID, ChessGame.TeamColor playerColor, String whiteUsername,
                                String blackUsername, String gameName, ChessGame game) throws AlreadyTakenException{
