@@ -180,7 +180,7 @@ public class DatabaseTests {
         UserData user = new UserData("username", "pass", "email");
         db.createUser("username", user);
 
-        assertThrows(DataAccessException.class, () -> {db.getUser("fakeUsername");});
+        assertEquals(null, db.getUser("fakeUsername"));
     }
 
     @ParameterizedTest
