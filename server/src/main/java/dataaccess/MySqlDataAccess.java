@@ -14,13 +14,7 @@ import java.util.List;
 
 import static java.sql.Types.NULL;
 
-//TODO add better error messages
 
-//TODO intial testing
-
-//TODO go through error cases after
-//TODO final tests
-//TODO past service tests
 
 public class MySqlDataAccess implements DataAccess{
     //This implementation will be very similar to MemoryDataAccess but will configureDatabase() and will have
@@ -83,7 +77,6 @@ public class MySqlDataAccess implements DataAccess{
             try (PreparedStatement ps = conn.prepareStatement(statement)){
                 try (ResultSet rs = ps.executeQuery()){
                     while(rs.next()){
-                        //TODO: Write readAuth
                         result.add(readAuth(rs));
                     }
                 }
@@ -195,7 +188,6 @@ public class MySqlDataAccess implements DataAccess{
         var statement = "INSERT INTO games (whiteUsername, blackUsername, gameName, game) VALUES (?,?,?,?)";
         ChessGame newGame = new ChessGame();
         String game = new Gson().toJson(newGame);
-        //TODO: verify this is the correct way to get ID
         int gameID = executeUpdate(statement, null, null, gameName, game);
         return gameID;
     }
@@ -235,7 +227,6 @@ public class MySqlDataAccess implements DataAccess{
 
     public GameData updateGame(String username, int gameID, ChessGame.TeamColor playerColor, String whiteUsername,
                                String blackUsername, String gameName, ChessGame game) throws AlreadyTakenException, DataAccessException {
-        //TODO verify that the user should be null when updating
 
         updatePlayers(ChessGame.TeamColor.WHITE, username, whiteUsername, blackUsername);
 
@@ -244,11 +235,9 @@ public class MySqlDataAccess implements DataAccess{
         whiteUsername = usernames[0];
         blackUsername = usernames[1];
 
-        //TODO update the state with deserializing and modifying instead of doing this
-        //TODO verify that I do not need to add gameID to update
-        //TODO verify this is all I need to do and I can return the GameData like this
+
         var statement = "UPDATE games SET whiteUsername=?, blackUsername=?, gameName=?, game=? WHERE gameID=?";
-        //TODO verify that it is ok that I changed the hierarchy
+
         var gameJson = new Gson().toJson(game);
         executeUpdate(statement, whiteUsername, blackUsername, gameName, gameJson, gameID);
 
@@ -256,8 +245,6 @@ public class MySqlDataAccess implements DataAccess{
 
     }
 
-    //TODO verify this is all I need to do for deletion
-    //TODO verify that it is ok I changed all methods in hierarchy
     public void deleteAllGames() throws DataAccessException {
         var statement = "TRUNCATE games";
         executeUpdate(statement);
@@ -273,7 +260,6 @@ public class MySqlDataAccess implements DataAccess{
         executeUpdate(statement);
     }
 
-    //TODO verify this is all I need to do
     private UserData readUser(ResultSet rs) throws DataAccessException {
         try {
             var username = rs.getString("username");
@@ -313,15 +299,14 @@ public class MySqlDataAccess implements DataAccess{
 
     }
 
-    //TODO: verify executeUpdate works properly
     private int executeUpdate(String statement, Object... params) throws DataAccessException {
         try (Connection conn = DatabaseManager.getConnection()) {
             try (PreparedStatement ps = conn.prepareStatement(statement, Statement.RETURN_GENERATED_KEYS)) {
                 for (int i = 0; i < params.length; i++) {
                     Object param = params[i];
-                    if (param instanceof String p) ps.setString(i+1, p);
-                    else if (param instanceof Integer p) ps.setInt(i+1, p);
-                    else if (param instanceof ChessGame p) ps.setString(i+1, p.toString());
+                    if (param instanceof String p){ ps.setString(i+1, p);}
+                    else if (param instanceof Integer p){ ps.setInt(i+1, p);}
+                    else if (param instanceof ChessGame p){ ps.setString(i+1, p.toString());}
                     else if (param == null) ps.setNull(i+1, NULL);
                 }
                 ps.executeUpdate();

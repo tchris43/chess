@@ -60,7 +60,6 @@ public class UserService {
         UserData user = dataAccess.getUser(loginRequest.username());
         String authToken = generateToken();
         dataAccess.createAuth(authToken, new AuthData(authToken, loginRequest.username()));
-        //TODO check I have successfully unhashed the password
         boolean pwMatch;
         try {
             if (dataAccess.getClass().equals(MemoryDataAccess.class)) {
