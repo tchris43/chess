@@ -9,6 +9,8 @@ import java.net.http.HttpClient;
 import java.net.http.HttpRequest;
 import java.net.http.HttpResponse;
 
+
+
 public class ServerFacade {
     private final HttpClient client = HttpClient.newHttpClient();
     private final String serverUrl;
@@ -17,7 +19,7 @@ public class ServerFacade {
         serverUrl = url;
     }
 
-    public LoginResult register(LoginRequest registerRequest) throws ResponseException{
+    public LoginResult register(UserData registerRequest) throws ResponseException{
         var request = buildRequest("POST", "/user", registerRequest);
         var response = sendRequest(request);
         return handleResponse(response, LoginResult.class);
