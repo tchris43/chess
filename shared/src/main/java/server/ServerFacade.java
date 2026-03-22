@@ -17,9 +17,10 @@ public class ServerFacade {
         serverUrl = url;
     }
 
-    public LoginResult register(LoginRequest registerRequest){
-        LoginResult registerResult = new LoginResult("","");
-        return registerResult;
+    public LoginResult register(LoginRequest registerRequest) throws ResponseException{
+        var request = buildRequest("POST", "/user", registerRequest);
+        var response = sendRequest(request);
+        return handleResponse(response, LoginResult.class);
     }
 
     public LoginResult login(LoginRequest loginRequest){
