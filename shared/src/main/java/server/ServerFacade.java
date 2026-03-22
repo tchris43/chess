@@ -1,6 +1,7 @@
 package server;
 
 import com.google.gson.Gson;
+import com.sun.jdi.StringReference;
 import model.*;
 
 import java.net.URI;
@@ -68,6 +69,28 @@ public class ServerFacade {
         } catch (Exception ex){
             throw new ResponseException(ex.getMessage());
         }
+    }
+
+    private <T> T handleResponse(HttpResponse<String> response, Class<T> responseClass) throws ResponseException{
+        var status = response.statusCode();
+        if (!isSuccessful(status)){
+            var body = response.body();
+            if (body != null){
+                throw ResponseException.fromJson(body);
+            }
+
+            throw new ResponseException("Other failure: " + status);
+        }
+
+        if (responseClass != null){
+            return new Gson().fromJson(response.body(), responseClass);
+        }
+
+        return null;
+    }
+
+    private boolean isSuccessful(int status){
+        return status / 100 == 2;
     }
 
 
