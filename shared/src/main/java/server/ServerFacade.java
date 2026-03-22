@@ -19,6 +19,11 @@ public class ServerFacade {
         serverUrl = url;
     }
 
+    public void clear() throws ResponseException{
+        var request = buildRequest("DELETE", "/db", null);
+        sendRequest(request);
+    }
+
     public LoginResult register(UserData registerRequest) throws ResponseException{
         var request = buildRequest("POST", "/user", registerRequest);
         var response = sendRequest(request);

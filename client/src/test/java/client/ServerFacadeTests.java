@@ -23,10 +23,10 @@ public class ServerFacadeTests {
         facade = new ServerFacade(url);
     }
 
-//    @BeforeAll
-//    public static void clear() {
-//
-//    }
+    @BeforeAll
+    public static void clear() throws ResponseException{
+        facade.clear();
+    }
 
 
     @AfterAll
