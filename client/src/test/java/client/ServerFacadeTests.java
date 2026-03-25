@@ -65,7 +65,7 @@ public class ServerFacadeTests {
         facade.register(registerRequest);
         LoginRequest loginRequest = new LoginRequest("testUser","pass");
         LoginResult loginResult = facade.login(loginRequest);
-        assertNotNull(facade.authToken());
+        assertNotNull(facade.getAuth());
     }
 
     @Test

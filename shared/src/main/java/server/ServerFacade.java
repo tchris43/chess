@@ -20,6 +20,10 @@ public class ServerFacade {
         serverUrl = url;
     }
 
+    public String getAuth(){
+        return authToken;
+    }
+
     public void clear() throws ResponseException{
         var request = buildRequest("DELETE", "/db", null);
         sendRequest(request);
@@ -29,7 +33,7 @@ public class ServerFacade {
         var request = buildRequest("POST", "/user", registerRequest);
         var response = sendRequest(request);
         LoginResult loginResult = handleResponse(response, LoginResult.class);
-//        authToken = loginResult.authToken();
+        authToken = loginResult.authToken();
         return loginResult;
     }
 
