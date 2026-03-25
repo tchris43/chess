@@ -14,6 +14,7 @@ import java.net.http.HttpResponse;
 public class ServerFacade {
     private final HttpClient client = HttpClient.newHttpClient();
     private final String serverUrl;
+    private String authToken;
 
     public ServerFacade(String url){
         serverUrl = url;
@@ -27,7 +28,9 @@ public class ServerFacade {
     public LoginResult register(UserData registerRequest) throws ResponseException{
         var request = buildRequest("POST", "/user", registerRequest);
         var response = sendRequest(request);
-        return handleResponse(response, LoginResult.class);
+        LoginResult loginResult = handleResponse(response, LoginResult.class);
+//        authToken = loginResult.authToken();
+        return loginResult;
     }
 
     public LoginResult login(LoginRequest loginRequest) throws ResponseException{
