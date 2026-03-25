@@ -23,8 +23,8 @@ public class ServerFacadeTests {
         facade = new ServerFacade(url);
     }
 
-    @BeforeAll
-    public static void clear() throws ResponseException{
+    @BeforeEach
+    public void clear() throws ResponseException{
         facade.clear();
     }
 
@@ -45,7 +45,89 @@ public class ServerFacadeTests {
     @Test
     public void badRegisterRequest() throws ResponseException {
         UserData registerRequest = new UserData("testUser", null, "email");
-        assertThrows(ResponseException.class, () -> {facade.register(registerRequest);});
+        assertThrows(ResponseException.class, () -> {
+            facade.register(registerRequest);
+        });
+    }
+
+    @Test
+    public void duplicateRegisterRequest() throws ResponseException {
+        UserData registerRequest = new UserData("testUser", "pass", "email");
+        facade.register(registerRequest);
+        assertThrows(ResponseException.class, () -> {
+            facade.register(registerRequest);
+        });
+    }
+
+    @Test
+    public void loginValidAuth() throws ResponseException {
+        UserData registerRequest = new UserData("testUser", "pass", "email");
+        facade.register(registerRequest);
+        LoginRequest loginRequest = new LoginRequest("testUser","pass");
+        LoginResult loginResult = facade.login(loginRequest);
+        assertNotNull(loginResult.authToken());
+    }
+
+    @Test
+    public void invalidLogin() throws ResponseException {
+        LoginRequest loginRequest = new LoginRequest("newUser", "pass");
+        assertThrows(ResponseException.class, () -> {
+            facade.login(loginRequest);
+        });
+    }
+
+
+    @Test
+    public void createGame() throws ResponseException {
+        UserData registerRequest = new UserData("testUser", "pass", "email");
+        facade.register(registerRequest);
+        LoginRequest loginRequest = new LoginRequest("testUser","pass");
+        LoginResult loginResult = facade.login(loginRequest);
+
+        GameRequest gameRequest = new GameRequest("testGame");
+
+        assertDoesNotThrow(() -> {
+            facade.createGame(gameRequest);
+        });
+
+    }
+
+    @Test
+    public void invalidCreateGame() throws ResponseException {
+        GameRequest gameRequest = new GameRequest("testGame");
+
+        assertThrows(ResponseException.class, () -> {
+            facade.createGame(gameRequest);
+        });
+    }
+
+
+    @Test
+    public void logoutRemoveAuth() throws ResponseException {
+        UserData registerRequest = new UserData("testUser", "pass", "email");
+        facade.register(registerRequest);
+        LoginRequest loginRequest = new LoginRequest("testUser","pass");
+        LoginResult loginResult = facade.login(loginRequest);
+
+        String authToken = loginResult.authToken();
+        LogoutRequest logoutRequest = new LogoutRequest(authToken);
+        facade.logout(logoutRequest);
+
+        GameRequest gameRequest = new GameRequest("testGame");
+
+        assertThrows(ResponseException.class, () -> {
+            facade.createGame(gameRequest);
+        });
+
+        assertNull(loginResult.authToken());
+    }
+
+    @Test
+    public void invalidLogout() throws ResponseException {
+        LoginRequest loginRequest = new LoginRequest("newUser", "pass");
+        assertThrows(ResponseException.class, () -> {
+            facade.login(loginRequest);
+        });
     }
 
 }

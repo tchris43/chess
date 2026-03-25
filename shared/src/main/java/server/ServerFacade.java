@@ -30,9 +30,10 @@ public class ServerFacade {
         return handleResponse(response, LoginResult.class);
     }
 
-    public LoginResult login(LoginRequest loginRequest){
-        LoginResult loginResult = new LoginResult("","");
-        return loginResult;
+    public LoginResult login(LoginRequest loginRequest) throws ResponseException{
+        var request = buildRequest("POST", "/session", loginRequest);
+        var response = sendRequest(request);
+        return handleResponse(response, LoginResult.class);
     }
 
     public void logout(LogoutRequest logoutRequest){
