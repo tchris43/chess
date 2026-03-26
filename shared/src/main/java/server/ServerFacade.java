@@ -47,8 +47,10 @@ public class ServerFacade {
         return handleResponse(response, LoginResult.class);
     }
 
-    public void logout(){
+    public void logout() throws ResponseException{
         //must check for authtoken
+        var request = buildRequest("DELETE","/session", null);
+        sendRequest(request);
     }
 
     public GameResult createGame(GameRequest gameRequest){
@@ -73,6 +75,7 @@ public class ServerFacade {
                 .method(method, makeRequestBody(body));
         if (body != null){
             request.setHeader("Content-Type", "application/json");
+            request.setHeader("authorization", authToken);
         }
         return request.build();
     }

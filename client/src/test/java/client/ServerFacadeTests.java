@@ -63,6 +63,24 @@ public class ServerFacadeTests {
         });
     }
 
+    @Test
+    public void loginValidAuth() throws ResponseException {
+        UserData registerRequest = new UserData("testUser", "pass", "email");
+        facade.register(registerRequest);
+        facade.logout();
+        LoginRequest loginRequest = new LoginRequest("testUser","pass");
+        facade.login(loginRequest);
+        assertNotNull(facade.getAuth());
+    }
+
+    @Test
+    public void invalidLogin() throws ResponseException {
+        LoginRequest loginRequest = new LoginRequest("newUser", "pass");
+        assertThrows(ResponseException.class, () -> {
+            facade.login(loginRequest);
+        });
+    }
+
 
 
     @Test
@@ -184,22 +202,6 @@ public class ServerFacadeTests {
         });
     }
 
-    @Test
-    public void loginValidAuth() throws ResponseException {
-        UserData registerRequest = new UserData("testUser", "pass", "email");
-        facade.register(registerRequest);
-        facade.logout();
-        LoginRequest loginRequest = new LoginRequest("testUser","pass");
-        facade.login(loginRequest);
-        assertNotNull(facade.getAuth());
-    }
 
-    @Test
-    public void invalidLogin() throws ResponseException {
-        LoginRequest loginRequest = new LoginRequest("newUser", "pass");
-        assertThrows(ResponseException.class, () -> {
-            facade.login(loginRequest);
-        });
-    }
 
 }
