@@ -14,6 +14,10 @@ public class PreLoginClient {
         server = new ServerFacade(serverUrl);
     }
 
+    public ServerFacade getServer(){
+        return server;
+    }
+
     public void run() {
 
         Scanner scanner = new Scanner(System.in);

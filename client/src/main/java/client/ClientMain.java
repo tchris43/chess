@@ -13,8 +13,10 @@ public class ClientMain {
         }
 
         try {
-            new PreLoginClient(serverUrl).run();
-            new PostLoginClient(serverUrl).run();
+            var preClient = new PreLoginClient(serverUrl);
+            preClient.run();
+            var server = preClient.getServer();
+            new PostLoginClient(server).run();
         } catch(Throwable ex) {
             System.out.printf("Unable to start server: %s%n", ex.getMessage());
         }

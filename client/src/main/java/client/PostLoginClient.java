@@ -10,8 +10,8 @@ import java.util.Scanner;
 public class PostLoginClient {
     private final ServerFacade server;
 
-    public PreLoginClient(String serverUrl) throws ResponseException {
-        server = new ServerFacade(serverUrl);
+    public PostLoginClient(ServerFacade serverFacade) throws ResponseException {
+        server = serverFacade;
     }
 
     public void run() {
@@ -35,7 +35,7 @@ public class PostLoginClient {
     }
 
     public void printPrompt(){
-        System.out.print("\n" + "[LOGGED_OUT] >>> ");
+        System.out.print("\n" + "[LOGGED_IN] >>> ");
     }
 
     public String eval(String input) throws ResponseException{
@@ -55,8 +55,11 @@ public class PostLoginClient {
 
     public String help() {
         return """
-                register <USERNAME> <PASSWORD> <EMAIL> - to create an account
-                login <USERNAME> <PASSWORD> - to play chess
+                create <NAME> - a game
+                list - games
+                join <ID> [WHITE|BLACK] - a game
+                observe <ID> - a game
+                logout - when you are done
                 quit - playing chess
                 help - with possible commands
                 """;
