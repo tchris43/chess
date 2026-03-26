@@ -14,9 +14,21 @@ public class ClientMain {
 
         try {
             var preClient = new PreLoginClient(serverUrl);
-            preClient.run();
             var server = preClient.getServer();
-            new PostLoginClient(server).run();
+            while (true) {
+                preClient.setState(false);
+                preClient.run();
+                if (preClient.isLoggedIn()) {
+                    var postClient = new PostLoginClient(server);
+                    postClient.run();
+                    if (postClient.isDone()){
+                        break;
+                    }
+                }
+                else {
+                    break;
+                }
+            }
         } catch(Throwable ex) {
             System.out.printf("Unable to start server: %s%n", ex.getMessage());
         }

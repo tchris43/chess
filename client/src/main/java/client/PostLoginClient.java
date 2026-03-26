@@ -9,9 +9,19 @@ import java.util.Scanner;
 
 public class PostLoginClient {
     private final ServerFacade server;
+    private boolean loggedIn = true;
+    private boolean done = false;
 
     public PostLoginClient(ServerFacade serverFacade) throws ResponseException {
         server = serverFacade;
+    }
+
+    public boolean isLoggedIn(){
+        return loggedIn;
+    }
+
+    public boolean isDone() {
+        return done;
     }
 
     public void run() {
@@ -44,13 +54,19 @@ public class PostLoginClient {
             String cmd = (tokens.length > 0) ? tokens[0] : "help";
             String[] params = Arrays.copyOfRange(tokens, 1, tokens.length);
             return switch (cmd){
-                case "register" -> register(params);
+                case "logout" -> logout();
+                case "quit" -> quit();
                 default -> help();
             };
         }
         catch (ResponseException ex) {
             return ex.getMessage();
         }
+    }
+
+    public String quit() {
+        done = true;
+        return "quit";
     }
 
     public String help() {
@@ -65,10 +81,9 @@ public class PostLoginClient {
                 """;
     }
 
-    public String register(String... params) throws ResponseException{
-        UserData registerRequest = new UserData(params[0], params[1], params[2]);
-        server.register(registerRequest);
-        System.out.printf("Logged in as %s", params[0]);
+    public String logout() throws ResponseException{
+        server.logout();
+        loggedIn = false;
         return "quit";
     }
 }

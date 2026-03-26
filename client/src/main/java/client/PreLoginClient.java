@@ -9,6 +9,7 @@ import java.util.Scanner;
 
 public class PreLoginClient {
     private final ServerFacade server;
+    private boolean loggedIn = false;
 
     public PreLoginClient(String serverUrl) throws ResponseException {
         server = new ServerFacade(serverUrl);
@@ -16,6 +17,14 @@ public class PreLoginClient {
 
     public ServerFacade getServer(){
         return server;
+    }
+
+    public boolean isLoggedIn(){
+        return loggedIn;
+    }
+
+    public void setState(boolean state){
+        loggedIn = state;
     }
 
     public void run() {
@@ -48,6 +57,7 @@ public class PreLoginClient {
             String cmd = (tokens.length > 0) ? tokens[0] : "help";
             String[] params = Arrays.copyOfRange(tokens, 1, tokens.length);
             return switch (cmd){
+                case "quit" -> quit();
                 case "register" -> register(params);
                 case "login" -> login(params);
                 default -> help();
@@ -67,10 +77,15 @@ public class PreLoginClient {
                 """;
     }
 
+    public String quit() {
+        return "quit";
+    }
+
     public String register(String... params) throws ResponseException{
         UserData registerRequest = new UserData(params[0], params[1], params[2]);
         server.register(registerRequest);
         System.out.printf("Logged in as %s", params[0]);
+        loggedIn = true;
         return "quit";
     }
 
@@ -78,6 +93,7 @@ public class PreLoginClient {
         LoginRequest loginRequest = new LoginRequest(params[0], params[1]);
         server.login(loginRequest);
         System.out.printf("Logged in as %s", params[0]);
+        loggedIn = true;
         return "quit";
     }
 
