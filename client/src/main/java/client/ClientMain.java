@@ -2,6 +2,7 @@ package client;
 
 import chess.*;
 import server.ResponseException;
+import server.ServerFacade;
 
 import java.util.Scanner;
 import java.util.function.Function;
@@ -40,35 +41,39 @@ public class ClientMain {
         try {
             var preClient = new PreLoginClient(serverUrl);
             var server = preClient.getServer();
-            while (true) {
-                preClient.setState(false);
-                run("\n" + "[LOGGED_OUT] >>> ", line -> {
-                    try {
-                        return preClient.eval(line);
-                    } catch (ResponseException e) {
-                        throw new RuntimeException(e);
-                    }
-                });
-                if (preClient.isLoggedIn()) {
-                    var postClient = new PostLoginClient(server);
-                    run("\n" + "[LOGGED_IN] >>> ", line -> {
-                        try {
-                            return postClient.eval(line);
-                        } catch (ResponseException e) {
-                            throw new RuntimeException(e);
-                        }
-                    });
-                    if (postClient.isDone()){
-                        break;
-                    }
-                }
-                else {
-                    break;
-                }
-            }
+            runLoop(preClient, server);
         } catch(Throwable ex) {
             System.out.printf("Unable to start server: %s%n", ex.getMessage());
         }
 
+    }
+
+    private static void runLoop(PreLoginClient preClient, ServerFacade server) throws ResponseException {
+        while (true) {
+            preClient.setState(false);
+            run("\n" + "[LOGGED_OUT] >>> ", line -> {
+                try {
+                    return preClient.eval(line);
+                } catch (ResponseException e) {
+                    throw new RuntimeException(e);
+                }
+            });
+            if (preClient.isLoggedIn()) {
+                var postClient = new PostLoginClient(server);
+                run("\n" + "[LOGGED_IN] >>> ", line -> {
+                    try {
+                        return postClient.eval(line);
+                    } catch (ResponseException e) {
+                        throw new RuntimeException(e);
+                    }
+                });
+                if (postClient.isDone()){
+                    break;
+                }
+            }
+            else {
+                break;
+            }
+        }
     }
 }

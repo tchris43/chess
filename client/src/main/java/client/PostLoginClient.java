@@ -26,25 +26,6 @@ public class PostLoginClient {
         return done;
     }
 
-    public void run(String message) {
-
-        Scanner scanner = new Scanner(System.in);
-        var result = "";
-        while (!result.equals("quit")){
-            System.out.print(message);
-            String line = scanner.nextLine();
-
-            try {
-                result = eval(line);
-                if (result != "quit") {
-                    System.out.print(result);
-                }
-            } catch (Throwable e) {
-                var msg = e.toString();
-                System.out.print(msg);
-            }
-        }
-    }
 
     public String eval(String input) throws ResponseException{
         try {
