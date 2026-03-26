@@ -111,6 +111,28 @@ public class ServerFacadeTests {
         });
     }
 
+    @Test
+    public void createGame() throws ResponseException {
+        UserData registerRequest = new UserData("testUser", "pass", "email");
+        facade.register(registerRequest);
+
+        GameRequest gameRequest = new GameRequest("testGame");
+        facade.createGame(gameRequest);
+
+        GameListResult gameListResult = facade.listGames();
+
+        assertEquals(1, gameListResult.games().size());
+
+    }
+
+    @Test
+    public void invalidCreateGame() throws ResponseException {
+        GameRequest gameRequest = new GameRequest("testGame");
+        assertThrows(ResponseException.class, () -> {
+            facade.createGame(gameRequest);
+        });
+    }
+
 
 
     @Test
@@ -158,28 +180,6 @@ public class ServerFacadeTests {
         assertEquals(0, gameListResult.games().size());
 
 
-    }
-
-    @Test
-    public void createGame() throws ResponseException {
-        UserData registerRequest = new UserData("testUser", "pass", "email");
-        facade.register(registerRequest);
-
-        GameRequest gameRequest = new GameRequest("testGame");
-        facade.createGame(gameRequest);
-
-        GameListResult gameListResult = facade.listGames();
-
-        assertEquals(1, gameListResult.games().size());
-
-    }
-
-    @Test
-    public void invalidCreateGame() throws ResponseException {
-        GameRequest gameRequest = new GameRequest("testGame");
-        assertThrows(ResponseException.class, () -> {
-            facade.createGame(gameRequest);
-        });
     }
 
 

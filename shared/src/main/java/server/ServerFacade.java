@@ -63,7 +63,7 @@ public class ServerFacade {
 
     public GameResult createGame(GameRequest gameRequest)throws ResponseException{
         if (authToken != null) {
-            var request = buildRequest("POST", "/game", authToken);
+            var request = buildRequest("POST", "/game", gameRequest);
             var response = sendRequest(request);
             return handleResponse(response, GameResult.class);
         }
@@ -72,15 +72,27 @@ public class ServerFacade {
         }
     }
 
-    public GameListResult listGames(){
+    public GameListResult listGames() throws ResponseException {
         //must check for authToken
-        GameListResult gameListResult = new GameListResult(null);
-        return gameListResult;
+        if (authToken != null){
+          var request = buildRequest("GET", "/game", null);
+          var response = sendRequest(request);
+          return handleResponse(response, GameListResult.class);
+        }
+        else {
+            throw new ResponseException("No auth token");
+        }
     }
 
-    public UpdatedGameResult joinGame(JoinRequest joinRequest){
-        UpdatedGameResult  updatedGameResult = new UpdatedGameResult("");
-        return updatedGameResult;
+    public UpdatedGameResult joinGame(JoinRequest joinRequest) throws ResponseException{
+        if (authToken != null){
+            var request = buildRequest("PUT", "/game", joinRequest);
+            var response = sendRequest(request);
+            return handleResponse(response, UpdatedGameResult.class);
+        }
+        else {
+            throw new ResponseException("No auth token");
+        }
     }
 
     private HttpRequest buildRequest(String method, String path, Object body){
