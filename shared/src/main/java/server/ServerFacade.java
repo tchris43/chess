@@ -24,6 +24,10 @@ public class ServerFacade {
         return authToken;
     }
 
+    public void resetAuth(){
+        authToken = null;
+    }
+
     public void clear() throws ResponseException{
         var request = buildRequest("DELETE", "/db", null);
         sendRequest(request);
@@ -43,15 +47,17 @@ public class ServerFacade {
         return handleResponse(response, LoginResult.class);
     }
 
-    public void logout(LogoutRequest logoutRequest){
+    public void logout(){
+        //must check for authtoken
     }
 
     public GameResult createGame(GameRequest gameRequest){
-        GameResult gameResult = new GameResult(0);
-        return gameResult;
+
+        return null;
     }
 
-    public GameListResult listGames(GameList gameListRequest){
+    public GameListResult listGames(){
+        //must check for authToken
         GameListResult gameListResult = new GameListResult(null);
         return gameListResult;
     }

@@ -6,6 +6,8 @@ import server.ResponseException;
 import server.Server;
 import server.ServerFacade;
 
+import java.util.Collection;
+
 import static org.junit.jupiter.api.Assertions.*;
 
 
@@ -26,6 +28,7 @@ public class ServerFacadeTests {
     @BeforeEach
     public void clear() throws ResponseException{
         facade.clear();
+        facade.resetAuth();
     }
 
 
@@ -39,7 +42,7 @@ public class ServerFacadeTests {
     public void register() throws ResponseException {
         UserData registerRequest = new UserData("testUser", "pass", "email");
         LoginResult registerResult = facade.register(registerRequest);
-        assertNotNull(registerResult.authToken());
+        assertNotNull(facade.getAuth());
     }
 
     @Test
@@ -56,6 +59,75 @@ public class ServerFacadeTests {
         facade.register(registerRequest);
         assertThrows(ResponseException.class, () -> {
             facade.register(registerRequest);
+        });
+    }
+
+    @Test
+    public void listGames() throws ResponseException {
+        UserData registerRequest = new UserData("testUser", "pass", "email");
+        facade.register(registerRequest);
+
+        GameRequest gameRequest = new GameRequest("testGame");
+        GameRequest gameRequest2 = new GameRequest("testGame2");
+
+        facade.createGame(gameRequest);
+        facade.createGame(gameRequest2);
+
+        GameListResult gameListResult = facade.listGames();
+
+        assertEquals(2, gameListResult.games().size());
+
+    }
+
+    @Test
+    public void invalidGameList() throws ResponseException {
+        UserData registerRequest = new UserData("testUser", "pass", "email");
+        facade.register(registerRequest);
+
+        GameRequest gameRequest = new GameRequest("testGame");
+        GameRequest gameRequest2 = new GameRequest("testGame2");
+
+        facade.createGame(gameRequest);
+        facade.createGame(gameRequest2);
+
+        facade.logout();
+
+        assertThrows(ResponseException.class, () -> {
+            facade.listGames();
+        });
+    }
+
+    @Test
+    public void noGamesToList() throws ResponseException {
+        UserData registerRequest = new UserData("testUser", "pass", "email");
+        facade.register(registerRequest);
+
+        GameListResult gameListResult = facade.listGames();
+
+        assertEquals(0, gameListResult.games().size());
+
+
+    }
+
+    @Test
+    public void createGame() throws ResponseException {
+        UserData registerRequest = new UserData("testUser", "pass", "email");
+        facade.register(registerRequest);
+
+        GameRequest gameRequest = new GameRequest("testGame");
+
+        assertDoesNotThrow(() -> {
+            facade.createGame(gameRequest);
+        });
+
+    }
+
+    @Test
+    public void invalidCreateGame() throws ResponseException {
+        GameRequest gameRequest = new GameRequest("testGame");
+
+        assertThrows(ResponseException.class, () -> {
+            facade.createGame(gameRequest);
         });
     }
 
@@ -77,29 +149,7 @@ public class ServerFacadeTests {
     }
 
 
-    @Test
-    public void createGame() throws ResponseException {
-        UserData registerRequest = new UserData("testUser", "pass", "email");
-        facade.register(registerRequest);
-        LoginRequest loginRequest = new LoginRequest("testUser","pass");
-        LoginResult loginResult = facade.login(loginRequest);
 
-        GameRequest gameRequest = new GameRequest("testGame");
-
-        assertDoesNotThrow(() -> {
-            facade.createGame(gameRequest);
-        });
-
-    }
-
-    @Test
-    public void invalidCreateGame() throws ResponseException {
-        GameRequest gameRequest = new GameRequest("testGame");
-
-        assertThrows(ResponseException.class, () -> {
-            facade.createGame(gameRequest);
-        });
-    }
 
 
     @Test
@@ -111,7 +161,6 @@ public class ServerFacadeTests {
 
         String authToken = loginResult.authToken();
         LogoutRequest logoutRequest = new LogoutRequest(authToken);
-        facade.logout(logoutRequest);
 
         GameRequest gameRequest = new GameRequest("testGame");
 
