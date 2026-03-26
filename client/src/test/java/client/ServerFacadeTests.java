@@ -1,5 +1,6 @@
 package client;
 
+import chess.ChessGame;
 import model.*;
 import org.junit.jupiter.api.*;
 import server.ResponseException;
@@ -62,22 +63,7 @@ public class ServerFacadeTests {
         });
     }
 
-    @Test
-    public void loginValidAuth() throws ResponseException {
-        UserData registerRequest = new UserData("testUser", "pass", "email");
-        facade.register(registerRequest);
-        LoginRequest loginRequest = new LoginRequest("testUser","pass");
-        LoginResult loginResult = facade.login(loginRequest);
-        assertNotNull(facade.getAuth());
-    }
 
-    @Test
-    public void invalidLogin() throws ResponseException {
-        LoginRequest loginRequest = new LoginRequest("newUser", "pass");
-        assertThrows(ResponseException.class, () -> {
-            facade.login(loginRequest);
-        });
-    }
 
     @Test
     public void listGames() throws ResponseException {
@@ -150,7 +136,34 @@ public class ServerFacadeTests {
 
 
 
+    @Test
+    public void joinGame() throws ResponseException {
+        UserData registerRequest = new UserData("testUser", "pass", "email");
+        facade.register(registerRequest);
 
+        GameRequest gameRequest = new GameRequest("game1");
+        GameResult gameResult = facade.createGame(gameRequest);
+
+        JoinRequest joinRequest = new JoinRequest(ChessGame.TeamColor.WHITE, gameResult.gameID());
+        assertDoesNotThrow(() -> {
+            facade.joinGame(joinRequest);
+        });
+    }
+
+    @Test
+    public void joinGameAlreadyTaken() throws ResponseException {
+        UserData registerRequest = new UserData("testUser", "pass", "email");
+        facade.register(registerRequest);
+
+        GameRequest gameRequest = new GameRequest("game1");
+        GameResult gameResult = facade.createGame(gameRequest);
+
+        JoinRequest joinRequest = new JoinRequest(ChessGame.TeamColor.WHITE, gameResult.gameID());
+        facade.joinGame(joinRequest);
+        assertThrows(ResponseException.class, () -> {
+            facade.joinGame(joinRequest);
+        });
+    }
 
 
 
@@ -158,8 +171,6 @@ public class ServerFacadeTests {
     public void logoutRemoveAuth() throws ResponseException {
         UserData registerRequest = new UserData("testUser", "pass", "email");
         facade.register(registerRequest);
-        LoginRequest loginRequest = new LoginRequest("testUser","pass");
-        LoginResult loginResult = facade.login(loginRequest);
 
         facade.logout();
 
@@ -170,6 +181,24 @@ public class ServerFacadeTests {
     public void invalidLogout() throws ResponseException {
         assertThrows(ResponseException.class, () -> {
             facade.logout();
+        });
+    }
+
+    @Test
+    public void loginValidAuth() throws ResponseException {
+        UserData registerRequest = new UserData("testUser", "pass", "email");
+        facade.register(registerRequest);
+        facade.logout();
+        LoginRequest loginRequest = new LoginRequest("testUser","pass");
+        facade.login(loginRequest);
+        assertNotNull(facade.getAuth());
+    }
+
+    @Test
+    public void invalidLogin() throws ResponseException {
+        LoginRequest loginRequest = new LoginRequest("newUser", "pass");
+        assertThrows(ResponseException.class, () -> {
+            facade.login(loginRequest);
         });
     }
 
