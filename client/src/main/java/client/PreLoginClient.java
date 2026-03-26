@@ -27,12 +27,12 @@ public class PreLoginClient {
         loggedIn = state;
     }
 
-    public void run() {
+    public void run(String message) {
 
         Scanner scanner = new Scanner(System.in);
         var result = "";
         while (!result.equals("quit")){
-            printPrompt();
+            System.out.print(message);
             String line = scanner.nextLine();
 
             try {
@@ -47,9 +47,6 @@ public class PreLoginClient {
         }
     }
 
-    public void printPrompt(){
-        System.out.print("\n" + "[LOGGED_OUT] >>> ");
-    }
 
     public String eval(String input) throws ResponseException{
         try {

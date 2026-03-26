@@ -21,20 +21,16 @@ public class PostLoginClient {
         server = serverFacade;
     }
 
-    public boolean isLoggedIn(){
-        return loggedIn;
-    }
-
     public boolean isDone() {
         return done;
     }
 
-    public void run() {
+    public void run(String message) {
 
         Scanner scanner = new Scanner(System.in);
         var result = "";
         while (!result.equals("quit")){
-            printPrompt();
+            System.out.print(message);
             String line = scanner.nextLine();
 
             try {
@@ -47,10 +43,6 @@ public class PostLoginClient {
                 System.out.print(msg);
             }
         }
-    }
-
-    public void printPrompt(){
-        System.out.print("\n" + "[LOGGED_IN] >>> ");
     }
 
     public String eval(String input) throws ResponseException{

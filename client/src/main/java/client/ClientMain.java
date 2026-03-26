@@ -17,10 +17,10 @@ public class ClientMain {
             var server = preClient.getServer();
             while (true) {
                 preClient.setState(false);
-                preClient.run();
+                preClient.run("\n" + "[LOGGED_OUT] >>> ");
                 if (preClient.isLoggedIn()) {
                     var postClient = new PostLoginClient(server);
-                    postClient.run();
+                    postClient.run("\n" + "[LOGGED_IN] >>> ");
                     if (postClient.isDone()){
                         break;
                     }
