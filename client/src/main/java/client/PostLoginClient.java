@@ -1,19 +1,20 @@
 package client;
 
-import model.GameData;
-import model.GameList;
-import model.GameRequest;
-import model.UserData;
+import chess.ChessGame;
+import model.*;
 import server.ResponseException;
 import server.ServerFacade;
 
 import java.util.Arrays;
+import java.util.HashMap;
+import java.util.Map;
 import java.util.Scanner;
 
 public class PostLoginClient {
     private final ServerFacade server;
     private boolean loggedIn = true;
     private boolean done = false;
+    private Map<String, Integer> gameIDs = new HashMap<>();
 
     public PostLoginClient(ServerFacade serverFacade) throws ResponseException {
         server = serverFacade;
@@ -61,6 +62,7 @@ public class PostLoginClient {
                 case "quit" -> quit();
                 case "create" -> create(params);
                 case "list" -> list();
+                case "join" -> join(params);
                 default -> help();
             };
         }
@@ -107,9 +109,31 @@ public class PostLoginClient {
         for (GameData game : gameList){
             String gameString = String.format("%d %s %s %s \n", i, game.gameName(), game.whiteUsername(), game.blackUsername());
             games.append(gameString);
+            gameIDs.put(String.valueOf(i), game.gameID());
             i ++;
         }
 
         return games.toString();
+    }
+
+    public String join(String... params) throws ResponseException{
+        ChessGame.TeamColor teamColor;
+        if (params[1].equals("white")){
+            teamColor = ChessGame.TeamColor.WHITE;
+        }
+        else if(params[1].equals("black")){
+            teamColor = ChessGame.TeamColor.BLACK;
+        }
+        else {
+            throw new ResponseException("Invalid player color");
+        }
+
+        String gameNumber = params[0];
+        int gameID = gameIDs.get(gameNumber);
+
+        JoinRequest joinRequest = new JoinRequest(teamColor, gameID);
+        server.joinGame(joinRequest);
+         String result = String.format("Successfully joined game %s", gameNumber);
+         return result;
     }
 }
