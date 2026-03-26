@@ -4,6 +4,7 @@ import chess.ChessGame;
 import model.*;
 import server.ResponseException;
 import server.ServerFacade;
+import ui.DrawBoard;
 
 import java.util.Arrays;
 import java.util.HashMap;
@@ -63,7 +64,7 @@ public class PostLoginClient {
                 case "create" -> create(params);
                 case "list" -> list();
                 case "join" -> join(params);
-                case "observer" -> observe(params);
+                case "observe" -> observe(params);
                 default -> help();
             };
         }
@@ -118,6 +119,7 @@ public class PostLoginClient {
     }
 
     public String join(String... params) throws ResponseException{
+        //if (params.length < )
         ChessGame.TeamColor teamColor;
         if (params[1].equals("white")){
             teamColor = ChessGame.TeamColor.WHITE;
@@ -135,6 +137,9 @@ public class PostLoginClient {
         JoinRequest joinRequest = new JoinRequest(teamColor, gameID);
         server.joinGame(joinRequest);
          String result = String.format("Successfully joined game %s", gameNumber);
+         var board = new DrawBoard();
+         board.draw(teamColor);
+         System.out.println();
          return result;
     }
 
@@ -143,6 +148,9 @@ public class PostLoginClient {
         int gameID = gameIDs.get(gameNumber);
 
         String result = String.format("Observing game %s", gameNumber);
+        var board = new DrawBoard();
+        board.draw(ChessGame.TeamColor.WHITE);
+        System.out.println();
         return result;
     }
 }
