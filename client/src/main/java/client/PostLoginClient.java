@@ -1,5 +1,8 @@
 package client;
 
+import model.GameData;
+import model.GameList;
+import model.GameRequest;
 import model.UserData;
 import server.ResponseException;
 import server.ServerFacade;
@@ -56,6 +59,8 @@ public class PostLoginClient {
             return switch (cmd){
                 case "logout" -> logout();
                 case "quit" -> quit();
+                case "create" -> create(params);
+                case "list" -> list();
                 default -> help();
             };
         }
@@ -85,5 +90,26 @@ public class PostLoginClient {
         server.logout();
         loggedIn = false;
         return "quit";
+    }
+
+    public String create(String... params) throws ResponseException{
+        GameRequest gameRequest = new GameRequest(params[0]);
+        server.createGame(gameRequest);
+        String result = String.format("Created game: '%s'", gameRequest.gameName());
+        return result;
+    }
+
+    public String list() throws ResponseException{
+        GameList gameList = server.listGames().games();
+
+        StringBuilder games = new StringBuilder();
+        int i = 1;
+        for (GameData game : gameList){
+            String gameString = String.format("%d %s %s %s \n", i, game.gameName(), game.whiteUsername(), game.blackUsername());
+            games.append(gameString);
+            i ++;
+        }
+
+        return games.toString();
     }
 }
