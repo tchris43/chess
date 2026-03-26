@@ -49,6 +49,7 @@ public class PreLoginClient {
             String[] params = Arrays.copyOfRange(tokens, 1, tokens.length);
             return switch (cmd){
                 case "register" -> register(params);
+                case "login" -> login(params);
                 default -> help();
             };
         }
@@ -69,6 +70,13 @@ public class PreLoginClient {
     public String register(String... params) throws ResponseException{
         UserData registerRequest = new UserData(params[0], params[1], params[2]);
         server.register(registerRequest);
+        System.out.printf("Logged in as %s", params[0]);
+        return "quit";
+    }
+
+    public String login(String... params) throws ResponseException{
+        LoginRequest loginRequest = new LoginRequest(params[0], params[1]);
+        server.login(loginRequest);
         System.out.printf("Logged in as %s", params[0]);
         return "quit";
     }
