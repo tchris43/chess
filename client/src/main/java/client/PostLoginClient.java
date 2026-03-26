@@ -1,13 +1,13 @@
 package client;
 
-import model.*;
+import model.UserData;
 import server.ResponseException;
 import server.ServerFacade;
 
 import java.util.Arrays;
 import java.util.Scanner;
 
-public class PreLoginClient {
+public class PostLoginClient {
     private final ServerFacade server;
 
     public PreLoginClient(String serverUrl) throws ResponseException {
@@ -68,5 +68,4 @@ public class PreLoginClient {
         System.out.printf("Logged in as %s", params[0]);
         return "quit";
     }
-
 }
