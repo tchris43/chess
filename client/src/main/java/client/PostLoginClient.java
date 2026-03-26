@@ -63,6 +63,7 @@ public class PostLoginClient {
                 case "create" -> create(params);
                 case "list" -> list();
                 case "join" -> join(params);
+                case "observer" -> observe(params);
                 default -> help();
             };
         }
@@ -135,5 +136,13 @@ public class PostLoginClient {
         server.joinGame(joinRequest);
          String result = String.format("Successfully joined game %s", gameNumber);
          return result;
+    }
+
+    public String observe(String... params) throws ResponseException{
+        String gameNumber = params[0];
+        int gameID = gameIDs.get(gameNumber);
+
+        String result = String.format("Observing game %s", gameNumber);
+        return result;
     }
 }
