@@ -49,16 +49,27 @@ public class ServerFacade {
         return loginResult;
     }
 
-    public void logout() throws ResponseException{
+    public void logout() throws ResponseException {
         //must check for authtoken
-        var request = buildRequest("DELETE","/session", null);
-        resetAuth();
-        sendRequest(request);
+        if (authToken != null){
+            var request = buildRequest("DELETE", "/session", null);
+            resetAuth();
+            sendRequest(request);
+        }
+        else {
+            throw new ResponseException("No auth token");
+        }
     }
 
-    public GameResult createGame(GameRequest gameRequest){
-
-        return null;
+    public GameResult createGame(GameRequest gameRequest)throws ResponseException{
+        if (authToken != null) {
+            var request = buildRequest("POST", "/game", authToken);
+            var response = sendRequest(request);
+            return handleResponse(response, GameResult.class);
+        }
+        else {
+            throw new ResponseException("No auth token");
+        }
     }
 
     public GameListResult listGames(){
