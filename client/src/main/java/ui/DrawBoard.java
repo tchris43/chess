@@ -19,7 +19,7 @@ public class DrawBoard {
     public static final String WHITE_ROOK = SET_TEXT_COLOR_RED + "R";
     public static final String WHITE_PAWN = SET_TEXT_COLOR_RED + "P";
     public static final String BLACK_KING = SET_TEXT_COLOR_BLUE + "K";
-    public static final String BLACK_QUEEN = SET_BG_COLOR_BLUE + "Q";
+    public static final String BLACK_QUEEN = SET_TEXT_COLOR_BLUE + "Q";
     public static final String BLACK_BISHOP = SET_TEXT_COLOR_BLUE + "B";
     public static final String BLACK_KNIGHT = SET_TEXT_COLOR_BLUE + "N";
     public static final String BLACK_ROOK = SET_TEXT_COLOR_BLUE + "R";
@@ -30,6 +30,8 @@ public class DrawBoard {
 
     public static final String DG = SET_BG_COLOR_DARK_GREY + EMPTY;
 
+
+    \
     public static void drawMiddle(PrintStream out){
         for (int row = 2; row < 6; row++) {
             out.print(DG + SET_TEXT_COLOR_BLACK + String.valueOf(row+1) + DG);
