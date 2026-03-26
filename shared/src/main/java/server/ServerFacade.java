@@ -44,12 +44,15 @@ public class ServerFacade {
     public LoginResult login(LoginRequest loginRequest) throws ResponseException{
         var request = buildRequest("POST", "/session", loginRequest);
         var response = sendRequest(request);
-        return handleResponse(response, LoginResult.class);
+        LoginResult loginResult = handleResponse(response, LoginResult.class);
+        authToken = loginResult.authToken();
+        return loginResult;
     }
 
     public void logout() throws ResponseException{
         //must check for authtoken
         var request = buildRequest("DELETE","/session", null);
+        resetAuth();
         sendRequest(request);
     }
 
