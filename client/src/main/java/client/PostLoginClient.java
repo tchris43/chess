@@ -78,6 +78,10 @@ public class PostLoginClient {
         return "quit";
     }
 
+    public boolean goodParams(String[] params, int requiredNum){
+        return params.length == requiredNum;
+    }
+
     public String help() {
         return """
                 create <NAME> - a game
@@ -106,10 +110,24 @@ public class PostLoginClient {
     public String list() throws ResponseException{
         GameList gameList = server.listGames().games();
 
+
+
         StringBuilder games = new StringBuilder();
         int i = 1;
         for (GameData game : gameList){
-            String gameString = String.format("%d %s %s %s \n", i, game.gameName(), game.whiteUsername(), game.blackUsername());
+
+            String whiteUser = String.format("WHITE: %s", game.whiteUsername());
+            String blackUser = String.format("BLACK: %s", game.blackUsername());
+
+            if (game.whiteUsername() == null){
+                whiteUser = "WHITE: available";
+            }
+            if (game.blackUsername() == null){
+                blackUser = "BLACK: available";
+            }
+
+
+            String gameString = String.format("%d %s %s %s \n", i, game.gameName(), whiteUser, blackUser);
             games.append(gameString);
             gameIDs.put(String.valueOf(i), game.gameID());
             i ++;
@@ -119,38 +137,55 @@ public class PostLoginClient {
     }
 
     public String join(String... params) throws ResponseException{
-        //if (params.length < )
-        ChessGame.TeamColor teamColor;
-        if (params[1].equals("white")){
-            teamColor = ChessGame.TeamColor.WHITE;
-        }
-        else if(params[1].equals("black")){
-            teamColor = ChessGame.TeamColor.BLACK;
+        if (goodParams(params, 2)) {
+            ChessGame.TeamColor teamColor;
+            if (params[1].equals("white")) {
+                teamColor = ChessGame.TeamColor.WHITE;
+            } else if (params[1].equals("black")) {
+                teamColor = ChessGame.TeamColor.BLACK;
+            } else {
+                throw new ResponseException("Invalid player color");
+            }
+
+            String gameNumber = params[0];
+            if (Integer.parseInt(gameNumber) < 1 || Integer.parseInt(gameNumber) > server.listGames().games().size()){
+                throw new ResponseException("Please enter a valid gameID");
+            }
+            int gameID = gameIDs.get(gameNumber);
+
+
+            JoinRequest joinRequest = new JoinRequest(teamColor, gameID);
+            server.joinGame(joinRequest);
+            String result = String.format("Successfully joined game %s", gameNumber);
+            var board = new DrawBoard();
+            board.draw(teamColor);
+            System.out.println();
+            return result;
         }
         else {
-            throw new ResponseException("Invalid player color");
+            throw new ResponseException("Please enter valid parameters: join <gameID> <playerColor>");
         }
-
-        String gameNumber = params[0];
-        int gameID = gameIDs.get(gameNumber);
-
-        JoinRequest joinRequest = new JoinRequest(teamColor, gameID);
-        server.joinGame(joinRequest);
-         String result = String.format("Successfully joined game %s", gameNumber);
-         var board = new DrawBoard();
-         board.draw(teamColor);
-         System.out.println();
-         return result;
     }
 
     public String observe(String... params) throws ResponseException{
-        String gameNumber = params[0];
-        int gameID = gameIDs.get(gameNumber);
+        if (goodParams(params, 1)) {
+            String gameNumber = params[0];
 
-        String result = String.format("Observing game %s", gameNumber);
-        var board = new DrawBoard();
-        board.draw(ChessGame.TeamColor.WHITE);
-        System.out.println();
-        return result;
+            if (Integer.parseInt(gameNumber) < 1 || Integer.parseInt(gameNumber) > server.listGames().games().size()){
+                throw new ResponseException("Please enter a valid gameID");
+            }
+
+            int gameID = gameIDs.get(gameNumber);
+
+
+            String result = String.format("Observing game %s", gameNumber);
+            var board = new DrawBoard();
+            board.draw(ChessGame.TeamColor.WHITE);
+            System.out.println();
+            return result;
+        }
+        else {
+            throw new ResponseException("Please enter valid parameters: observe <gameID>");
+        }
     }
 }

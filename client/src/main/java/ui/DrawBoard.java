@@ -237,7 +237,7 @@ public class DrawBoard {
             out.print(DG + SET_TEXT_COLOR_BLACK + "h" + DG);
             out.print(DG + DG + DG);
             out.print(RESET_BG_COLOR);
-            out.println();
+            out.print(RESET_TEXT_COLOR);
 
         }
 

@@ -68,6 +68,10 @@ public class PreLoginClient {
         }
     }
 
+    public boolean goodParams(String[] params, int requiredNum){
+        return params.length == requiredNum;
+    }
+
     public String help() {
         return """
                 register <USERNAME> <PASSWORD> <EMAIL> - to create an account
@@ -82,19 +86,30 @@ public class PreLoginClient {
     }
 
     public String register(String... params) throws ResponseException{
-        UserData registerRequest = new UserData(params[0], params[1], params[2]);
-        server.register(registerRequest);
-        System.out.printf("Logged in as %s", params[0]);
-        loggedIn = true;
-        return "quit";
+        if (goodParams(params, 3)) {
+            UserData registerRequest = new UserData(params[0], params[1], params[2]);
+            server.register(registerRequest);
+            System.out.printf("Logged in as %s", params[0]);
+            loggedIn = true;
+            return "quit";
+        }
+        else {
+            throw new ResponseException("Please enter valid params: register <username> <password> <email>");
+        }
+
     }
 
     public String login(String... params) throws ResponseException{
-        LoginRequest loginRequest = new LoginRequest(params[0], params[1]);
-        server.login(loginRequest);
-        System.out.printf("Logged in as %s", params[0]);
-        loggedIn = true;
-        return "quit";
+        if (goodParams(params, 2)) {
+            LoginRequest loginRequest = new LoginRequest(params[0], params[1]);
+            server.login(loginRequest);
+            System.out.printf("Logged in as %s", params[0]);
+            loggedIn = true;
+            return "quit";
+        }
+        else {
+            throw new ResponseException("Please enter valid params: login <username> <password>");
+        }
     }
 
 }
