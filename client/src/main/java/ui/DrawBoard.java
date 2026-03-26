@@ -31,7 +31,7 @@ public class DrawBoard {
     public static final String DG = SET_BG_COLOR_DARK_GREY + EMPTY;
 
 
-    \
+
     public static void drawMiddle(PrintStream out){
         for (int row = 2; row < 6; row++) {
             out.print(DG + SET_TEXT_COLOR_BLACK + String.valueOf(row+1) + DG);
@@ -74,8 +74,8 @@ public class DrawBoard {
         out.print(GREY + WHITE_ROOK + GREY);
         out.print(BLACK + WHITE_KNIGHT + BLACK);
         out.print(GREY + WHITE_BISHOP + GREY);
-        out.print(BLACK + WHITE_QUEEN + BLACK);
-        out.print(GREY + WHITE_KING + GREY);
+        out.print(BLACK + WHITE_KING + BLACK);
+        out.print(GREY + WHITE_QUEEN + GREY);
         out.print(BLACK + WHITE_BISHOP + BLACK);
         out.print(GREY + WHITE_KNIGHT + GREY);
         out.print(BLACK + WHITE_ROOK + BLACK);
@@ -114,8 +114,8 @@ public class DrawBoard {
         out.print(BLACK + BLACK_ROOK + BLACK);
         out.print(GREY + BLACK_KNIGHT + GREY);
         out.print(BLACK + BLACK_BISHOP + BLACK);
-        out.print(GREY + BLACK_QUEEN + GREY);
-        out.print(BLACK + BLACK_KING + BLACK);
+        out.print(GREY + BLACK_KING + GREY);
+        out.print(BLACK + BLACK_QUEEN + BLACK);
         out.print(GREY + BLACK_BISHOP + GREY);
         out.print(BLACK + BLACK_KNIGHT + BLACK);
         out.print(GREY + BLACK_ROOK + GREY);
@@ -194,8 +194,8 @@ public class DrawBoard {
         out.print(BLACK + WHITE_ROOK + BLACK);
         out.print(GREY + WHITE_KNIGHT + GREY);
         out.print(BLACK + WHITE_BISHOP + BLACK);
-        out.print(GREY + WHITE_KING + GREY);
-        out.print(BLACK + WHITE_QUEEN + BLACK);
+        out.print(GREY + WHITE_QUEEN + GREY);
+        out.print(BLACK + WHITE_KING + BLACK);
         out.print(GREY + WHITE_BISHOP + GREY);
         out.print(BLACK + WHITE_KNIGHT + BLACK);
         out.print(GREY + WHITE_ROOK + GREY);

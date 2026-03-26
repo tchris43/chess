@@ -16,6 +16,7 @@ public class PostLoginClient {
     private boolean loggedIn = true;
     private boolean done = false;
     private Map<String, Integer> gameIDs = new HashMap<>();
+    private int numGames = 0;
 
     public PostLoginClient(ServerFacade serverFacade) throws ResponseException {
         server = serverFacade;
@@ -125,6 +126,8 @@ public class PostLoginClient {
             i ++;
         }
 
+        numGames = gameList.size();
+
         return games.toString();
     }
 
@@ -140,9 +143,15 @@ public class PostLoginClient {
             }
 
             String gameNumber = params[0];
-            if (Integer.parseInt(gameNumber) < 1 || Integer.parseInt(gameNumber) > server.listGames().games().size()){
+            try {
+                if (Integer.parseInt(gameNumber) < 1 || Integer.parseInt(gameNumber) > numGames){
+                    throw new ResponseException("Please enter a valid gameID");
+                }
+            } catch (Exception ex){
                 throw new ResponseException("Please enter a valid gameID");
             }
+
+
             int gameID = gameIDs.get(gameNumber);
 
 
@@ -163,8 +172,12 @@ public class PostLoginClient {
         if (goodParams(params, 1)) {
             String gameNumber = params[0];
 
-            if (Integer.parseInt(gameNumber) < 1 || Integer.parseInt(gameNumber) > server.listGames().games().size()){
-                throw new ResponseException("Please enter a valid gameID");
+            try {
+                if (Integer.parseInt(gameNumber) < 1 || Integer.parseInt(gameNumber) > numGames){
+                    throw new ResponseException("Please enter a valid gameID");
+                }
+            } catch (Exception ex){
+                throw new ResponseException("Please enter a valid game ID");
             }
 
             int gameID = gameIDs.get(gameNumber);
