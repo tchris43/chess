@@ -63,6 +63,23 @@ public class ServerFacadeTests {
     }
 
     @Test
+    public void loginValidAuth() throws ResponseException {
+        UserData registerRequest = new UserData("testUser", "pass", "email");
+        facade.register(registerRequest);
+        LoginRequest loginRequest = new LoginRequest("testUser","pass");
+        LoginResult loginResult = facade.login(loginRequest);
+        assertNotNull(facade.getAuth());
+    }
+
+    @Test
+    public void invalidLogin() throws ResponseException {
+        LoginRequest loginRequest = new LoginRequest("newUser", "pass");
+        assertThrows(ResponseException.class, () -> {
+            facade.login(loginRequest);
+        });
+    }
+
+    @Test
     public void listGames() throws ResponseException {
         UserData registerRequest = new UserData("testUser", "pass", "email");
         facade.register(registerRequest);
@@ -115,38 +132,23 @@ public class ServerFacadeTests {
         facade.register(registerRequest);
 
         GameRequest gameRequest = new GameRequest("testGame");
+        facade.createGame(gameRequest);
 
-        assertDoesNotThrow(() -> {
-            facade.createGame(gameRequest);
-        });
+        GameListResult gameListResult = facade.listGames();
+
+        assertEquals(1, gameListResult.games().size());
 
     }
 
     @Test
     public void invalidCreateGame() throws ResponseException {
         GameRequest gameRequest = new GameRequest("testGame");
-
         assertThrows(ResponseException.class, () -> {
             facade.createGame(gameRequest);
         });
     }
 
-    @Test
-    public void loginValidAuth() throws ResponseException {
-        UserData registerRequest = new UserData("testUser", "pass", "email");
-        facade.register(registerRequest);
-        LoginRequest loginRequest = new LoginRequest("testUser","pass");
-        LoginResult loginResult = facade.login(loginRequest);
-        assertNotNull(facade.getAuth());
-    }
 
-    @Test
-    public void invalidLogin() throws ResponseException {
-        LoginRequest loginRequest = new LoginRequest("newUser", "pass");
-        assertThrows(ResponseException.class, () -> {
-            facade.login(loginRequest);
-        });
-    }
 
 
 
