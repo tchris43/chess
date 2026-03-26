@@ -161,23 +161,15 @@ public class ServerFacadeTests {
         LoginRequest loginRequest = new LoginRequest("testUser","pass");
         LoginResult loginResult = facade.login(loginRequest);
 
-        String authToken = loginResult.authToken();
-        LogoutRequest logoutRequest = new LogoutRequest(authToken);
+        facade.logout();
 
-        GameRequest gameRequest = new GameRequest("testGame");
-
-        assertThrows(ResponseException.class, () -> {
-            facade.createGame(gameRequest);
-        });
-
-        assertNull(loginResult.authToken());
+        assertNull(facade.getAuth());
     }
 
     @Test
     public void invalidLogout() throws ResponseException {
-        LoginRequest loginRequest = new LoginRequest("newUser", "pass");
         assertThrows(ResponseException.class, () -> {
-            facade.login(loginRequest);
+            facade.logout();
         });
     }
 
