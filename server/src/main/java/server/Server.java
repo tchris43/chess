@@ -32,7 +32,7 @@ public class Server {
             throw new RuntimeException(e.getMessage());
         }
 
-        webSocketHandler = new WebSocketHandler();
+        webSocketHandler websocketHandler = new webSocketHandler();
 
         javalin = Javalin.create(config -> config.staticFiles.add("web"))
             .post("/user", this::registerUser)
@@ -48,9 +48,9 @@ public class Server {
             .exception(UnauthorizedException.class, this::unauthorizedExceptionHandler)
             .exception(DataAccessException.class, this::dataAccessExceptionHandler)
             .ws("/ws", ws -> {
-                ws.onConnect(webSocketHandler);
-                ws.onMessage(webSocketHandler);
-                ws.onClose(webSocketHandler);
+                ws.onConnect(websocketHandler);
+                ws.onMessage(websocketHandler);
+                ws.onClose(websocketHandler);
             });
     }
 
