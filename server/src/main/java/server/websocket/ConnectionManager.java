@@ -13,7 +13,11 @@ import java.util.concurrent.ConcurrentHashMap;
 public class ConnectionManager {
     public final ConcurrentHashMap<Integer, List<Session>> connections = new ConcurrentHashMap<>();
 
-    public void add(int gameID, Session session) { connections.put(gameID, session);}
+    public void add(int gameID, Session session) {
+        List<Session> sessions = connections.get(gameID);
+        sessions.add(session);
+        connections.put(gameID, sessions);
+    }
 
     public void remove(Session session) {connections.remove(session);}
 
