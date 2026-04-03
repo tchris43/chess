@@ -17,6 +17,8 @@ import service.UserService;
 
 import java.sql.SQLException;
 
+import server.websocket.webSocketHandler;
+
 
 public class Server {
 
@@ -29,6 +31,9 @@ public class Server {
         } catch(DataAccessException e){
             throw new RuntimeException(e.getMessage());
         }
+
+        webSocketHandler = new WebSocketHandler();
+
         javalin = Javalin.create(config -> config.staticFiles.add("web"))
             .post("/user", this::registerUser)
             .post("/session", this::loginUser)
@@ -41,7 +46,12 @@ public class Server {
             .exception(BadRequestException.class, this::badRequestExceptionHandler)
             .exception(AlreadyTakenException.class, this::alreadyTakenExceptionHandler)
             .exception(UnauthorizedException.class, this::unauthorizedExceptionHandler)
-            .exception(DataAccessException.class, this::dataAccessExceptionHandler);
+            .exception(DataAccessException.class, this::dataAccessExceptionHandler)
+            .ws("/ws", ws -> {
+                ws.onConnect(webSocketHandler);
+                ws.onMessage(webSocketHandler);
+                ws.onClose(webSocketHandler);
+            });
     }
 
     private void dataAccessExceptionHandler(DataAccessException exception, Context ctx){
@@ -132,6 +142,7 @@ public class Server {
         userService.clear();
         ctx.status(200);
     }
+
 
     public int run(int desiredPort) {
         javalin.start(desiredPort);
