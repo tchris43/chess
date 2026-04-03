@@ -32,7 +32,7 @@ public class Server {
             throw new RuntimeException(e.getMessage());
         }
 
-        webSocketHandler websocketHandler = new webSocketHandler();
+        webSocketHandler websocketHandler = new webSocketHandler(userService);
 
         javalin = Javalin.create(config -> config.staticFiles.add("web"))
             .post("/user", this::registerUser)

@@ -2,7 +2,8 @@ package server.websocket;
 
 
 
-import jakarta.websocket.Session;
+
+import org.eclipse.jetty.websocket.api.Session;
 import websocket.messages.ServerMessage;
 
 import java.io.IOException;
@@ -22,7 +23,7 @@ public class ConnectionManager {
             if (s.isOpen()){
                 if (!s.equals(excludeSession)) {
                     //TODO: verify this command and correct session dependency
-                    s.getBasicRemote().sendText(msg);
+                    s.getRemote().sendString(msg);
                 }
             }
         }

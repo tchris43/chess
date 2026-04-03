@@ -1,21 +1,33 @@
 package server.websocket;
 
 import com.google.gson.Gson;
+import dataaccess.DataAccessException;
 import io.javalin.websocket.*;
 
 
-import jakarta.websocket.Session;
+
+import model.AuthData;
+import model.UserData;
+import org.eclipse.jetty.websocket.api.Session;
 import org.jetbrains.annotations.NotNull;
+import service.UserService;
 import websocket.commands.UserGameCommand;
 import websocket.messages.ServerMessage;
 
 import java.io.IOException;
+import java.util.List;
+import java.util.Objects;
 
 import static websocket.commands.UserGameCommand.CommandType.*;
 
 public class webSocketHandler implements WsConnectHandler, WsMessageHandler, WsCloseHandler {
 
     private final ConnectionManager connections = new ConnectionManager();
+    private final UserService userService;
+
+    public webSocketHandler(UserService userService){
+        this.userService = userService;
+    }
 
     @Override
     public void handleConnect(WsConnectContext ctx{
@@ -24,9 +36,18 @@ public class webSocketHandler implements WsConnectHandler, WsMessageHandler, WsC
     }
 
     @Override
-    public void handleMessage(WsMessageContext ctx) {
+    public void handleMessage(WsMessageContext ctx) throws DataAccessException {
         try {
             UserGameCommand command = new Gson().fromJson(ctx.message(), UserGameCommand.class);
+            String userName = "";
+            List<AuthData> auths = userService.getAuths();
+            for (AuthData auth : auths){
+                if (Objects.equals(auth.authToken(), command.getAuthToken())){
+                    userName = auth.username();
+                }
+            }
+            //TODO: Throw an exception if userName is not found
+
             switch (command.getCommandType()){
                 case CONNECT -> connect(command.getGameID(), userName, ctx.session);
 //                case MAKE_MOVE -> makeMove(userName, ctx.session);
@@ -43,7 +64,7 @@ public class webSocketHandler implements WsConnectHandler, WsMessageHandler, WsC
         System.out.println("Websocket closed");
     }
 
-    private void connect(int gameID, String authToken, Session session) throws IOException{
+    private void connect(int gameID, String userName, Session session) throws IOException{
         connections.add(gameID, session);
         var message = String.format("%s has joined the game", userName);
         var notification = new ServerMessage(ServerMessage.ServerMessageType.LOAD_GAME);
