@@ -230,13 +230,17 @@ public class MySqlDataAccess implements DataAccess{
         blackUsername = usernames[1];
 
 
+        return updateJustGame(whiteUsername, blackUsername, gameName, game, gameID);
+
+    }
+
+    public GameData updateJustGame(String whiteUsername, String blackUsername, String gameName, ChessGame game, int gameID) throws DataAccessException {
         var statement = "UPDATE games SET whiteUsername=?, blackUsername=?, gameName=?, game=? WHERE gameID=?";
 
         var gameJson = new Gson().toJson(game);
         executeUpdate(statement, whiteUsername, blackUsername, gameName, gameJson, gameID);
 
         return new GameData(gameID, whiteUsername, blackUsername, gameName, game);
-
     }
 
     public void deleteAllGames() throws DataAccessException {

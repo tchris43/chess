@@ -74,10 +74,10 @@ public class MemoryDataAccess implements DataAccess {
         whiteUsername = usernames[0];
         blackUsername = usernames[1];
 
-        return updateJustGame(whiteUsername, blackUsername, gameName, game);
+        return updateJustGame(whiteUsername, blackUsername, gameName, game, gameID);
     }
 
-    public GameData updateJustGame(String whiteUsername, String blackUsername, String gameName, ChessGame game){
+    public GameData updateJustGame(String whiteUsername, String blackUsername, String gameName, ChessGame game, int gameID){
         GameData updatedGame = new GameData(gameID, whiteUsername, blackUsername, gameName, game);
 
         games.put(gameID, updatedGame);

@@ -6,6 +6,7 @@ import server.ServerException;
 import service.AlreadyTakenException;
 import service.UnauthorizedException;
 
+import javax.xml.crypto.Data;
 import java.util.List;
 import java.util.function.Function;
 
@@ -22,7 +23,7 @@ public interface DataAccess {
     GameData getGame(int gameID) throws DataAccessException;
     GameData updateGame(String username, int gameID, ChessGame.TeamColor playerColor, String whiteUsername,
                         String blackUsername, String gameName, ChessGame game) throws AlreadyTakenException, DataAccessException;
-    GameData updateJustGame(String whiteUsername, String blackUsername, String gameName, ChessGame game);
+    GameData updateJustGame(String whiteUsername, String blackUsername, String gameName, ChessGame game, int gameID) throws DataAccessException;
     void deleteAllGames() throws ServerException, DataAccessException;
     void deleteAllUsers() throws ServerException, DataAccessException;
     void deleteAllAuths() throws ServerException, DataAccessException;

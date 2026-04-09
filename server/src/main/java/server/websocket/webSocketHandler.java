@@ -169,6 +169,7 @@ public class webSocketHandler implements WsConnectHandler, WsMessageHandler, WsC
                 ChessGame.TeamColor playerColor = getPlayerColor(authToken, gameID, userName);
                 game.makeMove(move);
                 connections.updateGame(dataAccess, userName, gameID, playerColor, game);
+                //----- verified up to here 12:17 for normal
             }
         } catch (DataAccessException ex){
             ErrorMessage errorMessage = new ErrorMessage("Error: cannot make this move");

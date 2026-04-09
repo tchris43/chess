@@ -43,7 +43,7 @@ public class ConnectionManager {
         String whiteUsername = gameManager.whiteUserName;
         String blackUserName = gameManager.blackUserName;
         String gameName = gameManager.gameName;
-        dataAccess.updateJustGame(whiteUsername, blackUserName, gameName, game);
+        dataAccess.updateJustGame(whiteUsername, blackUserName, gameName, game, gameID);
         gameManager.setGame(game);
     }
 
