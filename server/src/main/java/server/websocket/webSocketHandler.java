@@ -3,8 +3,11 @@ package server.websocket;
 import chess.ChessGame;
 import chess.ChessMove;
 import chess.ChessPiece;
+import chess.InvalidMoveException;
 import com.google.gson.Gson;
+import dataaccess.DataAccess;
 import dataaccess.DataAccessException;
+import dataaccess.MemoryDataAccess;
 import io.javalin.websocket.*;
 
 
@@ -70,7 +73,7 @@ public class webSocketHandler implements WsConnectHandler, WsMessageHandler, WsC
 
             switch (command.getCommandType()){
                 case CONNECT -> connect(command.getGameID(), userName, ctx.session, command.getAuthToken());
-                case MAKE_MOVE -> makeMove(userName, ctx.session, command.getMove(), command.getGameID());
+                case MAKE_MOVE -> makeMove(userName, ctx.session, command.getMove(), command.getGameID(), command.getAuthToken());
 //                case LEAVE -> leave(userName, ctx.session);
 //                case RESIGN -> resign(userName, ctx.session);
             }
@@ -102,6 +105,16 @@ public class webSocketHandler implements WsConnectHandler, WsMessageHandler, WsC
         }
         else {
             return "observer";
+        }
+    }
+
+    private ChessGame.TeamColor getPlayerColor(String authToken, int gameID, String userName) throws DataAccessException{
+        String color = getTeam(authToken, gameID, userName);
+        if (color.equals("white")){
+            return ChessGame.TeamColor.WHITE;
+        }
+        else {
+            return ChessGame.TeamColor.BLACK;
         }
     }
 
@@ -137,24 +150,32 @@ public class webSocketHandler implements WsConnectHandler, WsMessageHandler, WsC
         }
     }
 
-    private void makeMove(String userName, Session session, ChessMove move, int gameID){
+    private void makeMove(String userName, Session session, ChessMove move, int gameID, String authToken) throws DataAccessException, IOException {
         //verify move validity
         //get the piece by the position on board
         //check if the move is in pieceMoves
-        boolean valid = false;
-        ChessGame game = connections.get(gameID).game;
-        Collection<ChessMove> validMoves = game.validMoves(move.getStartPosition());
-        for (ChessMove m : validMoves){
-            if (m.equals(move)){
-                valid = true;
+        try {
+            boolean valid = false;
+            ChessGame game = connections.get(gameID).game;
+            Collection<ChessMove> validMoves = game.validMoves(move.getStartPosition());
+            for (ChessMove m : validMoves) {
+                if (m.equals(move)) {
+                    valid = true;
+                }
             }
+            //update the game
+            if (valid) {
+                DataAccess dataAccess = userService.getDataAccess();
+                ChessGame.TeamColor playerColor = getPlayerColor(authToken, gameID, userName);
+                game.makeMove(move);
+                connections.updateGame(dataAccess, userName, gameID, playerColor, game);
+            }
+        } catch (DataAccessException ex){
+            ErrorMessage errorMessage = new ErrorMessage("Error: cannot make this move");
+            connections.broadcast(gameID, session, errorMessage);
+        } catch (InvalidMoveException e) {
+            throw new RuntimeException(e);
         }
-        if (valid){
-
-        }
-
-
-        //update the game
 
         //Load game to all clients
 

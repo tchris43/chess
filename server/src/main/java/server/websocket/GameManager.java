@@ -17,11 +17,13 @@ public class GameManager {
     String whiteUserName;
     String blackUserName;
     ChessGame game;
+    String gameName;
 
     public GameManager(int gameID, UserService userService, String authToken) throws DataAccessException{
         GameData game = getGame(gameID, userService, authToken);
         this.whiteUserName = game.whiteUsername();
         this.blackUserName = game.blackUsername();
+        this.gameName = game.gameName();
     }
 
     public GameData getGame(int gameID, UserService userService, String authToken) throws DataAccessException {

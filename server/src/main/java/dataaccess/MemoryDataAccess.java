@@ -74,13 +74,15 @@ public class MemoryDataAccess implements DataAccess {
         whiteUsername = usernames[0];
         blackUsername = usernames[1];
 
+        return updateJustGame(whiteUsername, blackUsername, gameName, game);
+    }
+
+    public GameData updateJustGame(String whiteUsername, String blackUsername, String gameName, ChessGame game){
         GameData updatedGame = new GameData(gameID, whiteUsername, blackUsername, gameName, game);
 
         games.put(gameID, updatedGame);
 
         return updatedGame;
-
-
     }
 
     public void deleteAllGames(){

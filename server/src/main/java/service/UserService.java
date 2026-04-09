@@ -20,6 +20,10 @@ public class UserService {
         this.dataAccess = dataAccess;
     }
 
+    public DataAccess getDataAccess(){
+       return dataAccess;
+    }
+
     public boolean isAuthorized(String authToken) throws UnauthorizedException, DataAccessException {
         AuthData authData = dataAccess.getAuth(authToken);
         return authData != null;

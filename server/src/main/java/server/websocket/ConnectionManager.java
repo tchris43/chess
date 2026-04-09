@@ -3,7 +3,10 @@ package server.websocket;
 
 
 
+import chess.ChessGame;
+import dataaccess.DataAccess;
 import dataaccess.DataAccessException;
+import dataaccess.MemoryDataAccess;
 import org.eclipse.jetty.websocket.api.Session;
 import service.UserService;
 import websocket.messages.LoadGameMessage;
@@ -34,6 +37,15 @@ public class ConnectionManager {
 
     //TODO figure out how to remove just one value in a ConcurrentHashMap
     public void remove(Session session) {connections.remove(session);}
+
+    public void updateGame(DataAccess dataAccess, String userName, int gameID, ChessGame.TeamColor playerColor, ChessGame game) throws DataAccessException {
+        GameManager gameManager = connections.get(gameID);
+        String whiteUsername = gameManager.whiteUserName;
+        String blackUserName = gameManager.blackUserName;
+        String gameName = gameManager.gameName;
+        dataAccess.updateJustGame(whiteUsername, blackUserName, gameName, game);
+        gameManager.setGame(game);
+    }
 
     public void broadcast(int gameID, Session excludeSession, ServerMessage notification) throws IOException {
         //------------- approved for connect tests 8:24 wed

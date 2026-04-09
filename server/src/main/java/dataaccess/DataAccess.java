@@ -22,6 +22,7 @@ public interface DataAccess {
     GameData getGame(int gameID) throws DataAccessException;
     GameData updateGame(String username, int gameID, ChessGame.TeamColor playerColor, String whiteUsername,
                         String blackUsername, String gameName, ChessGame game) throws AlreadyTakenException, DataAccessException;
+    GameData updateJustGame(String whiteUsername, String blackUsername, String gameName, ChessGame game);
     void deleteAllGames() throws ServerException, DataAccessException;
     void deleteAllUsers() throws ServerException, DataAccessException;
     void deleteAllAuths() throws ServerException, DataAccessException;
@@ -47,4 +48,5 @@ public interface DataAccess {
         String[] usernames = new String[]{whiteUsername, blackUsername};
         return usernames;
     }
+
 }
