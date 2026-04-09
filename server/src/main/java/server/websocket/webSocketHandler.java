@@ -171,6 +171,9 @@ public class webSocketHandler implements WsConnectHandler, WsMessageHandler, WsC
                 connections.updateGame(dataAccess, userName, gameID, playerColor, game);
                 //----- verified up to here 12:17 for normal
             }
+            //Load game to all clients
+            LoadGameMessage loadGame = new LoadGameMessage(game);
+            connections.broadcastMove(gameID, session, loadGame);
         } catch (DataAccessException ex){
             ErrorMessage errorMessage = new ErrorMessage("Error: cannot make this move");
             connections.broadcast(gameID, session, errorMessage);
@@ -178,7 +181,7 @@ public class webSocketHandler implements WsConnectHandler, WsMessageHandler, WsC
             throw new RuntimeException(e);
         }
 
-        //Load game to all clients
+
 
         //notify all other clients of move
 

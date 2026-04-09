@@ -44,7 +44,6 @@ public class ConnectionManager {
         String blackUserName = gameManager.blackUserName;
         String gameName = gameManager.gameName;
         dataAccess.updateJustGame(whiteUsername, blackUserName, gameName, game, gameID);
-        gameManager.setGame(game);
     }
 
     public void broadcast(int gameID, Session excludeSession, ServerMessage notification) throws IOException {
@@ -72,4 +71,29 @@ public class ConnectionManager {
         }
 
     }
+
+    public void broadcastMove(int gameID, Session excludeSession, ServerMessage notification) throws IOException {
+        //------------- approved for connect tests 8:24 wed
+        String msg = notification.toString();
+        GameManager game = connections.get(gameID);
+        if (notification.getServerMessageType() == ServerMessage.ServerMessageType.ERROR){
+            excludeSession.getRemote().sendString(msg);
+        }
+        for (Session s : game.getSessions()){
+            if (s.isOpen()){
+                if (notification.getServerMessageType() == ServerMessage.ServerMessageType.NOTIFICATION) {
+                    if (!s.equals(excludeSession)) {
+                        s.getRemote().sendString(msg);
+                    }
+                }
+                else if (notification.getServerMessageType() == ServerMessage.ServerMessageType.LOAD_GAME){
+                    LoadGameMessage loadGame = (LoadGameMessage) notification;
+                    s.getRemote().sendString(msg);
+                    game.setGame(loadGame.getGame());
+                }
+            }
+        }
+
+    }
+
 }
