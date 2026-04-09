@@ -35,9 +35,13 @@ public class ConnectionManager {
         GameManager game = connections.get(gameID);
         for (Session s : game.getSessions()){
             if (s.isOpen()){
-                if (!s.equals(excludeSession)) {
-                    //TODO: verify this command and correct session dependency
-                    s.getRemote().sendString(msg);
+                if (notification.getServerMessageType() == ServerMessage.ServerMessageType.NOTIFICATION) {
+                    if (!s.equals(excludeSession)) {
+                        s.getRemote().sendString(msg);
+                    }
+                }
+                else if (notification.getServerMessageType() == ServerMessage.ServerMessageType.LOAD_GAME){
+                    excludeSession.getRemote().sendString(msg);
                 }
             }
         }

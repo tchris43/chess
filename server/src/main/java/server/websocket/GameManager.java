@@ -51,10 +51,17 @@ public class GameManager {
     }
 
     public List<Session> getSessions(){
+        //------------ approved
         List<Session> sessions = new ArrayList<>();
-        sessions.add(white);
-        sessions.add(black);
-        sessions.addAll(observers);
+        if (white != null) {
+            sessions.add(white);
+        }
+        if (black != null) {
+            sessions.add(black);
+        }
+        if (observers != null) {
+            sessions.addAll(observers);
+        }
         return sessions;
     }
 
