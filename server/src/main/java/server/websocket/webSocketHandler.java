@@ -1,6 +1,8 @@
 package server.websocket;
 
 import chess.ChessGame;
+import chess.ChessMove;
+import chess.ChessPiece;
 import com.google.gson.Gson;
 import dataaccess.DataAccessException;
 import io.javalin.websocket.*;
@@ -14,6 +16,7 @@ import model.UserData;
 import org.eclipse.jetty.websocket.api.Session;
 import org.jetbrains.annotations.NotNull;
 import service.UserService;
+import websocket.commands.MakeMoveCommand;
 import websocket.commands.UserGameCommand;
 import websocket.messages.LoadGameMessage;
 import websocket.messages.NotificationMessage;
@@ -44,7 +47,14 @@ public class webSocketHandler implements WsConnectHandler, WsMessageHandler, WsC
     @Override
     public void handleMessage(WsMessageContext ctx) throws DataAccessException {
         try {
-            UserGameCommand command = new Gson().fromJson(ctx.message(), UserGameCommand.class);
+            MakeMoveCommand moveCommand = new Gson().fromJson(ctx.message(), MakeMoveCommand.class);
+            UserGameCommand command = null;
+            if (moveCommand.getCommandType() != MAKE_MOVE){
+                command = new UserGameCommand(moveCommand.getCommandType(), moveCommand.getAuthToken(), moveCommand.getGameID());
+            }
+            else {
+                command = moveCommand;
+            }
             String userName = null;
             List<AuthData> auths = userService.getAuths();
             for (AuthData auth : auths){
