@@ -34,6 +34,9 @@ public class ConnectionManager {
         //------------- approved for connect tests 8:24 wed
         String msg = notification.toString();
         GameManager game = connections.get(gameID);
+        if (notification.getServerMessageType() == ServerMessage.ServerMessageType.ERROR){
+            excludeSession.getRemote().sendString(msg);
+        }
         for (Session s : game.getSessions()){
             if (s.isOpen()){
                 if (notification.getServerMessageType() == ServerMessage.ServerMessageType.NOTIFICATION) {

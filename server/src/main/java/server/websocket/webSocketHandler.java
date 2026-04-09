@@ -18,12 +18,14 @@ import org.jetbrains.annotations.NotNull;
 import service.UserService;
 import websocket.commands.MakeMoveCommand;
 import websocket.commands.UserGameCommand;
+import websocket.messages.ErrorMessage;
 import websocket.messages.LoadGameMessage;
 import websocket.messages.NotificationMessage;
 import websocket.messages.ServerMessage;
 
 import javax.xml.crypto.Data;
 import java.io.IOException;
+import java.rmi.ServerException;
 import java.util.List;
 import java.util.Objects;
 
@@ -120,13 +122,18 @@ public class webSocketHandler implements WsConnectHandler, WsMessageHandler, WsC
 
     private void connect(int gameID, String userName, Session session, String authToken) throws IOException, DataAccessException {
         //--------  approved for both connect tests 8:23 wed
-        connections.add(gameID, session, userService, userName, authToken);
-        String teamColor = getTeam(authToken, gameID, userName);
-        NotificationMessage notification = getNotification(teamColor, userName);
-        connections.broadcast(gameID, session, notification);
-        //TODO verify that I am supposed to pass a new chessGame here
-        LoadGameMessage loadGame = new LoadGameMessage(new ChessGame());
-        connections.broadcast(gameID, session, loadGame);
+        try {
+            connections.add(gameID, session, userService, userName, authToken);
+            String teamColor = getTeam(authToken, gameID, userName);
+            NotificationMessage notification = getNotification(teamColor, userName);
+            connections.broadcast(gameID, session, notification);
+            //TODO verify that I am supposed to pass a new chessGame here
+            LoadGameMessage loadGame = new LoadGameMessage(new ChessGame());
+            connections.broadcast(gameID, session, loadGame);
+        } catch(DataAccessException ex){
+            ErrorMessage errorMessage = new ErrorMessage("Error: cannot connect to websocket");
+            connections.broadcast(gameID, session, errorMessage);
+        }
     }
 
     private void makeMove(String userName, Session session){
