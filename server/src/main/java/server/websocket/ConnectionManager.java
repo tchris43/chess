@@ -41,7 +41,9 @@ public class ConnectionManager {
                     }
                 }
                 else if (notification.getServerMessageType() == ServerMessage.ServerMessageType.LOAD_GAME){
-                    excludeSession.getRemote().sendString(msg);
+                    if (s.equals(excludeSession)) {
+                        s.getRemote().sendString(msg);
+                    }
                 }
             }
         }

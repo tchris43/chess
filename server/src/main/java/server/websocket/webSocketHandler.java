@@ -120,6 +120,7 @@ public class webSocketHandler implements WsConnectHandler, WsMessageHandler, WsC
         //TODO verify that I am supposed to pass a new chessGame here
         LoadGameMessage loadGame = new LoadGameMessage(new ChessGame());
         connections.broadcast(gameID, session, loadGame);
+        //--------  verified for first connect test 8:14 wed
     }
 
 

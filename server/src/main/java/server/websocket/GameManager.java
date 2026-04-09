@@ -12,7 +12,7 @@ import java.util.List;
 public class GameManager {
     Session white;
     Session black;
-    List<Session> observers;
+    List<Session> observers = new ArrayList<>();
     String whiteUserName;
     String blackUserName;
 
