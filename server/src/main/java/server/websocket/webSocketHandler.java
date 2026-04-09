@@ -64,11 +64,8 @@ public class webSocketHandler implements WsConnectHandler, WsMessageHandler, WsC
                     userName = auth.username();
                 }
             }
-            // ---------- Verified up to here (connect) 1:27 Wed
-            //Throw an exception if userName is not found
-            if (userName == null){
-                throw new DataAccessException("Unauthorized");
-            }
+
+
 
             switch (command.getCommandType()){
                 case CONNECT -> connect(command.getGameID(), userName, ctx.session, command.getAuthToken());
@@ -123,6 +120,9 @@ public class webSocketHandler implements WsConnectHandler, WsMessageHandler, WsC
     private void connect(int gameID, String userName, Session session, String authToken) throws IOException, DataAccessException {
         //--------  approved for both connect tests 8:23 wed
         try {
+            if (userName == null){
+                throw new DataAccessException("Invalid auth");
+            }
             connections.add(gameID, session, userService, userName, authToken);
             String teamColor = getTeam(authToken, gameID, userName);
             NotificationMessage notification = getNotification(teamColor, userName);

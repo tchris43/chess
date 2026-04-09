@@ -39,14 +39,14 @@ public class GameManager {
 
     public void addSession (Session session, String userName){
         //------- approved (connect) 6:54 wed
-        if (userName.equals(whiteUserName)){
-            addWhite(session);
-        }
-        else if (userName.equals(blackUserName)){
-            addBlack(session);
-        }
-        else {
-            addObserver(session);
+        if (userName != null) {
+            if (userName.equals(whiteUserName)) {
+                addWhite(session);
+            } else if (userName.equals(blackUserName)) {
+                addBlack(session);
+            } else {
+                addObserver(session);
+            }
         }
     }
 
