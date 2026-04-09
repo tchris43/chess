@@ -6,6 +6,7 @@ package server.websocket;
 import dataaccess.DataAccessException;
 import org.eclipse.jetty.websocket.api.Session;
 import service.UserService;
+import websocket.messages.LoadGameMessage;
 import websocket.messages.ServerMessage;
 
 import java.io.IOException;
@@ -27,6 +28,10 @@ public class ConnectionManager {
         game.addSession(session, userName);
     }
 
+    public GameManager get(int gameID){
+        return connections.get(gameID);
+    }
+
     //TODO figure out how to remove just one value in a ConcurrentHashMap
     public void remove(Session session) {connections.remove(session);}
 
@@ -45,9 +50,11 @@ public class ConnectionManager {
                     }
                 }
                 else if (notification.getServerMessageType() == ServerMessage.ServerMessageType.LOAD_GAME){
+                    LoadGameMessage loadGame = (LoadGameMessage) notification;
                     if (s.equals(excludeSession)) {
                         s.getRemote().sendString(msg);
                     }
+                    game.setGame(loadGame.getGame());
                 }
             }
         }

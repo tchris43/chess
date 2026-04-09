@@ -1,5 +1,6 @@
 package server.websocket;
 
+import chess.ChessGame;
 import dataaccess.DataAccessException;
 import model.GameData;
 import model.GameList;
@@ -15,6 +16,7 @@ public class GameManager {
     List<Session> observers = new ArrayList<>();
     String whiteUserName;
     String blackUserName;
+    ChessGame game;
 
     public GameManager(int gameID, UserService userService, String authToken) throws DataAccessException{
         GameData game = getGame(gameID, userService, authToken);
@@ -63,6 +65,10 @@ public class GameManager {
             sessions.addAll(observers);
         }
         return sessions;
+    }
+
+    public void setGame(ChessGame game){
+        this.game = game;
     }
 
     private void addWhite(Session white){

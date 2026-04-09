@@ -26,6 +26,7 @@ import websocket.messages.ServerMessage;
 import javax.xml.crypto.Data;
 import java.io.IOException;
 import java.rmi.ServerException;
+import java.util.Collection;
 import java.util.List;
 import java.util.Objects;
 
@@ -69,7 +70,7 @@ public class webSocketHandler implements WsConnectHandler, WsMessageHandler, WsC
 
             switch (command.getCommandType()){
                 case CONNECT -> connect(command.getGameID(), userName, ctx.session, command.getAuthToken());
-                case MAKE_MOVE -> makeMove(userName, ctx.session);
+                case MAKE_MOVE -> makeMove(userName, ctx.session, command.getMove(), command.getGameID());
 //                case LEAVE -> leave(userName, ctx.session);
 //                case RESIGN -> resign(userName, ctx.session);
             }
@@ -136,8 +137,30 @@ public class webSocketHandler implements WsConnectHandler, WsMessageHandler, WsC
         }
     }
 
-    private void makeMove(String userName, Session session){
+    private void makeMove(String userName, Session session, ChessMove move, int gameID){
+        //verify move validity
+        //get the piece by the position on board
+        //check if the move is in pieceMoves
+        boolean valid = false;
+        ChessGame game = connections.get(gameID).game;
+        Collection<ChessMove> validMoves = game.validMoves(move.getStartPosition());
+        for (ChessMove m : validMoves){
+            if (m.equals(move)){
+                valid = true;
+            }
+        }
+        if (valid){
 
+        }
+
+
+        //update the game
+
+        //Load game to all clients
+
+        //notify all other clients of move
+
+        //notify all clients if in check, checkmate or stalemate
     }
 
 
