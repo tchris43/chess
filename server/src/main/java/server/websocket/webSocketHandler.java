@@ -60,7 +60,7 @@ public class webSocketHandler implements WsConnectHandler, WsMessageHandler, WsC
 
             switch (command.getCommandType()){
                 case CONNECT -> connect(command.getGameID(), userName, ctx.session, command.getAuthToken());
-//                case MAKE_MOVE -> makeMove(userName, ctx.session);
+                case MAKE_MOVE -> makeMove(userName, ctx.session);
 //                case LEAVE -> leave(userName, ctx.session);
 //                case RESIGN -> resign(userName, ctx.session);
             }
@@ -109,18 +109,18 @@ public class webSocketHandler implements WsConnectHandler, WsMessageHandler, WsC
     }
 
     private void connect(int gameID, String userName, Session session, String authToken) throws IOException, DataAccessException {
-        System.out.println("CONNECT: connecting to server through websocket");
-        //----------verified up to here 1:29 wed
+        //--------  approved for both connect tests 8:23 wed
         connections.add(gameID, session, userService, userName, authToken);
-        //---------verified to here 6:54 wed
         String teamColor = getTeam(authToken, gameID, userName);
         NotificationMessage notification = getNotification(teamColor, userName);
         connections.broadcast(gameID, session, notification);
-        //---------  verified 8:01 wed
         //TODO verify that I am supposed to pass a new chessGame here
         LoadGameMessage loadGame = new LoadGameMessage(new ChessGame());
         connections.broadcast(gameID, session, loadGame);
-        //--------  verified for first connect test 8:14 wed
+    }
+
+    private void makeMove(String userName, Session session){
+
     }
 
 

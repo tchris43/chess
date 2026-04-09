@@ -31,6 +31,7 @@ public class ConnectionManager {
     public void remove(Session session) {connections.remove(session);}
 
     public void broadcast(int gameID, Session excludeSession, ServerMessage notification) throws IOException {
+        //------------- approved for connect tests 8:24 wed
         String msg = notification.toString();
         GameManager game = connections.get(gameID);
         for (Session s : game.getSessions()){
