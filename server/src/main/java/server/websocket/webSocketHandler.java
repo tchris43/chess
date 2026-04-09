@@ -69,10 +69,11 @@ public class webSocketHandler implements WsConnectHandler, WsMessageHandler, WsC
         System.out.println("Websocket closed");
     }
 
-    private void connect(int gameID, String userName, Session session, String authToken) throws IOException{
+    private void connect(int gameID, String userName, Session session, String authToken) throws IOException, DataAccessException {
         System.out.println("CONNECT: connecting to server through websocket");
         //----------verified up to here 1:29 tuesday
         connections.add(gameID, session, userService, userName, authToken);
+        //---------verified to here 6:54 wed
         //TODO look at server messages to create the subclasses with messages
         var message = String.format("%s has joined the game", userName);
         var notification = new ServerMessage(ServerMessage.ServerMessageType.LOAD_GAME);

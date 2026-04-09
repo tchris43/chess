@@ -6,6 +6,7 @@ import model.GameList;
 import org.eclipse.jetty.websocket.api.Session;
 import service.UserService;
 
+import java.util.ArrayList;
 import java.util.List;
 
 public class GameManager {
@@ -37,6 +38,7 @@ public class GameManager {
 
 
     public void addSession (Session session, String userName){
+        //------- approved (connect) 6:54 wed
         if (userName.equals(whiteUserName)){
             addWhite(session);
         }
@@ -46,6 +48,14 @@ public class GameManager {
         else {
             addObserver(session);
         }
+    }
+
+    public List<Session> getSessions(){
+        List<Session> sessions = new ArrayList<>();
+        sessions.add(white);
+        sessions.add(black);
+        sessions.addAll(observers);
+        return sessions;
     }
 
     private void addWhite(Session white){

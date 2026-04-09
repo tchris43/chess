@@ -32,7 +32,8 @@ public class ConnectionManager {
 
     public void broadcast(int gameID, Session excludeSession, ServerMessage notification) throws IOException {
         String msg = notification.toString();
-        for (Session s : connections.get(gameID)){
+        GameManager game = connections.get(gameID);
+        for (Session s : game.getSessions()){
             if (s.isOpen()){
                 if (!s.equals(excludeSession)) {
                     //TODO: verify this command and correct session dependency
