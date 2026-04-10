@@ -214,15 +214,28 @@ public class webSocketHandler implements WsConnectHandler, WsMessageHandler, WsC
 
     }
 
-    private void resign(String userName, Session session, int gameID) throws IOException {
+    private void resign(String userName, Session session, int gameID) throws IOException, DataAccessException, ServerException {
         //marks the game as over (no more moves can be made)
-        GameManager gameManager = connections.get(gameID);
-        //TODO how do I mark as no more moves?
-        gameManager.setGame(null);
-        //game is updated in database
-        //notification to all clients that the root client has resigned (sent to players and observers)
-        NotificationMessage notification = new NotificationMessage(String.format("%s resigned", userName));
-        connections.broadcastAll(gameID, session, notification);
+        try {
+            GameManager gameManager = connections.get(gameID);
+            if (!(userName.equals(gameManager.blackUserName) || userName.equals(gameManager.whiteUserName))) {
+                throw new ServerException("Observers can't resign");
+            }
+            if (gameManager.game == null){
+                throw new ServerException("Opponent already resigned");
+            }
+            //TODO how do I mark as no more moves?
+            gameManager.setGame(null);
+            //game is updated in database
+            DataAccess dataAccess = userService.getDataAccess();
+            connections.updateGame(dataAccess, userName, gameID, ChessGame.TeamColor.WHITE, null);
+            //notification to all clients that the root client has resigned (sent to players and observers)
+            NotificationMessage notification = new NotificationMessage(String.format("%s resigned", userName));
+            connections.broadcastAll(gameID, session, notification);
+        } catch(ServerException ex) {
+            ErrorMessage errorMessage = new ErrorMessage("Error: unable to resign");
+            connections.broadcast(gameID, session, errorMessage);
+        }
     }
 
 
