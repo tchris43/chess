@@ -73,8 +73,8 @@ public class webSocketHandler implements WsConnectHandler, WsMessageHandler, WsC
             switch (command.getCommandType()){
                 case CONNECT -> connect(command.getGameID(), userName, ctx.session, command.getAuthToken());
                 case MAKE_MOVE -> makeMove(userName, ctx.session, command.getMove(), command.getGameID(), command.getAuthToken());
-//                case LEAVE -> leave(userName, ctx.session);
-//                case RESIGN -> resign(userName, ctx.session);
+                //case LEAVE -> leave(userName, ctx.session);
+                case RESIGN -> resign(userName, ctx.session, command.getGameID());
             }
         } catch (IOException ex) {
             ex.printStackTrace();
@@ -212,6 +212,16 @@ public class webSocketHandler implements WsConnectHandler, WsMessageHandler, WsC
         }
 
 
+    }
+
+    private void resign(String userName, Session session, int gameID) throws IOException {
+        //marks the game as over (no more moves can be made)
+        ChessGame game = connections.get(gameID).game;
+        //TODO how do I mark as no more moves?
+        //game is updated in database
+        //notification to all clients that the root client has resigned (sent to players and observers)
+        NotificationMessage notification = new NotificationMessage(String.format("%s resigned", userName));
+        connections.broadcastAll(gameID, session, notification);
     }
 
 
