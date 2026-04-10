@@ -174,6 +174,10 @@ public class webSocketHandler implements WsConnectHandler, WsMessageHandler, WsC
             //Load game to all clients
             LoadGameMessage loadGame = new LoadGameMessage(game);
             connections.broadcastMove(gameID, session, loadGame);
+            //notify all other clients of move
+            NotificationMessage notification = new NotificationMessage(String.format("%s moved from %s to %s", userName, move.getStartPosition(), move.getEndPosition()));
+            connections.broadcastMove(gameID, session, notification);
+            //notify all clients if in check, checkmate or stalemate
         } catch (DataAccessException ex){
             ErrorMessage errorMessage = new ErrorMessage("Error: cannot make this move");
             connections.broadcast(gameID, session, errorMessage);
@@ -183,9 +187,6 @@ public class webSocketHandler implements WsConnectHandler, WsMessageHandler, WsC
 
 
 
-        //notify all other clients of move
-
-        //notify all clients if in check, checkmate or stalemate
     }
 
 
