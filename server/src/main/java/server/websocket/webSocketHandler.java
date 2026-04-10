@@ -180,36 +180,37 @@ public class webSocketHandler implements WsConnectHandler, WsMessageHandler, WsC
                 game.makeMove(move);
                 connections.updateGame(dataAccess, userName, gameID, playerColor, game);
                 //----- verified up to here 12:17 for normal
+                //Load game to all clients
+                LoadGameMessage loadGame = new LoadGameMessage(game);
+                connections.broadcastMove(gameID, session, loadGame);
+                //notify all other clients of move
+                NotificationMessage notification = new NotificationMessage(String.format("%s moved from %s to %s", userName, move.getStartPosition(), move.getEndPosition()));
+                connections.broadcastMove(gameID, session, notification);
+                //notify all clients if in check, checkmate or stalemate
+                ChessGame.TeamColor opposingTeam = getOpposing(playerColor);
+                NotificationMessage stateChange = null;
+                if (game.isInCheck(opposingTeam)){
+                    stateChange = new NotificationMessage(String.format("%s is now in check", opposingTeam));
+                }
+                else if (game.isInCheckmate(opposingTeam)){
+                    stateChange = new NotificationMessage(String.format("%s is now in checkmate", opposingTeam));
+                }
+                else if (game.isInStalemate(opposingTeam)){
+                    stateChange = new NotificationMessage(String.format("%s is now in stalemate", opposingTeam));
+                }
+
+                if (stateChange != null){
+                    connections.broadcastAll(gameID, session, stateChange);
+                }
             }
-            //Load game to all clients
-            LoadGameMessage loadGame = new LoadGameMessage(game);
-            connections.broadcastMove(gameID, session, loadGame);
-            //notify all other clients of move
-            NotificationMessage notification = new NotificationMessage(String.format("%s moved from %s to %s", userName, move.getStartPosition(), move.getEndPosition()));
-            connections.broadcastMove(gameID, session, notification);
-            //notify all clients if in check, checkmate or stalemate
-            ChessGame.TeamColor opposingTeam = getOpposing(playerColor);
-            NotificationMessage stateChange = null;
-            if (game.isInCheck(opposingTeam)){
-                stateChange = new NotificationMessage(String.format("%s is now in check", opposingTeam));
-            }
-            else if (game.isInCheckmate(opposingTeam)){
-                stateChange = new NotificationMessage(String.format("%s is now in checkmate", opposingTeam));
-            }
-            else if (game.isInStalemate(opposingTeam)){
-                stateChange = new NotificationMessage(String.format("%s is now in stalemate", opposingTeam));
+            else {
+                throw new InvalidMoveException("This move is not valid");
             }
 
-            if (stateChange != null){
-                connections.broadcastAll(gameID, session, stateChange);
-            }
-        } catch (DataAccessException ex){
+        } catch (DataAccessException | InvalidMoveException ex){
             ErrorMessage errorMessage = new ErrorMessage("Error: cannot make this move");
             connections.broadcast(gameID, session, errorMessage);
-        } catch (InvalidMoveException e) {
-            throw new RuntimeException(e);
         }
-
 
 
     }
