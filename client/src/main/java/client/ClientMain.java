@@ -4,6 +4,7 @@ import chess.*;
 import server.ResponseException;
 import server.ServerFacade;
 
+import java.net.URISyntaxException;
 import java.util.Scanner;
 import java.util.function.Function;
 
@@ -48,7 +49,7 @@ public class ClientMain {
 
     }
 
-    private static void runLoop(PreLoginClient preClient, ServerFacade server) throws ResponseException {
+    private static void runLoop(PreLoginClient preClient, ServerFacade server) throws ResponseException, URISyntaxException {
         while (true) {
             preClient.setState(false);
             run("\n" + "[LOGGED_OUT] >>> ", line -> {

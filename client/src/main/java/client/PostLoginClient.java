@@ -1,26 +1,34 @@
 package client;
 
 import chess.ChessGame;
+import client.websocket.NotificationHandler;
+import client.websocket.WebSocketFacade;
+import jakarta.websocket.DeploymentException;
 import model.*;
 import server.ResponseException;
 import server.ServerFacade;
 import ui.DrawBoard;
+import websocket.messages.ServerMessage;
 
+import java.io.IOException;
+import java.net.URISyntaxException;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Scanner;
 
-public class PostLoginClient {
+public class PostLoginClient implements NotificationHandler {
     private final ServerFacade server;
     private boolean loggedIn = true;
     private boolean done = false;
     private Map<String, Integer> gameIDs = new HashMap<>();
     private int numGames = 0;
+    private WebSocketFacade ws;
 
-    public PostLoginClient(ServerFacade serverFacade) throws ResponseException {
+    public PostLoginClient(ServerFacade serverFacade) throws ResponseException, URISyntaxException {
         server = serverFacade;
     }
+
 
     public boolean isDone() {
         return done;
@@ -44,6 +52,8 @@ public class PostLoginClient {
         }
         catch (ResponseException ex) {
             return ex.getMessage();
+        } catch (DeploymentException | IOException | URISyntaxException e) {
+            throw new RuntimeException(e);
         }
     }
 
@@ -112,7 +122,7 @@ public class PostLoginClient {
         return games.toString();
     }
 
-    public String join(String... params) throws ResponseException{
+    public String join(String... params) throws ResponseException, DeploymentException, IOException, URISyntaxException {
         if (goodParams(params, 2)) {
             ChessGame.TeamColor teamColor;
             if (params[1].equals("white")) {
@@ -138,6 +148,8 @@ public class PostLoginClient {
 
             JoinRequest joinRequest = new JoinRequest(teamColor, gameID);
             server.joinGame(joinRequest);
+            ws = new WebSocketFacade(server.getUrl(), this);
+            ws.connect(server.getAuth(), gameID);
             String result = String.format("Successfully joined game %s", gameNumber);
             var board = new DrawBoard();
             board.draw(teamColor);
@@ -173,5 +185,10 @@ public class PostLoginClient {
         else {
             throw new ResponseException("Please enter valid parameters: observe <gameID>");
         }
+    }
+
+    @Override
+    public void notify(ServerMessage message) {
+        System.out.println(String.format("MADE IT!:%s",message.toString()));
     }
 }

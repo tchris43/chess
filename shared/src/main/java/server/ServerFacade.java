@@ -24,6 +24,10 @@ public class ServerFacade {
         return authToken;
     }
 
+    public String getUrl(){
+        return serverUrl;
+    }
+
     public void resetAuth(){
         authToken = null;
     }
