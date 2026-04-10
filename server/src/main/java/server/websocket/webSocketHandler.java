@@ -206,7 +206,7 @@ public class webSocketHandler implements WsConnectHandler, WsMessageHandler, WsC
                 throw new InvalidMoveException("This move is not valid");
             }
 
-        } catch (DataAccessException | InvalidMoveException | UnauthorizedException ex){
+        } catch (DataAccessException | InvalidMoveException | UnauthorizedException | NullPointerException ex){
             ErrorMessage errorMessage = new ErrorMessage("Error: cannot make this move");
             connections.broadcast(gameID, session, errorMessage);
         }
@@ -216,8 +216,9 @@ public class webSocketHandler implements WsConnectHandler, WsMessageHandler, WsC
 
     private void resign(String userName, Session session, int gameID) throws IOException {
         //marks the game as over (no more moves can be made)
-        ChessGame game = connections.get(gameID).game;
+        GameManager gameManager = connections.get(gameID);
         //TODO how do I mark as no more moves?
+        gameManager.setGame(null);
         //game is updated in database
         //notification to all clients that the root client has resigned (sent to players and observers)
         NotificationMessage notification = new NotificationMessage(String.format("%s resigned", userName));
