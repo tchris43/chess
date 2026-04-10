@@ -26,6 +26,7 @@ import websocket.messages.LoadGameMessage;
 import websocket.messages.NotificationMessage;
 import websocket.messages.ServerMessage;
 
+import javax.management.NotificationFilter;
 import javax.xml.crypto.Data;
 import java.io.IOException;
 import java.rmi.ServerException;
@@ -150,6 +151,15 @@ public class webSocketHandler implements WsConnectHandler, WsMessageHandler, WsC
         }
     }
 
+    private ChessGame.TeamColor getOpposing(ChessGame.TeamColor playerColor){
+        if (playerColor == ChessGame.TeamColor.WHITE){
+            return ChessGame.TeamColor.BLACK;
+        }
+        else {
+            return ChessGame.TeamColor.WHITE;
+        }
+    }
+
     private void makeMove(String userName, Session session, ChessMove move, int gameID, String authToken) throws DataAccessException, IOException {
         //verify move validity
         //get the piece by the position on board
@@ -164,9 +174,9 @@ public class webSocketHandler implements WsConnectHandler, WsMessageHandler, WsC
                 }
             }
             //update the game
+            ChessGame.TeamColor playerColor = getPlayerColor(authToken, gameID, userName);
             if (valid) {
                 DataAccess dataAccess = userService.getDataAccess();
-                ChessGame.TeamColor playerColor = getPlayerColor(authToken, gameID, userName);
                 game.makeMove(move);
                 connections.updateGame(dataAccess, userName, gameID, playerColor, game);
                 //----- verified up to here 12:17 for normal
@@ -178,6 +188,21 @@ public class webSocketHandler implements WsConnectHandler, WsMessageHandler, WsC
             NotificationMessage notification = new NotificationMessage(String.format("%s moved from %s to %s", userName, move.getStartPosition(), move.getEndPosition()));
             connections.broadcastMove(gameID, session, notification);
             //notify all clients if in check, checkmate or stalemate
+            ChessGame.TeamColor opposingTeam = getOpposing(playerColor);
+            NotificationMessage stateChange = null;
+            if (game.isInCheck(opposingTeam)){
+                stateChange = new NotificationMessage(String.format("%s is now in check", opposingTeam));
+            }
+            else if (game.isInCheckmate(opposingTeam)){
+                stateChange = new NotificationMessage(String.format("%s is now in checkmate", opposingTeam));
+            }
+            else if (game.isInStalemate(opposingTeam)){
+                stateChange = new NotificationMessage(String.format("%s is now in stalemate", opposingTeam));
+            }
+
+            if (stateChange != null){
+                connections.broadcastAll(gameID, session, stateChange);
+            }
         } catch (DataAccessException ex){
             ErrorMessage errorMessage = new ErrorMessage("Error: cannot make this move");
             connections.broadcast(gameID, session, errorMessage);
