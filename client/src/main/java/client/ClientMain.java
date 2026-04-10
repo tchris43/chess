@@ -1,6 +1,7 @@
 package client;
 
 import chess.*;
+import org.glassfish.grizzly.http.server.Response;
 import server.ResponseException;
 import server.ServerFacade;
 
@@ -50,6 +51,7 @@ public class ClientMain {
     }
 
     private static void runLoop(PreLoginClient preClient, ServerFacade server) throws ResponseException, URISyntaxException {
+        var postClient = new PostLoginClient(server);
         while (true) {
             preClient.setState(false);
             run("\n" + "[LOGGED_OUT] >>> ", line -> {
@@ -60,7 +62,6 @@ public class ClientMain {
                 }
             });
             if (preClient.isLoggedIn()) {
-                var postClient = new PostLoginClient(server);
                 run("\n" + "[LOGGED_IN] >>> ", line -> {
                     try {
                         return postClient.eval(line);
@@ -71,6 +72,16 @@ public class ClientMain {
                 if (postClient.isDone()){
                     break;
                 }
+            }
+            if (postClient.isInGame()){
+                var gameClient = new GameClient(server);
+                run("\n" + "[IN_GAME] >>> ", line -> {
+                    try {
+                        return gameClient.eval(line);
+                    } catch (ResponseException e){
+                        throw new RuntimeException(e);
+                    }
+                });
             }
             else {
                 break;

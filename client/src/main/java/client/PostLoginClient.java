@@ -24,6 +24,7 @@ public class PostLoginClient implements NotificationHandler {
     private Map<String, Integer> gameIDs = new HashMap<>();
     private int numGames = 0;
     private WebSocketFacade ws;
+    private boolean inGame = false;
 
     public PostLoginClient(ServerFacade serverFacade) throws ResponseException, URISyntaxException {
         server = serverFacade;
@@ -32,6 +33,10 @@ public class PostLoginClient implements NotificationHandler {
 
     public boolean isDone() {
         return done;
+    }
+
+    public boolean isInGame() {
+        return inGame;
     }
 
 
@@ -151,10 +156,11 @@ public class PostLoginClient implements NotificationHandler {
             ws = new WebSocketFacade(server.getUrl(), this);
             ws.connect(server.getAuth(), gameID);
             String result = String.format("Successfully joined game %s", gameNumber);
+            inGame = true;
             var board = new DrawBoard();
             board.draw(teamColor);
             System.out.println();
-            return result;
+            return "quit";
         }
         else {
             throw new ResponseException("Please enter valid parameters: join <gameID> <playerColor>");
