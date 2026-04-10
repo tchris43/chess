@@ -73,7 +73,7 @@ public class webSocketHandler implements WsConnectHandler, WsMessageHandler, WsC
             switch (command.getCommandType()){
                 case CONNECT -> connect(command.getGameID(), userName, ctx.session, command.getAuthToken());
                 case MAKE_MOVE -> makeMove(userName, ctx.session, command.getMove(), command.getGameID(), command.getAuthToken());
-                //case LEAVE -> leave(userName, ctx.session);
+                case LEAVE -> leave(userName, ctx.session, command.getGameID(), command.getAuthToken());
                 case RESIGN -> resign(userName, ctx.session, command.getGameID());
             }
         } catch (IOException ex) {
@@ -237,6 +237,32 @@ public class webSocketHandler implements WsConnectHandler, WsMessageHandler, WsC
             connections.broadcast(gameID, session, errorMessage);
         }
     }
+
+    private void leave(String userName, Session session, int gameID, String authToken) throws DataAccessException, IOException {
+        //game is updated to remove the client
+        GameManager gameManager = connections.get(gameID);
+        ChessGame game = gameManager.game;
+        //game is updated in the database
+        DataAccess dataAccess = userService.getDataAccess();
+        if (userName.equals(gameManager.whiteUserName) || userName.equals(gameManager.blackUserName)) {
+            ChessGame.TeamColor playerColor = getPlayerColor(authToken, gameID, userName);
+            String whiteUsername = gameManager.whiteUserName;
+            String blackUsername = gameManager.blackUserName;
+            if (playerColor == ChessGame.TeamColor.WHITE) {
+                whiteUsername = null;
+            } else if (playerColor == ChessGame.TeamColor.BLACK) {
+                blackUsername = null;
+            }
+            connections.updatePlayers(dataAccess, userName, gameID, playerColor, whiteUsername, blackUsername, game);
+
+            //notification to all other clients informing that the root player left
+        }
+        NotificationMessage notification = new NotificationMessage(String.format("%s left", userName));
+        connections.broadcast(gameID, session, notification);
+        connections.remove(session, gameID, userName);
+
+    }
+
 
 
 }

@@ -36,7 +36,10 @@ public class ConnectionManager {
     }
 
     //TODO figure out how to remove just one value in a ConcurrentHashMap
-    public void remove(Session session) {connections.remove(session);}
+    public void remove(Session session, int gameID, String userName) {
+        GameManager game = connections.get(gameID);
+        game.removeSession(session, userName);
+    }
 
     public void updateGame(DataAccess dataAccess, String userName, int gameID, ChessGame.TeamColor playerColor, ChessGame game) throws DataAccessException {
         GameManager gameManager = connections.get(gameID);
@@ -44,6 +47,11 @@ public class ConnectionManager {
         String blackUserName = gameManager.blackUserName;
         String gameName = gameManager.gameName;
         dataAccess.updateJustGame(whiteUsername, blackUserName, gameName, game, gameID);
+    }
+
+    public void updatePlayers(DataAccess dataAccess, String userName, int gameID, ChessGame.TeamColor playerColor, String whiteUsername, String blackUsername, ChessGame game) throws DataAccessException {
+        String gameName = connections.get(gameID).gameName;
+        dataAccess.updateGame(userName, gameID, playerColor, whiteUsername, blackUsername, gameName, game);
     }
 
     public void broadcast(int gameID, Session excludeSession, ServerMessage notification) throws IOException {

@@ -85,4 +85,26 @@ public class GameManager {
         this.observers.add(observer);
     }
 
+    public void removeSession(Session session, String userName){
+        if (userName.equals(whiteUserName)) {
+            removeWhite();
+        } else if (userName.equals(blackUserName)) {
+            removeBlack();
+        } else {
+            removeObserver(session);
+        }
+    }
+
+    private void removeWhite(){
+        this.white = null;
+    }
+
+    private void removeBlack(){
+        this.black = null;
+    }
+
+    private void removeObserver(Session observer){
+        this.observers.remove(observer);
+    }
+
 }

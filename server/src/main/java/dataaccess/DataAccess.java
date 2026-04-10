@@ -30,7 +30,7 @@ public interface DataAccess {
 
     default String[] updatePlayers(ChessGame.TeamColor playerColor, String username, String whiteUsername, String blackUsername){
         if (playerColor == ChessGame.TeamColor.WHITE){
-            if (whiteUsername == null) {
+            if (whiteUsername == null || username == null) {
                 whiteUsername = username;
             }
             else {
@@ -38,7 +38,7 @@ public interface DataAccess {
             }
         }
         else {
-            if (blackUsername == null) {
+            if (blackUsername == null || username == null) {
                 blackUsername = username;
             }
             else {
