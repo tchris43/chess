@@ -15,6 +15,7 @@ import model.GameList;
 import model.UserData;
 import org.eclipse.jetty.websocket.api.Session;
 import org.jetbrains.annotations.NotNull;
+import service.UnauthorizedException;
 import service.UserService;
 import websocket.commands.MakeMoveCommand;
 import websocket.commands.UserGameCommand;
@@ -205,7 +206,7 @@ public class webSocketHandler implements WsConnectHandler, WsMessageHandler, WsC
                 throw new InvalidMoveException("This move is not valid");
             }
 
-        } catch (DataAccessException | InvalidMoveException ex){
+        } catch (DataAccessException | InvalidMoveException | UnauthorizedException ex){
             ErrorMessage errorMessage = new ErrorMessage("Error: cannot make this move");
             connections.broadcast(gameID, session, errorMessage);
         }
