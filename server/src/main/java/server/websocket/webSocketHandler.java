@@ -1,9 +1,6 @@
 package server.websocket;
 
-import chess.ChessGame;
-import chess.ChessMove;
-import chess.ChessPiece;
-import chess.InvalidMoveException;
+import chess.*;
 import com.google.gson.Gson;
 import dataaccess.DataAccess;
 import dataaccess.DataAccessException;
@@ -166,15 +163,16 @@ public class webSocketHandler implements WsConnectHandler, WsMessageHandler, WsC
         //check if the move is in pieceMoves
         try {
             boolean valid = false;
+            ChessGame.TeamColor playerColor = getPlayerColor(authToken, gameID, userName);
             ChessGame game = connections.get(gameID).game;
+            ChessBoard board = game.getBoard();
             Collection<ChessMove> validMoves = game.validMoves(move.getStartPosition());
             for (ChessMove m : validMoves) {
-                if (m.equals(move)) {
+                if (m.equals(move) && board.getPiece(m.getStartPosition()).getTeamColor() == playerColor) {
                     valid = true;
                 }
             }
             //update the game
-            ChessGame.TeamColor playerColor = getPlayerColor(authToken, gameID, userName);
             if (valid) {
                 DataAccess dataAccess = userService.getDataAccess();
                 game.makeMove(move);
