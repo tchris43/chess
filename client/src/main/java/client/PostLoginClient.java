@@ -218,17 +218,17 @@ public class PostLoginClient implements NotificationHandler {
         this.board = board;
     }
 
-    private void receiveBoard(ChessBoard chessBoard, ChessGame chessGame){
+    private void receiveBoard(ChessBoard chessBoard, ChessGame chessGame, ChessGame.TeamColor playerColor){
         loadBoard(chessBoard);
         this.game = chessGame;
         var drawBoard = new DrawBoard();
-        drawBoard.printBoard(board, game.getTeamTurn(), null);
+        drawBoard.printBoard(board, playerColor, null);
     }
 
     @Override
     public void notify(LoadGameMessage message) {
         ChessBoard chessBoard = message.getGame().getBoard();
-        receiveBoard(chessBoard, message.getGame());
+        receiveBoard(chessBoard, message.getGame(), message.getPlayerColor());
     }
 
 }
