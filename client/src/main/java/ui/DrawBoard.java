@@ -155,17 +155,20 @@ public class DrawBoard {
                 out.print(secondSquare + piece2 + secondSquare);
             }
 
-            var tmp = firstSquare;
-            firstSquare = secondSquare;
-            secondSquare = tmp;
-            var tmpHighlight = firstHighlight;
-            firstHighlight = secondHighlight;
-            secondHighlight = tmp;
+
             col += 2;
         }
         out.print(RESET_TEXT_COLOR);
         out.print(border + SET_TEXT_COLOR_BLACK+ rowNum + border);
         out.print(RESET_TEXT_COLOR);
+
+        var tmp = firstSquare;
+        firstSquare = secondSquare;
+        secondSquare = tmp;
+        var tmpHighlight = firstHighlight;
+        firstHighlight = secondHighlight;
+        secondHighlight = tmpHighlight;
+
     }
 
     private void printHeaderBlack(PrintStream out){
