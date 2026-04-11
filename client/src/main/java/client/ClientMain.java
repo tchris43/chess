@@ -74,7 +74,7 @@ public class ClientMain {
                 }
             }
             if (postClient.isInGame()){
-                var gameClient = new GameClient(server);
+                var gameClient = new GameClient(server, postClient.getWS(), postClient.getGameID(), postClient.getBoard(), postClient.getGame());
                 run("\n" + "[IN_GAME] >>> ", line -> {
                     try {
                         return gameClient.eval(line);

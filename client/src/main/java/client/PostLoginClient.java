@@ -1,5 +1,6 @@
 package client;
 
+import chess.ChessBoard;
 import chess.ChessGame;
 import client.websocket.NotificationHandler;
 import client.websocket.WebSocketFacade;
@@ -8,6 +9,7 @@ import model.*;
 import server.ResponseException;
 import server.ServerFacade;
 import ui.DrawBoard;
+import websocket.messages.LoadGameMessage;
 import websocket.messages.ServerMessage;
 
 import java.io.IOException;
@@ -25,9 +27,28 @@ public class PostLoginClient implements NotificationHandler {
     private int numGames = 0;
     private WebSocketFacade ws;
     private boolean inGame = false;
+    private int gameID;
+    private ChessBoard board;
+    private ChessGame game;
 
     public PostLoginClient(ServerFacade serverFacade) throws ResponseException, URISyntaxException {
         server = serverFacade;
+    }
+
+    public ChessGame getGame(){
+        return game;
+    }
+
+    public ChessBoard getBoard(){
+        return board;
+    }
+
+    public int getGameID(){
+        return gameID;
+    }
+
+    public WebSocketFacade getWS() {
+        return ws;
     }
 
 
@@ -149,6 +170,7 @@ public class PostLoginClient implements NotificationHandler {
 
 
             int gameID = gameIDs.get(gameNumber);
+            this.gameID = gameID;
 
 
             JoinRequest joinRequest = new JoinRequest(teamColor, gameID);
@@ -157,8 +179,7 @@ public class PostLoginClient implements NotificationHandler {
             ws.connect(server.getAuth(), gameID);
             String result = String.format("Successfully joined game %s", gameNumber);
             inGame = true;
-            var board = new DrawBoard();
-            board.draw(teamColor);
+
             System.out.println();
             return "quit";
         }
@@ -183,8 +204,8 @@ public class PostLoginClient implements NotificationHandler {
 
 
             String result = String.format("Observing game %s", gameNumber);
-            var board = new DrawBoard();
-            board.draw(ChessGame.TeamColor.WHITE);
+//            receiveBoard(board);
+            System.out.print("DEBUG: now it should draw board");
             System.out.println();
             return result;
         }
@@ -193,8 +214,21 @@ public class PostLoginClient implements NotificationHandler {
         }
     }
 
-    @Override
-    public void notify(ServerMessage message) {
-        System.out.println(String.format("MADE IT!:%s",message.toString()));
+    private void loadBoard(ChessBoard board){
+        this.board = board;
     }
+
+    private void receiveBoard(ChessBoard chessBoard, ChessGame chessGame){
+        loadBoard(chessBoard);
+        this.game = chessGame;
+        var drawBoard = new DrawBoard();
+        drawBoard.printBoard(board, game.getTeamTurn(), null);
+    }
+
+    @Override
+    public void notify(LoadGameMessage message) {
+        ChessBoard chessBoard = message.getGame().getBoard();
+        receiveBoard(chessBoard, message.getGame());
+    }
+
 }

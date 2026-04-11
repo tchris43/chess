@@ -1,6 +1,9 @@
 package client;
 
+import chess.ChessBoard;
 import chess.ChessGame;
+import chess.ChessMove;
+import chess.ChessPosition;
 import client.websocket.NotificationHandler;
 import client.websocket.WebSocketFacade;
 import jakarta.websocket.DeploymentException;
@@ -8,50 +11,101 @@ import model.*;
 import server.ResponseException;
 import server.ServerFacade;
 import ui.DrawBoard;
+import websocket.messages.LoadGameMessage;
 import websocket.messages.ServerMessage;
 
 import java.io.IOException;
 import java.net.URISyntaxException;
-import java.util.Arrays;
-import java.util.HashMap;
-import java.util.Map;
-import java.util.Scanner;
+import java.util.*;
 
 public class GameClient implements NotificationHandler {
     private final ServerFacade server;
     private WebSocketFacade ws;
+    private int gameID;
+    private ChessBoard board;
+    private ChessGame game;
 
-    public GameClient(ServerFacade serverFacade) throws ResponseException, URISyntaxException {
+    public GameClient(ServerFacade serverFacade, WebSocketFacade ws, int gameID, ChessBoard board, ChessGame game) throws ResponseException, URISyntaxException {
         server = serverFacade;
+        this.ws = ws;
+        this.gameID = gameID;
+        this.ws.setNotificationHandler(this);
+        this.board = board;
+        this.game = game;
     }
 
 
 
     public String eval(String input) throws ResponseException{
-        String cmd = input.toLowerCase();
+        String[] tokens = input.toLowerCase().split(" ");
+        String cmd = (tokens.length > 0) ? tokens[0] : "help";
+        String[] params = Arrays.copyOfRange(tokens, 1, tokens.length);
         return switch (cmd){
             case "help" -> help();
-//                case "redraw chess board" -> redrawChessBoard();
-//                case "leave" -> leave();
-//                case "make move" -> makeMove();
-//                case "resign" -> resign();
-//                case "highlight legal moves" -> highlightLegalMoves();
+            case "redraw" -> redrawChessBoard();
+            case "leave" -> leave();
+            case "move" -> makeMove(params[0], params[1], params[2], params[3]);
+            case "resign" -> resign();
+            case "highlight" -> highlightLegalMoves(params[0], params[1]);
             default -> help();
         };
     }
 
     public String help() {
         return """
-                redraw chess board
+                redraw
                 leave
-                make move
+                move <column> <row> <column> <row>
                 resign
-                highlight legal moves
+                highlight <col> <row>
                 """;
     }
 
+    public String leave() throws ResponseException {
+        ws.leave(server.getAuth(), gameID);
+        return "left";
+    }
+
+    public String makeMove(String startCol, String startRow, String endCol, String endRow) throws ResponseException {
+        ChessPosition start = new ChessPosition(Integer.parseInt(startRow), Integer.parseInt(startCol));
+        ChessPosition end = new ChessPosition(Integer.parseInt(endRow), Integer.parseInt(endCol));
+        ChessMove move = new ChessMove(start, end, null);
+        ws.makeMove(server.getAuth(), gameID, move);
+        return "made move";
+    }
+
+    public String resign() throws ResponseException {
+        ws.resign(server.getAuth(), gameID);
+        return "resigned";
+    }
+
+    public Collection<ChessMove> getValidSpots(ChessPosition position){
+        return game.validMoves(position);
+    }
+
+    public String highlightLegalMoves(String col, String row) throws ResponseException {
+        ChessPosition position = new ChessPosition(Integer.parseInt(row), Integer.parseInt(col));
+        var drawBoard = new DrawBoard();
+        var validSpots = getValidSpots(position);
+        drawBoard.printBoard(board, game.getTeamTurn(), validSpots);
+        return "highlight legal moves";
+    }
+
+    public String redrawChessBoard() {
+        LoadGameMessage loadGame = new LoadGameMessage(game);
+        notify(loadGame);
+        return "redraw chess board";
+    }
+
+    private void receiveBoard(ChessBoard chessBoard, ChessGame chessGame){
+        this.board = chessBoard;
+        this.game = chessGame;
+        var drawBoard = new DrawBoard();
+        drawBoard.printBoard(board, game.getTeamTurn(), null);
+    }
+
     @Override
-    public void notify(ServerMessage message) {
-        System.out.println(String.format("MADE IT!:%s",message.toString()));
+    public void notify(LoadGameMessage message) {
+
     }
 }

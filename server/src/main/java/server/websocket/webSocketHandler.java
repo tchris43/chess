@@ -246,14 +246,7 @@ public class webSocketHandler implements WsConnectHandler, WsMessageHandler, WsC
         DataAccess dataAccess = userService.getDataAccess();
         if (userName.equals(gameManager.whiteUserName) || userName.equals(gameManager.blackUserName)) {
             ChessGame.TeamColor playerColor = getPlayerColor(authToken, gameID, userName);
-            String whiteUsername = gameManager.whiteUserName;
-            String blackUsername = gameManager.blackUserName;
-            if (playerColor == ChessGame.TeamColor.WHITE) {
-                whiteUsername = null;
-            } else if (playerColor == ChessGame.TeamColor.BLACK) {
-                blackUsername = null;
-            }
-            connections.updatePlayers(dataAccess, userName, gameID, playerColor, whiteUsername, blackUsername, game);
+            connections.updatePlayers(dataAccess, null, gameID, playerColor, gameManager.whiteUserName, gameManager.blackUserName, game);
 
             //notification to all other clients informing that the root player left
         }
