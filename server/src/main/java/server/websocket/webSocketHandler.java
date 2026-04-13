@@ -97,19 +97,14 @@ public class webSocketHandler implements WsConnectHandler, WsMessageHandler, WsC
             }
         }
         if (game != null) {
-            if (game.whiteUsername() != null) {
-                if (game.whiteUsername().equals(userName)) {
-                    return "white";
-                }
-            } else {
-                if (game.blackUsername().equals(userName)) {
-                    return "black";
-                } else {
-                    return "observer";
-                }
+            if (game.whiteUsername() != null && game.whiteUsername().equals(userName)) {
+                return "white";
+            }
+            if (game.blackUsername() != null && game.blackUsername().equals(userName)) {
+                return "black";
             }
         }
-        return null;
+        return "observer";
     }
 
     private ChessGame.TeamColor getPlayerColor(String authToken, int gameID, String userName) throws DataAccessException{
