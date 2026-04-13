@@ -81,6 +81,7 @@ public class DrawBoard {
 
     }
 
+
     private String getPiece(ChessPiece piece){
         String pieceText = "";
         if (piece != null) {
@@ -138,22 +139,32 @@ public class DrawBoard {
             ChessPosition pos = new ChessPosition(rowNum, col + 1);
             String piece = getPiece(board.getPiece(pos));
             if (piece.isEmpty()){
-                piece = firstSquare;
+                if (inHighlights(pos)){
+                    piece = firstHighlight;
+                }
+                else {
+                    piece = firstSquare;
+                }
             }
             ChessPosition pos2 = new ChessPosition(rowNum, col + 2);
             String piece2 = getPiece(board.getPiece(pos2));
             if (piece2.isEmpty()){
-                piece2 = secondSquare;
+                if (inHighlights(pos2)) {
+                    piece2 = secondHighlight;
+                }
+                else {
+                    piece2 = secondSquare;
+                }
             }
 
             if (inHighlights(pos)){
-                out.print(firstHighlight + piece + firstSquare);
+                out.print(firstHighlight + piece + firstHighlight);
             }
             else {
                 out.print(firstSquare + piece + firstSquare);
             }
             if (inHighlights(pos2)){
-                out.print(secondHighlight + secondHighlight);
+                out.print(secondHighlight + piece + secondHighlight);
             }
             else {
                 out.print(secondSquare + piece2 + secondSquare);
