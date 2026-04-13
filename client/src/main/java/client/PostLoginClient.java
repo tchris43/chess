@@ -19,7 +19,7 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.Scanner;
 
-public class PostLoginClient implements NotificationHandler {
+public class PostLoginClient {
     private final ServerFacade server;
     private boolean loggedIn = true;
     private boolean done = false;
@@ -228,10 +228,5 @@ public class PostLoginClient implements NotificationHandler {
         drawBoard.printBoard(board, playerColor, null);
     }
 
-    @Override
-    public void notify(LoadGameMessage message) {
-        ChessBoard chessBoard = message.getGame().getBoard();
-        receiveBoard(chessBoard, message.getGame(), message.getPlayerColor());
-    }
 
 }

@@ -147,8 +147,6 @@ public class webSocketHandler implements WsConnectHandler, WsMessageHandler, WsC
             connections.broadcast(gameID, session, notification);
             //TODO verify that I am supposed to pass a new chessGame here
             LoadGameMessage loadGame = new LoadGameMessage(new ChessGame());
-            ChessGame.TeamColor playerColor = getPlayerColor(authToken, gameID, userName);
-            loadGame.setPlayerColor(playerColor);
             connections.broadcast(gameID, session, loadGame);
         } catch(DataAccessException ex){
             ErrorMessage errorMessage = new ErrorMessage("Error: cannot connect to websocket");

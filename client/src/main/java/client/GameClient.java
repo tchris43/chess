@@ -8,7 +8,9 @@ import model.*;
 import server.ResponseException;
 import server.ServerFacade;
 import ui.DrawBoard;
+import websocket.messages.ErrorMessage;
 import websocket.messages.LoadGameMessage;
+import websocket.messages.NotificationMessage;
 import websocket.messages.ServerMessage;
 
 import java.io.IOException;
@@ -21,6 +23,9 @@ public class GameClient implements NotificationHandler {
     private int gameID;
     private ChessBoard board;
     private ChessGame game;
+    private ChessGame.TeamColor playerColor;
+
+    private static DrawBoard drawBoard = new DrawBoard();
 
     public GameClient(ServerFacade serverFacade, int gameID, JoinRequest joinRequest) throws ResponseException, URISyntaxException, DeploymentException, IOException {
         server = serverFacade;
@@ -31,12 +36,10 @@ public class GameClient implements NotificationHandler {
 
         this.gameID = gameID;
         this.ws.setNotificationHandler(this);
+        this.playerColor = joinRequest.playerColor();
 
     }
 
-    public void setBoard(ChessBoard board){
-        this.board = board;
-    }
 
 
 
@@ -86,7 +89,7 @@ public class GameClient implements NotificationHandler {
     }
 
     public ChessPiece.PieceType getPromotion(ChessPosition start, ChessPosition end){
-        if (board.getPiece(start).getPieceType().equals(ChessPiece.PieceType.PAWN)){
+        if (board.getPiece(start).getPieceType().equals(ChessPiece.PieceType.PAWN) && (end.getRow() == 8 || end.getRow() == 1)){
             Scanner scanner = new Scanner(System.in);
             System.out.print("choose promotion <queen> <rook> <bishop> <knight>");
             String promotion = scanner.nextLine();
@@ -117,8 +120,16 @@ public class GameClient implements NotificationHandler {
     }
 
     public String resign() throws ResponseException {
-        ws.resign(server.getAuth(), gameID);
-        return "resigned";
+        Scanner scanner = new Scanner(System.in);
+        System.out.print("Do you really want to resign? <yes/no>");
+        String confirm = scanner.nextLine();
+        if (Objects.equals(confirm, "yes")) {
+            ws.resign(server.getAuth(), gameID);
+            return "resigned";
+        }
+        else {
+            return "keep playing";
+        }
     }
 
     public Collection<ChessMove> getValidSpots(ChessPosition position){
@@ -126,29 +137,51 @@ public class GameClient implements NotificationHandler {
     }
 
     public String highlightLegalMoves(String col, String row) throws ResponseException {
-        ChessPosition position = new ChessPosition(Integer.parseInt(row), Integer.parseInt(col));
-        var drawBoard = new DrawBoard();
+        int convertedCol = convert(col);
+        ChessPosition position = new ChessPosition(Integer.parseInt(row), convertedCol);
         var validSpots = getValidSpots(position);
-        drawBoard.printBoard(board, game.getTeamTurn(), validSpots);
+        drawBoard.printBoard(board, playerColor, validSpots);
         return "highlight legal moves";
     }
 
     public String redrawChessBoard() {
-        LoadGameMessage loadGame = new LoadGameMessage(game);
-        notify(loadGame);
+        drawBoard.printBoard(board, playerColor, null);
         return "(redrew chess board)";
     }
 
-    private void receiveBoard(ChessBoard chessBoard, ChessGame chessGame, ChessGame.TeamColor playerColor){
-        this.board = chessBoard;
-        this.game = chessGame;
-        var drawBoard = new DrawBoard();
-        drawBoard.printBoard(board, playerColor, null);
-    }
 
     @Override
-    public void notify(LoadGameMessage message) {
-        ChessBoard chessBoard = message.getGame().getBoard();
-        receiveBoard(chessBoard, message.getGame(), message.getPlayerColor());
+    public void notify(ServerMessage message) {
+        switch(message.getServerMessageType()){
+            case ServerMessage.ServerMessageType.LOAD_GAME : {
+                LoadGameMessage loadGame = (LoadGameMessage) message;
+                ChessGame chessGame = loadGame.getGame();
+                this.board = chessGame.getBoard();
+                this.game = chessGame;
+                drawBoard.printBoard(board, playerColor, null);
+            }
+            case ServerMessage.ServerMessageType.NOTIFICATION : {
+                NotificationMessage notification = (NotificationMessage) message;
+                System.out.print(notification);
+            }
+            case ServerMessage.ServerMessageType.ERROR : {
+                ErrorMessage errorMessage = (ErrorMessage) message;
+                System.out.print(errorMessage);
+            }
+        }
+
+
     }
+
+//    @Override
+//    public void notify(LoadGameMessage message) {
+//        ServerMessage serverMessage = (ServerMessage) message;
+//        LoadGameMessage loadGame = (LoadGameMessage) message;
+//        ChessBoard chessBoard = loadGame.getGame().getBoard();
+//        receiveBoard(chessBoard, loadGame.getGame(), loadGame.getPlayerColor());
+//    }
+
+
+
+
 }
