@@ -74,9 +74,27 @@ public class GameClient implements NotificationHandler {
         return "quit";
     }
 
+    public int convert(String col){
+        return switch(col){
+            case "a" -> 1;
+            case "b" -> 2;
+            case "c" -> 3;
+            case "d" -> 4;
+            case "e" -> 5;
+            case "f" -> 6;
+            case "g" -> 7;
+            case "h" -> 8;
+            default -> throw new IllegalStateException("Unexpected value: " + col);
+        };
+    }
+
     public String makeMove(String startCol, String startRow, String endCol, String endRow) throws ResponseException {
-        ChessPosition start = new ChessPosition(Integer.parseInt(startRow), Integer.parseInt(startCol));
-        ChessPosition end = new ChessPosition(Integer.parseInt(endRow), Integer.parseInt(endCol));
+        int convertedCol = convert(startCol);
+        int convertedEndCol = convert(endCol);
+
+
+        ChessPosition start = new ChessPosition(Integer.parseInt(startRow), convertedCol);
+        ChessPosition end = new ChessPosition(Integer.parseInt(endRow), convertedEndCol);
         ChessMove move = new ChessMove(start, end, null);
         ws.makeMove(server.getAuth(), gameID, move);
         return "made move";
