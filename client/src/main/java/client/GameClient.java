@@ -1,9 +1,6 @@
 package client;
 
-import chess.ChessBoard;
-import chess.ChessGame;
-import chess.ChessMove;
-import chess.ChessPosition;
+import chess.*;
 import client.websocket.NotificationHandler;
 import client.websocket.WebSocketFacade;
 import jakarta.websocket.DeploymentException;
@@ -88,6 +85,24 @@ public class GameClient implements NotificationHandler {
         };
     }
 
+    public ChessPiece.PieceType getPromotion(ChessPosition start, ChessPosition end){
+        if (board.getPiece(start).getPieceType().equals(ChessPiece.PieceType.PAWN)){
+            Scanner scanner = new Scanner(System.in);
+            System.out.print("choose promotion <queen> <rook> <bishop> <knight>");
+            String promotion = scanner.nextLine();
+            return switch(promotion){
+                case "queen" -> ChessPiece.PieceType.QUEEN;
+                case "rook" -> ChessPiece.PieceType.ROOK;
+                case "bishop" -> ChessPiece.PieceType.BISHOP;
+                case "knight" -> ChessPiece.PieceType.KNIGHT;
+                default -> throw new IllegalStateException("Unexpected value: " + promotion);
+            };
+        }
+        else {
+            return null;
+        }
+    }
+
     public String makeMove(String startCol, String startRow, String endCol, String endRow) throws ResponseException {
         int convertedCol = convert(startCol);
         int convertedEndCol = convert(endCol);
@@ -95,7 +110,8 @@ public class GameClient implements NotificationHandler {
 
         ChessPosition start = new ChessPosition(Integer.parseInt(startRow), convertedCol);
         ChessPosition end = new ChessPosition(Integer.parseInt(endRow), convertedEndCol);
-        ChessMove move = new ChessMove(start, end, null);
+        ChessPiece.PieceType promotion = getPromotion(start, end);
+        ChessMove move = new ChessMove(start, end, promotion);
         ws.makeMove(server.getAuth(), gameID, move);
         return "made move";
     }
