@@ -64,26 +64,34 @@ public class ClientMain {
                 }
             });
             if (preClient.isLoggedIn()) {
-                run("\n" + "[LOGGED_IN] >>> ", line -> {
-                    try {
-                        return postClient.eval(line);
-                    } catch (ResponseException e) {
-                        throw new RuntimeException(e);
+                while(true) {
+                    run("\n" + "[LOGGED_IN] >>> ", line -> {
+                        try {
+                            return postClient.eval(line);
+                        } catch (ResponseException e) {
+                            throw new RuntimeException(e);
+                        }
+                    });
+
+                    if (postClient.isDone()) {
+                        break;
                     }
-                });
-                if (postClient.isDone()){
-                    break;
+
+                    if (postClient.isInGame()) {
+                        var gameClient = new GameClient(server, postClient.getGameID(), postClient.getJoin());
+                        run("\n" + "[IN_GAME] >>> ", line -> {
+                            try {
+                                return gameClient.eval(line);
+                            } catch (ResponseException e) {
+                                throw new RuntimeException(e);
+                            }
+                        });
+                    }
+
+
                 }
-            }
-            if (postClient.isInGame()){
-                var gameClient = new GameClient(server, postClient.getGameID(), postClient.getJoin());
-                run("\n" + "[IN_GAME] >>> ", line -> {
-                    try {
-                        return gameClient.eval(line);
-                    } catch (ResponseException e){
-                        throw new RuntimeException(e);
-                    }
-                });
+
+
             }
             else {
                 break;

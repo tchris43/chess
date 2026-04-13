@@ -71,7 +71,7 @@ public class GameClient implements NotificationHandler {
 
     public String leave() throws ResponseException {
         ws.leave(server.getAuth(), gameID);
-        return "left";
+        return "quit";
     }
 
     public String makeMove(String startCol, String startRow, String endCol, String endRow) throws ResponseException {
@@ -102,7 +102,7 @@ public class GameClient implements NotificationHandler {
     public String redrawChessBoard() {
         LoadGameMessage loadGame = new LoadGameMessage(game);
         notify(loadGame);
-        return "redraw chess board";
+        return "(redrew chess board)";
     }
 
     private void receiveBoard(ChessBoard chessBoard, ChessGame chessGame, ChessGame.TeamColor playerColor){
