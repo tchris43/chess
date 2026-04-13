@@ -59,6 +59,9 @@ public class DrawBoard {
                 out.println();
             }
             printHeaderWhite(out);
+            out.print(RESET_BG_COLOR);
+            out.print(RESET_TEXT_COLOR);
+            out.println();
         }
         else {
             printHeaderBlack(out);
@@ -73,6 +76,7 @@ public class DrawBoard {
             printHeaderBlack(out);
             out.print(RESET_BG_COLOR);
             out.print(RESET_TEXT_COLOR);
+            out.println();
         }
 
     }

@@ -1,10 +1,12 @@
 package client;
 
 import chess.*;
+import jakarta.websocket.DeploymentException;
 import org.glassfish.grizzly.http.server.Response;
 import server.ResponseException;
 import server.ServerFacade;
 
+import java.io.IOException;
 import java.net.URISyntaxException;
 import java.util.Scanner;
 import java.util.function.Function;
@@ -50,7 +52,7 @@ public class ClientMain {
 
     }
 
-    private static void runLoop(PreLoginClient preClient, ServerFacade server) throws ResponseException, URISyntaxException {
+    private static void runLoop(PreLoginClient preClient, ServerFacade server) throws ResponseException, URISyntaxException, DeploymentException, IOException {
         var postClient = new PostLoginClient(server);
         while (true) {
             preClient.setState(false);
@@ -74,7 +76,7 @@ public class ClientMain {
                 }
             }
             if (postClient.isInGame()){
-                var gameClient = new GameClient(server, postClient.getWS(), postClient.getGameID(), postClient.getBoard(), postClient.getGame());
+                var gameClient = new GameClient(server, postClient.getGameID(), postClient.getJoin());
                 run("\n" + "[IN_GAME] >>> ", line -> {
                     try {
                         return gameClient.eval(line);

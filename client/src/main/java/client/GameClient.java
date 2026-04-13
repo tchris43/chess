@@ -25,13 +25,20 @@ public class GameClient implements NotificationHandler {
     private ChessBoard board;
     private ChessGame game;
 
-    public GameClient(ServerFacade serverFacade, WebSocketFacade ws, int gameID, ChessBoard board, ChessGame game) throws ResponseException, URISyntaxException {
+    public GameClient(ServerFacade serverFacade, int gameID, JoinRequest joinRequest) throws ResponseException, URISyntaxException, DeploymentException, IOException {
         server = serverFacade;
-        this.ws = ws;
+
+        server.joinGame(joinRequest);
+        this.ws = new WebSocketFacade(server.getUrl(), this);
+        ws.connect(server.getAuth(), gameID);
+
         this.gameID = gameID;
         this.ws.setNotificationHandler(this);
+
+    }
+
+    public void setBoard(ChessBoard board){
         this.board = board;
-        this.game = game;
     }
 
 
@@ -53,6 +60,7 @@ public class GameClient implements NotificationHandler {
 
     public String help() {
         return """
+                help
                 redraw
                 leave
                 move <column> <row> <column> <row>
@@ -97,15 +105,16 @@ public class GameClient implements NotificationHandler {
         return "redraw chess board";
     }
 
-    private void receiveBoard(ChessBoard chessBoard, ChessGame chessGame){
+    private void receiveBoard(ChessBoard chessBoard, ChessGame chessGame, ChessGame.TeamColor playerColor){
         this.board = chessBoard;
         this.game = chessGame;
         var drawBoard = new DrawBoard();
-        drawBoard.printBoard(board, game.getTeamTurn(), null);
+        drawBoard.printBoard(board, playerColor, null);
     }
 
     @Override
     public void notify(LoadGameMessage message) {
-
+        ChessBoard chessBoard = message.getGame().getBoard();
+        receiveBoard(chessBoard, message.getGame(), message.getPlayerColor());
     }
 }

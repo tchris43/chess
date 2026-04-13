@@ -30,10 +30,16 @@ public class PostLoginClient implements NotificationHandler {
     private int gameID;
     private ChessBoard board;
     private ChessGame game;
+    private JoinRequest joinRequest;
 
     public PostLoginClient(ServerFacade serverFacade) throws ResponseException, URISyntaxException {
         server = serverFacade;
     }
+
+    public JoinRequest getJoin(){
+        return joinRequest;
+    }
+
 
     public ChessGame getGame(){
         return game;
@@ -173,11 +179,8 @@ public class PostLoginClient implements NotificationHandler {
             this.gameID = gameID;
 
 
-            JoinRequest joinRequest = new JoinRequest(teamColor, gameID);
-            server.joinGame(joinRequest);
-            ws = new WebSocketFacade(server.getUrl(), this);
-            ws.connect(server.getAuth(), gameID);
-            String result = String.format("Successfully joined game %s", gameNumber);
+            this.joinRequest = new JoinRequest(teamColor, gameID);
+
             inGame = true;
 
             System.out.println();
