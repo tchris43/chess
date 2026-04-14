@@ -28,6 +28,7 @@ public class GameManager {
         this.whiteUserName = game.whiteUsername();
         this.blackUserName = game.blackUsername();
         this.gameName = game.gameName();
+        this.game = game.game();
     }
 
     public GameData getGame(int gameID, UserService userService, String authToken) throws DataAccessException {

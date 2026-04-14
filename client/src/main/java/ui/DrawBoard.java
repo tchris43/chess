@@ -54,7 +54,7 @@ public class DrawBoard {
             out.print(RESET_TEXT_COLOR);
             out.println();
             for (int row = 8; row > 0; row--){
-                printRow(out, row);
+                printRow(out, row, false);
                 out.print(RESET_BG_COLOR);
                 out.println();
             }
@@ -69,7 +69,7 @@ public class DrawBoard {
             out.print(RESET_TEXT_COLOR);
             out.println();
             for (int row = 1; row < 9; row ++){
-                printRow(out, row);
+                printRow(out, row, true);
                 out.print(RESET_BG_COLOR);
                 out.println();
             }
@@ -132,11 +132,17 @@ public class DrawBoard {
         return false;
     }
 
-    private void printRow(PrintStream out, int rowNum){
+    private void printRow(PrintStream out, int rowNum, boolean black){
         out.print(border + SET_TEXT_COLOR_BLACK + rowNum + border);
-        int col = 0;
+        int col;
+        if (black){
+            col = 8;
+        }
+        else {
+            col = 1;
+        }
         for (int i = 0; i < 4; i++){
-            ChessPosition pos = new ChessPosition(rowNum, col + 1);
+            ChessPosition pos = new ChessPosition(rowNum, col);
             String piece = getPiece(board.getPiece(pos));
             if (piece.isEmpty()){
                 if (inHighlights(pos)){
@@ -146,7 +152,13 @@ public class DrawBoard {
                     piece = firstSquare;
                 }
             }
-            ChessPosition pos2 = new ChessPosition(rowNum, col + 2);
+            if (black){
+                col = col - 1;
+            }
+            else {
+                col = col + 1;
+            }
+            ChessPosition pos2 = new ChessPosition(rowNum, col);
             String piece2 = getPiece(board.getPiece(pos2));
             if (piece2.isEmpty()){
                 if (inHighlights(pos2)) {
@@ -164,14 +176,19 @@ public class DrawBoard {
                 out.print(firstSquare + piece + firstSquare);
             }
             if (inHighlights(pos2)){
-                out.print(secondHighlight + piece + secondHighlight);
+                out.print(secondHighlight + piece2 + secondHighlight);
             }
             else {
                 out.print(secondSquare + piece2 + secondSquare);
             }
 
+            if (black){
+                col = col - 1;
+            }
+            else {
+                col = col + 1;
+            }
 
-            col += 2;
         }
         out.print(RESET_TEXT_COLOR);
         out.print(border + SET_TEXT_COLOR_BLACK+ rowNum + border);

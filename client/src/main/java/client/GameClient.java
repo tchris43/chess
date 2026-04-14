@@ -64,15 +64,20 @@ public class GameClient implements NotificationHandler {
         String[] tokens = input.toLowerCase().split(" ");
         String cmd = (tokens.length > 0) ? tokens[0] : "help";
         String[] params = Arrays.copyOfRange(tokens, 1, tokens.length);
-        return switch (cmd){
-            case "help" -> help();
-            case "redraw" -> redrawChessBoard();
-            case "leave" -> leave();
-            case "move" -> makeMove(params[0], params[1], params[2], params[3]);
-            case "resign" -> resign();
-            case "highlight" -> highlightLegalMoves(params[0], params[1]);
-            default -> help();
-        };
+        try{
+            return switch (cmd){
+                case "help" -> help();
+                case "redraw" -> redrawChessBoard();
+                case "leave" -> leave();
+                case "move" -> makeMove(params[0], params[1], params[2], params[3]);
+                case "resign" -> resign();
+                case "highlight" -> highlightLegalMoves(params[0], params[1]);
+                default -> help();
+            };
+        } catch(ResponseException ex){
+            System.out.print("Error");
+            return "Error";
+        }
     }
 
     public String help() {
@@ -156,6 +161,7 @@ public class GameClient implements NotificationHandler {
 
 
     public String makeMove(String startCol, String startRow, String endCol, String endRow) throws ResponseException {
+
         ChessPosition start = convert(startCol, startRow);
         ChessPosition end = convert(endCol, endRow);
 

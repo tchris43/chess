@@ -136,7 +136,8 @@ public class WebSocketHandler implements WsConnectHandler, WsMessageHandler, WsC
             NotificationMessage notification = getNotification(teamColor, userName);
             connections.broadcast(gameID, userName, notification, session);
 
-            LoadGameMessage loadGame = new LoadGameMessage(new ChessGame());
+            ChessGame game = connections.get(gameID).game;
+            LoadGameMessage loadGame = new LoadGameMessage(game);
             connections.broadcast(gameID, userName, loadGame, session);
         } catch(DataAccessException ex){
             ErrorMessage errorMessage = new ErrorMessage("Error: cannot connect to websocket");

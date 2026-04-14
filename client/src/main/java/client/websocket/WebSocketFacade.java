@@ -38,22 +38,21 @@ public class WebSocketFacade extends Endpoint {
                 switch(type){
                     case ServerMessage.ServerMessageType.LOAD_GAME : {
                         LoadGameMessage loadGame = new Gson().fromJson(message, LoadGameMessage.class);
-                        notification = loadGame;
+                        notificationHandler.notify(loadGame);
                         break;
                     }
                     case ServerMessage.ServerMessageType.NOTIFICATION : {
                         NotificationMessage notificationMessage = new Gson().fromJson(message, NotificationMessage.class);
-                        notification = notificationMessage;
+                        notificationHandler.notify(notificationMessage);
                         break;
                     }
                     case ServerMessage.ServerMessageType.ERROR: {
                         ErrorMessage errorMessage = new Gson().fromJson(message, ErrorMessage.class);
-                        notification = errorMessage;
+                        notificationHandler.notify(errorMessage);
                         break;
                     }
 
                 }
-                notificationHandler.notify(notification);
             }
         });
 
