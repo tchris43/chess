@@ -52,6 +52,54 @@ public class ClientMain {
 
     }
 
+    private static void inGameLoop(PostLoginClient postClient, ServerFacade server) throws ResponseException, DeploymentException, URISyntaxException, IOException {
+        if (postClient.observing){
+            var gameClient = new GameClient(server, postClient.getGameID(), postClient.authToken);
+            run("\n" + "[IN_GAME] >>> ", line -> {
+                try {
+                    return gameClient.eval(line);
+                } catch (ResponseException e) {
+                    throw new RuntimeException(e);
+                }
+            });
+        }
+        else{
+            var gameClient = new GameClient(server, postClient.getGameID(), postClient.getJoin());
+            gameClient.setAuthToken(postClient.authToken);
+            run("\n" + "[IN_GAME] >>> ", line -> {
+                try {
+                    return gameClient.eval(line);
+                } catch (ResponseException e) {
+                    throw new RuntimeException(e);
+                }
+            });
+        }
+    }
+
+    private static void loggedInLoop(PostLoginClient postClient, PreLoginClient preClient, ServerFacade server) throws ResponseException, DeploymentException, URISyntaxException, IOException {
+        postClient.setAuthToken(preClient.authToken);
+        while(true) {
+            run("\n" + "[LOGGED_IN] >>> ", line -> {
+                try {
+                    return postClient.eval(line);
+                } catch (ResponseException e) {
+                    throw new RuntimeException(e);
+                }
+            });
+
+            if (postClient.isDone()) {
+                break;
+            }
+
+            if (postClient.isInGame()) {
+                inGameLoop(postClient, server);
+            }
+
+
+        }
+    }
+
+
     private static void runLoop(PreLoginClient preClient, ServerFacade server)
             throws ResponseException, URISyntaxException, DeploymentException, IOException {
         var postClient = new PostLoginClient(server);
@@ -65,48 +113,7 @@ public class ClientMain {
                 }
             });
             if (preClient.isLoggedIn()) {
-                postClient.setAuthToken(preClient.authToken);
-                while(true) {
-                    run("\n" + "[LOGGED_IN] >>> ", line -> {
-                        try {
-                            return postClient.eval(line);
-                        } catch (ResponseException e) {
-                            throw new RuntimeException(e);
-                        }
-                    });
-
-                    if (postClient.isDone()) {
-                        break;
-                    }
-
-                    if (postClient.isInGame()) {
-                        if (postClient.observing){
-                            var gameClient = new GameClient(server, postClient.getGameID(), postClient.authToken);
-                            run("\n" + "[IN_GAME] >>> ", line -> {
-                                try {
-                                    return gameClient.eval(line);
-                                } catch (ResponseException e) {
-                                    throw new RuntimeException(e);
-                                }
-                            });
-                        }
-                        else{
-                            var gameClient = new GameClient(server, postClient.getGameID(), postClient.getJoin());
-                            gameClient.setAuthToken(postClient.authToken);
-                            run("\n" + "[IN_GAME] >>> ", line -> {
-                                try {
-                                    return gameClient.eval(line);
-                                } catch (ResponseException e) {
-                                    throw new RuntimeException(e);
-                                }
-                            });
-                        }
-                    }
-
-
-                }
-
-
+                loggedInLoop(postClient, preClient, server);
             }
             else {
                 break;
