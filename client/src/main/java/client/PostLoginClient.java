@@ -117,10 +117,13 @@ public class PostLoginClient {
     }
 
     public String create(String... params) throws ResponseException{
-        GameRequest gameRequest = new GameRequest(params[0]);
-        server.createGame(gameRequest);
-        String result = String.format("Created game: '%s'", gameRequest.gameName());
-        return result;
+        if (goodParams(params, 1)) {
+            GameRequest gameRequest = new GameRequest(params[0]);
+            server.createGame(gameRequest);
+            String result = String.format("Created game: '%s'", gameRequest.gameName());
+            return result;
+        }
+        return "Error: please enter game name";
     }
 
     public String list() throws ResponseException{
