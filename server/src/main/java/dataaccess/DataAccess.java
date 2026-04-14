@@ -29,7 +29,13 @@ public interface DataAccess {
 
     default  GameData updateGame(String username, int gameID, ChessGame.TeamColor playerColor, String whiteUsername,
                         String blackUsername, String gameName, ChessGame game) throws AlreadyTakenException, DataAccessException{
+        String[] usernames = updatePlayers(playerColor, username, whiteUsername, blackUsername);
 
+        whiteUsername = usernames[0];
+        blackUsername = usernames[1];
+
+
+        return updateJustGame(whiteUsername, blackUsername, gameName, game, gameID);
     }
     GameData updateJustGame(String whiteUsername, String blackUsername, String gameName, ChessGame game, int gameID) throws DataAccessException;
 
