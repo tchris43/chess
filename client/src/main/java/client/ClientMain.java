@@ -52,7 +52,9 @@ public class ClientMain {
 
     }
 
-    private static void inGameLoop(PostLoginClient postClient, ServerFacade server) throws ResponseException, DeploymentException, URISyntaxException, IOException {
+    private static void inGameLoop(PostLoginClient postClient,
+                                   ServerFacade server) throws ResponseException, DeploymentException,
+                                    URISyntaxException, IOException {
         if (postClient.observing){
             var gameClient = new GameClient(server, postClient.getGameID(), postClient.authToken);
             run("\n" + "[IN_GAME] >>> ", line -> {
@@ -76,7 +78,9 @@ public class ClientMain {
         }
     }
 
-    private static void loggedInLoop(PostLoginClient postClient, PreLoginClient preClient, ServerFacade server) throws ResponseException, DeploymentException, URISyntaxException, IOException {
+    private static void loggedInLoop(PostLoginClient postClient, PreLoginClient preClient,
+                                     ServerFacade server) throws ResponseException,
+                                    DeploymentException, URISyntaxException, IOException {
         postClient.setAuthToken(preClient.authToken);
         while(true) {
             run("\n" + "[LOGGED_IN] >>> ", line -> {
