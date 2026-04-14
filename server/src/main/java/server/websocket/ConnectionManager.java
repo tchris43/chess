@@ -54,7 +54,41 @@ public class ConnectionManager {
         dataAccess.updateGame(userName, gameID, playerColor, whiteUsername, blackUsername, gameName, game);
     }
 
-    public void broadcast(int gameID, String excludeSession, ServerMessage notification) throws IOException {
+    public void broadcast(int gameID, String excludeSession, ServerMessage notification, Session session) throws IOException {
+        //------------- approved for connect tests 8:24 wed
+        String msg = notification.toString();
+        GameManager game = connections.get(gameID);
+        Pipeline currentPipe = null;
+        if (game != null){
+            for (Pipeline p : game.getSessions()) {
+                if (p.getUserName().equals(excludeSession)) {
+                    currentPipe = p;
+                }
+            }
+        }
+        if (notification.getServerMessageType() == ServerMessage.ServerMessageType.ERROR) {
+            session.getRemote().sendString(msg);
+        }
+        for (Pipeline s : game.getSessions()) {
+            if (s.getSession().isOpen()) {
+                if (notification.getServerMessageType() == ServerMessage.ServerMessageType.NOTIFICATION) {
+                    if (!s.getUserName().equals(excludeSession)) {
+                        s.getSession().getRemote().sendString(msg);
+                    }
+                } else if (notification.getServerMessageType() == ServerMessage.ServerMessageType.LOAD_GAME) {
+                    LoadGameMessage loadGame = (LoadGameMessage) notification;
+                    if (s.getUserName().equals(excludeSession)) {
+                        s.getSession().getRemote().sendString(msg);
+                    }
+                    game.setGame(loadGame.getGame());
+                }
+            }
+        }
+
+
+    }
+
+    public void broadcastMove(int gameID, String excludeSession, ServerMessage notification, Session session) throws IOException {
         //------------- approved for connect tests 8:24 wed
         String msg = notification.toString();
         GameManager game = connections.get(gameID);
@@ -76,45 +110,13 @@ public class ConnectionManager {
                 }
                 else if (notification.getServerMessageType() == ServerMessage.ServerMessageType.LOAD_GAME){
                     LoadGameMessage loadGame = (LoadGameMessage) notification;
-                    if (s.getUserName().equals(excludeSession)) {
-                        s.getSession().getRemote().sendString(msg);
-                    }
+                    s.getSession().getRemote().sendString(msg);
                     game.setGame(loadGame.getGame());
                 }
             }
         }
 
     }
-
-//    public void broadcastMove(int gameID, String excludeSession, ServerMessage notification) throws IOException {
-//        //------------- approved for connect tests 8:24 wed
-//        String msg = notification.toString();
-//        GameManager game = connections.get(gameID);
-//        Pipeline currentPipe = null;
-//        for (Pipeline p : game.getSessions()){
-//            if (p.getUserName().equals(excludeSession)){
-//                currentPipe = p;
-//            }
-//        }
-//        if (notification.getServerMessageType() == ServerMessage.ServerMessageType.ERROR){
-//            currentPipe.getSession().getRemote().sendString(msg);
-//        }
-//        for (Pipeline s : game.getSessions()){
-//            if (s.getSession().isOpen()){
-//                if (notification.getServerMessageType() == ServerMessage.ServerMessageType.NOTIFICATION) {
-//                    if (!s.getUserName().equals(excludeSession)) {
-//                        s.getSession().getRemote().sendString(msg);
-//                    }
-//                }
-//                else if (notification.getServerMessageType() == ServerMessage.ServerMessageType.LOAD_GAME){
-//                    LoadGameMessage loadGame = (LoadGameMessage) notification;
-//                    s.getSession().getRemote().sendString(msg);
-//                    game.setGame(loadGame.getGame());
-//                }
-//            }
-//        }
-//
-//    }
 
 
     public void broadcastAll(int gameID, String excludeSession, ServerMessage notification) throws IOException {

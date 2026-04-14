@@ -134,13 +134,13 @@ public class WebSocketHandler implements WsConnectHandler, WsMessageHandler, WsC
             connections.add(gameID, session, userService, userName, authToken);
             String teamColor = getTeam(authToken, gameID, userName);
             NotificationMessage notification = getNotification(teamColor, userName);
-            connections.broadcast(gameID, userName, notification);
+            connections.broadcast(gameID, userName, notification, session);
             //TODO verify that I am supposed to pass a new chessGame here
             LoadGameMessage loadGame = new LoadGameMessage(new ChessGame());
-            connections.broadcast(gameID, userName, loadGame);
+            connections.broadcast(gameID, userName, loadGame, session);
         } catch(DataAccessException ex){
             ErrorMessage errorMessage = new ErrorMessage("Error: cannot connect to websocket");
-            connections.broadcast(gameID, userName, errorMessage);
+            connections.broadcast(gameID, userName, errorMessage, session);
         }
     }
 
@@ -176,10 +176,10 @@ public class WebSocketHandler implements WsConnectHandler, WsMessageHandler, WsC
                 //----- verified up to here 12:17 for normal
                 //Load game to all clients
                 LoadGameMessage loadGame = new LoadGameMessage(game);
-                connections.broadcast(gameID, userName, loadGame);
+                connections.broadcastMove(gameID, userName, loadGame, session);
                 //notify all other clients of move
                 NotificationMessage notification = new NotificationMessage(String.format("%s moved from %s to %s", userName, move.getStartPosition(), move.getEndPosition()));
-                connections.broadcast(gameID, userName, notification);
+                connections.broadcast(gameID, userName, notification, session);
                 //notify all clients if in check, checkmate or stalemate
                 ChessGame.TeamColor opposingTeam = getOpposing(playerColor);
                 NotificationMessage stateChange = null;
@@ -203,7 +203,7 @@ public class WebSocketHandler implements WsConnectHandler, WsMessageHandler, WsC
 
         } catch (DataAccessException | InvalidMoveException | UnauthorizedException | NullPointerException ex){
             ErrorMessage errorMessage = new ErrorMessage("Error: cannot make this move");
-            connections.broadcast(gameID, userName, errorMessage);
+            connections.broadcast(gameID, userName, errorMessage, session);
         }
 
 
@@ -229,7 +229,7 @@ public class WebSocketHandler implements WsConnectHandler, WsMessageHandler, WsC
             connections.broadcastAll(gameID, userName, notification);
         } catch(ServerException ex) {
             ErrorMessage errorMessage = new ErrorMessage("Error: unable to resign");
-            connections.broadcast(gameID, userName, errorMessage);
+            connections.broadcast(gameID, userName, errorMessage, session);
         }
     }
 
@@ -246,7 +246,7 @@ public class WebSocketHandler implements WsConnectHandler, WsMessageHandler, WsC
             //notification to all other clients informing that the root player left
         }
         NotificationMessage notification = new NotificationMessage(String.format("%s left", userName));
-        connections.broadcast(gameID, userName, notification);
+        connections.broadcast(gameID, userName, notification, session);
         connections.remove(session, gameID, userName);
 
     }
