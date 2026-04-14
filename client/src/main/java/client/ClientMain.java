@@ -52,7 +52,8 @@ public class ClientMain {
 
     }
 
-    private static void runLoop(PreLoginClient preClient, ServerFacade server) throws ResponseException, URISyntaxException, DeploymentException, IOException {
+    private static void runLoop(PreLoginClient preClient, ServerFacade server)
+            throws ResponseException, URISyntaxException, DeploymentException, IOException {
         var postClient = new PostLoginClient(server);
         while (true) {
             preClient.setState(false);

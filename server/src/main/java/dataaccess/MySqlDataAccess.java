@@ -221,7 +221,8 @@ public class MySqlDataAccess implements DataAccess{
     }
 
     @Override
-    public GameData updateJustGame(String whiteUsername, String blackUsername, String gameName, ChessGame game, int gameID) throws DataAccessException {
+    public GameData updateJustGame(String whiteUsername, String blackUsername,
+                                   String gameName, ChessGame game, int gameID) throws DataAccessException {
         var statement = "UPDATE games SET whiteUsername=?, blackUsername=?, gameName=?, game=? WHERE gameID=?";
 
         var gameJson = new Gson().toJson(game);

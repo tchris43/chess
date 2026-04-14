@@ -28,7 +28,8 @@ public class GameClient implements NotificationHandler {
 
     private static DrawBoard drawBoard = new DrawBoard();
 
-    public GameClient(ServerFacade serverFacade, int gameID, JoinRequest joinRequest) throws ResponseException, URISyntaxException, DeploymentException, IOException {
+    public GameClient(ServerFacade serverFacade, int gameID, JoinRequest joinRequest)
+            throws ResponseException, URISyntaxException, DeploymentException, IOException {
         server = serverFacade;
 
         server.joinGame(joinRequest);
@@ -41,7 +42,8 @@ public class GameClient implements NotificationHandler {
 
     }
 
-    public GameClient(ServerFacade serverFacade, int gameID, String authToken) throws ResponseException, DeploymentException, URISyntaxException, IOException {
+    public GameClient(ServerFacade serverFacade, int gameID, String authToken)
+            throws ResponseException, DeploymentException, URISyntaxException, IOException {
         server = serverFacade;
 
         this.ws = new WebSocketFacade(server.getUrl(), this);

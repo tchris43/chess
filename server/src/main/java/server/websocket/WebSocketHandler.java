@@ -135,7 +135,7 @@ public class WebSocketHandler implements WsConnectHandler, WsMessageHandler, WsC
             String teamColor = getTeam(authToken, gameID, userName);
             NotificationMessage notification = getNotification(teamColor, userName);
             connections.broadcast(gameID, userName, notification, session);
-            //TODO verify that I am supposed to pass a new chessGame here
+
             LoadGameMessage loadGame = new LoadGameMessage(new ChessGame());
             connections.broadcast(gameID, userName, loadGame, session);
         } catch(DataAccessException ex){
@@ -178,7 +178,8 @@ public class WebSocketHandler implements WsConnectHandler, WsMessageHandler, WsC
                 LoadGameMessage loadGame = new LoadGameMessage(game);
                 connections.broadcastMove(gameID, userName, loadGame, session);
                 //notify all other clients of move
-                NotificationMessage notification = new NotificationMessage(String.format("%s moved from %s to %s", userName, move.getStartPosition(), move.getEndPosition()));
+                NotificationMessage notification = new NotificationMessage(String.format("%s moved from %s to %s",
+                        userName, move.getStartPosition(), move.getEndPosition()));
                 connections.broadcast(gameID, userName, notification, session);
                 //notify all clients if in check, checkmate or stalemate
                 ChessGame.TeamColor opposingTeam = getOpposing(playerColor);
@@ -216,10 +217,9 @@ public class WebSocketHandler implements WsConnectHandler, WsMessageHandler, WsC
             if (!(userName.equals(gameManager.blackUserName) || userName.equals(gameManager.whiteUserName))) {
                 throw new ServerException("Observers can't resign");
             }
-            if (gameManager.game == null){
+            if (gameManager.game == null) {
                 throw new ServerException("Opponent already resigned");
             }
-            //TODO how do I mark as no more moves?
             gameManager.setGame(null);
             //game is updated in database
             DataAccess dataAccess = userService.getDataAccess();

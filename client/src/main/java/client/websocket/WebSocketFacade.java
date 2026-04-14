@@ -20,7 +20,8 @@ public class WebSocketFacade extends Endpoint {
     NotificationHandler notificationHandler;
     URI socketURI;
 
-    public WebSocketFacade(String url, NotificationHandler notificationHandler) throws URISyntaxException, ResponseException, DeploymentException, IOException {
+    public WebSocketFacade(String url, NotificationHandler notificationHandler) throws URISyntaxException,
+            ResponseException, DeploymentException, IOException {
 
         url = url.replace("http", "ws");
         this.socketURI = new URI(url + "/ws");
