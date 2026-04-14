@@ -19,6 +19,9 @@ import java.util.concurrent.ConcurrentHashMap;
 
 public class ConnectionManager {
     public final ConcurrentHashMap<Integer, GameManager> connections = new ConcurrentHashMap<>();
+    String msg;
+    GameManager game;
+    Pipeline currentPipe;
 
     public void add(int gameID, Session session, UserService userService, String userName, String authToken) throws DataAccessException {
         GameManager game = connections.get(gameID);
@@ -88,16 +91,20 @@ public class ConnectionManager {
 
     }
 
-    public void broadcastMove(int gameID, String excludeSession, ServerMessage notification, Session session) throws IOException {
-        //------------- approved for connect tests 8:24 wed
-        String msg = notification.toString();
-        GameManager game = connections.get(gameID);
-        Pipeline currentPipe = null;
+    public void setBroadcast(ServerMessage notification, int gameID, String excludeSession){
+        this.msg = notification.toString();
+        this.game = connections.get(gameID);
+        this.currentPipe = null;
         for (Pipeline p : game.getSessions()){
             if (p.getUserName().equals(excludeSession)){
                 currentPipe = p;
             }
         }
+    }
+
+    public void broadcastMove(int gameID, String excludeSession, ServerMessage notification, Session session) throws IOException {
+        //------------- approved for connect tests 8:24 wed
+        setBroadcast(notification, gameID, excludeSession);
         if (notification.getServerMessageType() == ServerMessage.ServerMessageType.ERROR){
             currentPipe.getSession().getRemote().sendString(msg);
         }
@@ -121,14 +128,7 @@ public class ConnectionManager {
 
     public void broadcastAll(int gameID, String excludeSession, ServerMessage notification) throws IOException {
         //------------- approved for connect tests 8:24 wed
-        String msg = notification.toString();
-        GameManager game = connections.get(gameID);
-        Pipeline currentPipe = null;
-        for (Pipeline p : game.getSessions()){
-            if (p.getUserName().equals(excludeSession)){
-                currentPipe = p;
-            }
-        }
+        setBroadcast(notification, gameID, excludeSession);
         if (notification.getServerMessageType() == ServerMessage.ServerMessageType.ERROR){
             currentPipe.getSession().getRemote().sendString(msg);
         }
