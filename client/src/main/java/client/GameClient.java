@@ -74,19 +74,7 @@ public class GameClient implements NotificationHandler {
         return "quit";
     }
 
-    public int convert(String col){
-        return switch(col){
-            case "a" -> 1;
-            case "b" -> 2;
-            case "c" -> 3;
-            case "d" -> 4;
-            case "e" -> 5;
-            case "f" -> 6;
-            case "g" -> 7;
-            case "h" -> 8;
-            default -> throw new IllegalStateException("Unexpected value: " + col);
-        };
-    }
+
 
     public ChessPiece.PieceType getPromotion(ChessPosition start, ChessPosition end){
         if (board.getPiece(start).getPieceType().equals(ChessPiece.PieceType.PAWN) && (end.getRow() == 8 || end.getRow() == 1)){
@@ -106,13 +94,51 @@ public class GameClient implements NotificationHandler {
         }
     }
 
+    public int convertCol(String c){
+        return switch(c){
+            case "a" -> 1;
+            case "b" -> 2;
+            case "c" -> 3;
+            case "d" -> 4;
+            case "e" -> 5;
+            case "f" -> 6;
+            case "g" -> 7;
+            case "h" -> 8;
+            default -> throw new IllegalStateException("Unexpected value: " + c);
+        };
+    }
+
+
+
+    public ChessPosition convert(String c, String r){
+        switch(c){
+            case "a" : {return new ChessPosition(Integer.parseInt(r), 1);}
+            case "b" : {return new ChessPosition(Integer.parseInt(r),2);}
+            case "c" : {return new ChessPosition(Integer.parseInt(r),3);}
+            case "d" : {return new ChessPosition(Integer.parseInt(r),4);}
+            case "e" : {return new ChessPosition(Integer.parseInt(r),5);}
+            case "f" : {return new ChessPosition(Integer.parseInt(r),6);}
+            case "g" : {return new ChessPosition(Integer.parseInt(r),7);}
+            case "h" : {return new ChessPosition(Integer.parseInt(r),8);}
+            default : {switch(r){
+                case "a" : {return new ChessPosition(Integer.parseInt(c), 1);}
+                case "b" : {return new ChessPosition(Integer.parseInt(c), 2);}
+                case "c" : {return new ChessPosition(Integer.parseInt(c),3);}
+                case "d" : {return new ChessPosition(Integer.parseInt(c),4);}
+                case "e" : {return new ChessPosition(Integer.parseInt(c),5);}
+                case "f" : {return new ChessPosition(Integer.parseInt(c),6);}
+                case "g" : {return new ChessPosition(Integer.parseInt(c),7);}
+                case "h" : {return new ChessPosition(Integer.parseInt(c),8);}
+                default:  throw new IllegalStateException("Unexpected value: " + c);
+            }}
+        }
+    }
+
+
     public String makeMove(String startCol, String startRow, String endCol, String endRow) throws ResponseException {
-        int convertedCol = convert(startCol);
-        int convertedEndCol = convert(endCol);
+        ChessPosition start = convert(startCol, startRow);
+        ChessPosition end = convert(endCol, endRow);
 
-
-        ChessPosition start = new ChessPosition(Integer.parseInt(startRow), convertedCol);
-        ChessPosition end = new ChessPosition(Integer.parseInt(endRow), convertedEndCol);
         ChessPiece.PieceType promotion = getPromotion(start, end);
         ChessMove move = new ChessMove(start, end, promotion);
         ws.makeMove(server.getAuth(), gameID, move);
@@ -137,7 +163,7 @@ public class GameClient implements NotificationHandler {
     }
 
     public String highlightLegalMoves(String col, String row) throws ResponseException {
-        int convertedCol = convert(col);
+        int convertedCol = convertCol(col);
         ChessPosition position = new ChessPosition(Integer.parseInt(row), convertedCol);
         var validSpots = getValidSpots(position);
         drawBoard.printBoard(board, playerColor, validSpots);
@@ -159,27 +185,24 @@ public class GameClient implements NotificationHandler {
                 this.board = chessGame.getBoard();
                 this.game = chessGame;
                 drawBoard.printBoard(board, playerColor, null);
+                System.out.println();
             }
             case ServerMessage.ServerMessageType.NOTIFICATION : {
                 NotificationMessage notification = (NotificationMessage) message;
-                System.out.print(notification);
+                System.out.print(notification.getMessage());
+                System.out.println();
             }
             case ServerMessage.ServerMessageType.ERROR : {
                 ErrorMessage errorMessage = (ErrorMessage) message;
-                System.out.print(errorMessage);
+                System.out.print(errorMessage.getMessage());
+                System.out.println();
             }
         }
 
 
     }
 
-//    @Override
-//    public void notify(LoadGameMessage message) {
-//        ServerMessage serverMessage = (ServerMessage) message;
-//        LoadGameMessage loadGame = (LoadGameMessage) message;
-//        ChessBoard chessBoard = loadGame.getGame().getBoard();
-//        receiveBoard(chessBoard, loadGame.getGame(), loadGame.getPlayerColor());
-//    }
+
 
 
 
