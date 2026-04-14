@@ -24,6 +24,7 @@ public class GameClient implements NotificationHandler {
     private ChessBoard board;
     private ChessGame game;
     private ChessGame.TeamColor playerColor;
+    private String authToken;
 
     private static DrawBoard drawBoard = new DrawBoard();
 
@@ -38,6 +39,20 @@ public class GameClient implements NotificationHandler {
         this.ws.setNotificationHandler(this);
         this.playerColor = joinRequest.playerColor();
 
+    }
+
+    public GameClient(ServerFacade serverFacade, int gameID, String authToken) throws ResponseException, DeploymentException, URISyntaxException, IOException {
+        server = serverFacade;
+
+        this.ws = new WebSocketFacade(server.getUrl(), this);
+        ws.connect(authToken, gameID);
+
+        this.gameID = gameID;
+        this.ws.setNotificationHandler(this);
+    }
+
+    public void setAuthToken(String authToken){
+        this.authToken = authToken;
     }
 
 
@@ -95,43 +110,46 @@ public class GameClient implements NotificationHandler {
     }
 
     public int convertCol(String c){
-        return switch(c){
-            case "a" -> 1;
-            case "b" -> 2;
-            case "c" -> 3;
-            case "d" -> 4;
-            case "e" -> 5;
-            case "f" -> 6;
-            case "g" -> 7;
-            case "h" -> 8;
-            default -> throw new IllegalStateException("Unexpected value: " + c);
-        };
+        if (playerColor.equals(ChessGame.TeamColor.WHITE)) {
+            return switch (c) {
+                case "a" -> 1;
+                case "b" -> 2;
+                case "c" -> 3;
+                case "d" -> 4;
+                case "e" -> 5;
+                case "f" -> 6;
+                case "g" -> 7;
+                case "h" -> 8;
+                default -> throw new IllegalStateException("Unexpected value: " + c);
+            };
+        }
+        else {
+            return switch (c) {
+                case "a" -> 8;
+                case "b" -> 7;
+                case "c" -> 6;
+                case "d" -> 5;
+                case "e" -> 4;
+                case "f" -> 3;
+                case "g" -> 2;
+                case "h" -> 1;
+                default -> throw new IllegalStateException("Unexpected value: " + c);
+            };
+        }
     }
 
 
 
     public ChessPosition convert(String c, String r){
-        switch(c){
-            case "a" : {return new ChessPosition(Integer.parseInt(r), 1);}
-            case "b" : {return new ChessPosition(Integer.parseInt(r),2);}
-            case "c" : {return new ChessPosition(Integer.parseInt(r),3);}
-            case "d" : {return new ChessPosition(Integer.parseInt(r),4);}
-            case "e" : {return new ChessPosition(Integer.parseInt(r),5);}
-            case "f" : {return new ChessPosition(Integer.parseInt(r),6);}
-            case "g" : {return new ChessPosition(Integer.parseInt(r),7);}
-            case "h" : {return new ChessPosition(Integer.parseInt(r),8);}
-            default : {switch(r){
-                case "a" : {return new ChessPosition(Integer.parseInt(c), 1);}
-                case "b" : {return new ChessPosition(Integer.parseInt(c), 2);}
-                case "c" : {return new ChessPosition(Integer.parseInt(c),3);}
-                case "d" : {return new ChessPosition(Integer.parseInt(c),4);}
-                case "e" : {return new ChessPosition(Integer.parseInt(c),5);}
-                case "f" : {return new ChessPosition(Integer.parseInt(c),6);}
-                case "g" : {return new ChessPosition(Integer.parseInt(c),7);}
-                case "h" : {return new ChessPosition(Integer.parseInt(c),8);}
-                default:  throw new IllegalStateException("Unexpected value: " + c);
-            }}
+        String[] letters = {"a","b","c","d","e","f","g"};
+        for (String l : letters){
+            if (l.equals(c)){
+                int col = convertCol(c);
+                return new ChessPosition(Integer.parseInt(r),col);
+            }
         }
+        int col = convertCol(r);
+        return new ChessPosition(Integer.parseInt(c), col);
     }
 
 
@@ -184,6 +202,9 @@ public class GameClient implements NotificationHandler {
                 ChessGame chessGame = loadGame.getGame();
                 this.board = chessGame.getBoard();
                 this.game = chessGame;
+                if (playerColor == null){
+                    playerColor = ChessGame.TeamColor.WHITE;
+                }
                 drawBoard.printBoard(board, playerColor, null);
                 System.out.println();
             }

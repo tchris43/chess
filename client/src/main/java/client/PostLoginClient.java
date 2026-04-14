@@ -31,6 +31,8 @@ public class PostLoginClient {
     private ChessBoard board;
     private ChessGame game;
     private JoinRequest joinRequest;
+    boolean observing = false;
+    String authToken;
 
     public PostLoginClient(ServerFacade serverFacade) throws ResponseException, URISyntaxException {
         server = serverFacade;
@@ -38,6 +40,10 @@ public class PostLoginClient {
 
     public JoinRequest getJoin(){
         return joinRequest;
+    }
+
+    public void setAuthToken(String authToken){
+        this.authToken = authToken;
     }
 
 
@@ -206,29 +212,15 @@ public class PostLoginClient {
                 throw new ResponseException("Please enter a valid game ID");
             }
 
-            int gameID = gameIDs.get(gameNumber);
+            this.gameID = gameIDs.get(gameNumber);
 
-
-            String result = String.format("Observing game %s", gameNumber);
-//            receiveBoard(board);
-            System.out.print("DEBUG: now it should draw board");
-            System.out.println();
-            return result;
+            inGame = true;
+            observing = true;
+            return "quit";
         }
         else {
             throw new ResponseException("Please enter valid parameters: observe <gameID>");
         }
-    }
-
-    private void loadBoard(ChessBoard board){
-        this.board = board;
-    }
-
-    private void receiveBoard(ChessBoard chessBoard, ChessGame chessGame, ChessGame.TeamColor playerColor){
-        loadBoard(chessBoard);
-        this.game = chessGame;
-        var drawBoard = new DrawBoard();
-        drawBoard.printBoard(board, playerColor, null);
     }
 
 

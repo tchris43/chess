@@ -4,7 +4,6 @@ import chess.*;
 import com.google.gson.Gson;
 import dataaccess.DataAccess;
 import dataaccess.DataAccessException;
-import dataaccess.MemoryDataAccess;
 import io.javalin.websocket.*;
 
 
@@ -12,7 +11,6 @@ import io.javalin.websocket.*;
 import model.AuthData;
 import model.GameData;
 import model.GameList;
-import model.UserData;
 import org.eclipse.jetty.websocket.api.Session;
 import org.jetbrains.annotations.NotNull;
 import service.UnauthorizedException;
@@ -22,10 +20,7 @@ import websocket.commands.UserGameCommand;
 import websocket.messages.ErrorMessage;
 import websocket.messages.LoadGameMessage;
 import websocket.messages.NotificationMessage;
-import websocket.messages.ServerMessage;
 
-import javax.management.NotificationFilter;
-import javax.xml.crypto.Data;
 import java.io.IOException;
 import java.rmi.ServerException;
 import java.util.Collection;
@@ -34,12 +29,12 @@ import java.util.Objects;
 
 import static websocket.commands.UserGameCommand.CommandType.*;
 
-public class webSocketHandler implements WsConnectHandler, WsMessageHandler, WsCloseHandler {
+public class WebSocketHandler implements WsConnectHandler, WsMessageHandler, WsCloseHandler {
 
     private final ConnectionManager connections = new ConnectionManager();
     private final UserService userService;
 
-    public webSocketHandler(UserService userService){
+    public WebSocketHandler(UserService userService){
         this.userService = userService;
     }
 
@@ -139,13 +134,13 @@ public class webSocketHandler implements WsConnectHandler, WsMessageHandler, WsC
             connections.add(gameID, session, userService, userName, authToken);
             String teamColor = getTeam(authToken, gameID, userName);
             NotificationMessage notification = getNotification(teamColor, userName);
-            connections.broadcast(gameID, session, notification);
+            connections.broadcast(gameID, userName, notification);
             //TODO verify that I am supposed to pass a new chessGame here
             LoadGameMessage loadGame = new LoadGameMessage(new ChessGame());
-            connections.broadcast(gameID, session, loadGame);
+            connections.broadcast(gameID, userName, loadGame);
         } catch(DataAccessException ex){
             ErrorMessage errorMessage = new ErrorMessage("Error: cannot connect to websocket");
-            connections.broadcast(gameID, session, errorMessage);
+            connections.broadcast(gameID, userName, errorMessage);
         }
     }
 
@@ -181,10 +176,10 @@ public class webSocketHandler implements WsConnectHandler, WsMessageHandler, WsC
                 //----- verified up to here 12:17 for normal
                 //Load game to all clients
                 LoadGameMessage loadGame = new LoadGameMessage(game);
-                connections.broadcastMove(gameID, session, loadGame);
+                connections.broadcast(gameID, userName, loadGame);
                 //notify all other clients of move
                 NotificationMessage notification = new NotificationMessage(String.format("%s moved from %s to %s", userName, move.getStartPosition(), move.getEndPosition()));
-                connections.broadcastMove(gameID, session, notification);
+                connections.broadcast(gameID, userName, notification);
                 //notify all clients if in check, checkmate or stalemate
                 ChessGame.TeamColor opposingTeam = getOpposing(playerColor);
                 NotificationMessage stateChange = null;
@@ -199,7 +194,7 @@ public class webSocketHandler implements WsConnectHandler, WsMessageHandler, WsC
                 }
 
                 if (stateChange != null){
-                    connections.broadcastAll(gameID, session, stateChange);
+                    connections.broadcastAll(gameID, userName, stateChange);
                 }
             }
             else {
@@ -208,7 +203,7 @@ public class webSocketHandler implements WsConnectHandler, WsMessageHandler, WsC
 
         } catch (DataAccessException | InvalidMoveException | UnauthorizedException | NullPointerException ex){
             ErrorMessage errorMessage = new ErrorMessage("Error: cannot make this move");
-            connections.broadcast(gameID, session, errorMessage);
+            connections.broadcast(gameID, userName, errorMessage);
         }
 
 
@@ -231,10 +226,10 @@ public class webSocketHandler implements WsConnectHandler, WsMessageHandler, WsC
             connections.updateGame(dataAccess, userName, gameID, ChessGame.TeamColor.WHITE, null);
             //notification to all clients that the root client has resigned (sent to players and observers)
             NotificationMessage notification = new NotificationMessage(String.format("%s resigned", userName));
-            connections.broadcastAll(gameID, session, notification);
+            connections.broadcastAll(gameID, userName, notification);
         } catch(ServerException ex) {
             ErrorMessage errorMessage = new ErrorMessage("Error: unable to resign");
-            connections.broadcast(gameID, session, errorMessage);
+            connections.broadcast(gameID, userName, errorMessage);
         }
     }
 
@@ -251,7 +246,7 @@ public class webSocketHandler implements WsConnectHandler, WsMessageHandler, WsC
             //notification to all other clients informing that the root player left
         }
         NotificationMessage notification = new NotificationMessage(String.format("%s left", userName));
-        connections.broadcast(gameID, session, notification);
+        connections.broadcast(gameID, userName, notification);
         connections.remove(session, gameID, userName);
 
     }

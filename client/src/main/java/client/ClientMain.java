@@ -64,6 +64,7 @@ public class ClientMain {
                 }
             });
             if (preClient.isLoggedIn()) {
+                postClient.setAuthToken(preClient.authToken);
                 while(true) {
                     run("\n" + "[LOGGED_IN] >>> ", line -> {
                         try {
@@ -78,14 +79,27 @@ public class ClientMain {
                     }
 
                     if (postClient.isInGame()) {
-                        var gameClient = new GameClient(server, postClient.getGameID(), postClient.getJoin());
-                        run("\n" + "[IN_GAME] >>> ", line -> {
-                            try {
-                                return gameClient.eval(line);
-                            } catch (ResponseException e) {
-                                throw new RuntimeException(e);
-                            }
-                        });
+                        if (postClient.observing){
+                            var gameClient = new GameClient(server, postClient.getGameID(), postClient.authToken);
+                            run("\n" + "[IN_GAME] >>> ", line -> {
+                                try {
+                                    return gameClient.eval(line);
+                                } catch (ResponseException e) {
+                                    throw new RuntimeException(e);
+                                }
+                            });
+                        }
+                        else{
+                            var gameClient = new GameClient(server, postClient.getGameID(), postClient.getJoin());
+                            gameClient.setAuthToken(postClient.authToken);
+                            run("\n" + "[IN_GAME] >>> ", line -> {
+                                try {
+                                    return gameClient.eval(line);
+                                } catch (ResponseException e) {
+                                    throw new RuntimeException(e);
+                                }
+                            });
+                        }
                     }
 
 

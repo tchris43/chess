@@ -54,24 +54,30 @@ public class ConnectionManager {
         dataAccess.updateGame(userName, gameID, playerColor, whiteUsername, blackUsername, gameName, game);
     }
 
-    public void broadcast(int gameID, Session excludeSession, ServerMessage notification) throws IOException {
+    public void broadcast(int gameID, String excludeSession, ServerMessage notification) throws IOException {
         //------------- approved for connect tests 8:24 wed
         String msg = notification.toString();
         GameManager game = connections.get(gameID);
-        if (notification.getServerMessageType() == ServerMessage.ServerMessageType.ERROR){
-            excludeSession.getRemote().sendString(msg);
+        Pipeline currentPipe = null;
+        for (Pipeline p : game.getSessions()){
+            if (p.getUserName().equals(excludeSession)){
+                currentPipe = p;
+            }
         }
-        for (Session s : game.getSessions()){
-            if (s.isOpen()){
+        if (notification.getServerMessageType() == ServerMessage.ServerMessageType.ERROR){
+            currentPipe.getSession().getRemote().sendString(msg);
+        }
+        for (Pipeline s : game.getSessions()){
+            if (s.getSession().isOpen()){
                 if (notification.getServerMessageType() == ServerMessage.ServerMessageType.NOTIFICATION) {
-                    if (!s.equals(excludeSession)) {
-                        s.getRemote().sendString(msg);
+                    if (!s.getUserName().equals(excludeSession)) {
+                        s.getSession().getRemote().sendString(msg);
                     }
                 }
                 else if (notification.getServerMessageType() == ServerMessage.ServerMessageType.LOAD_GAME){
                     LoadGameMessage loadGame = (LoadGameMessage) notification;
-                    if (s.equals(excludeSession)) {
-                        s.getRemote().sendString(msg);
+                    if (s.getUserName().equals(excludeSession)) {
+                        s.getSession().getRemote().sendString(msg);
                     }
                     game.setGame(loadGame.getGame());
                 }
@@ -80,42 +86,54 @@ public class ConnectionManager {
 
     }
 
-    public void broadcastMove(int gameID, Session excludeSession, ServerMessage notification) throws IOException {
+//    public void broadcastMove(int gameID, String excludeSession, ServerMessage notification) throws IOException {
+//        //------------- approved for connect tests 8:24 wed
+//        String msg = notification.toString();
+//        GameManager game = connections.get(gameID);
+//        Pipeline currentPipe = null;
+//        for (Pipeline p : game.getSessions()){
+//            if (p.getUserName().equals(excludeSession)){
+//                currentPipe = p;
+//            }
+//        }
+//        if (notification.getServerMessageType() == ServerMessage.ServerMessageType.ERROR){
+//            currentPipe.getSession().getRemote().sendString(msg);
+//        }
+//        for (Pipeline s : game.getSessions()){
+//            if (s.getSession().isOpen()){
+//                if (notification.getServerMessageType() == ServerMessage.ServerMessageType.NOTIFICATION) {
+//                    if (!s.getUserName().equals(excludeSession)) {
+//                        s.getSession().getRemote().sendString(msg);
+//                    }
+//                }
+//                else if (notification.getServerMessageType() == ServerMessage.ServerMessageType.LOAD_GAME){
+//                    LoadGameMessage loadGame = (LoadGameMessage) notification;
+//                    s.getSession().getRemote().sendString(msg);
+//                    game.setGame(loadGame.getGame());
+//                }
+//            }
+//        }
+//
+//    }
+
+
+    public void broadcastAll(int gameID, String excludeSession, ServerMessage notification) throws IOException {
         //------------- approved for connect tests 8:24 wed
         String msg = notification.toString();
         GameManager game = connections.get(gameID);
-        if (notification.getServerMessageType() == ServerMessage.ServerMessageType.ERROR){
-            excludeSession.getRemote().sendString(msg);
-        }
-        for (Session s : game.getSessions()){
-            if (s.isOpen()){
-                if (notification.getServerMessageType() == ServerMessage.ServerMessageType.NOTIFICATION) {
-                    if (!s.equals(excludeSession)) {
-                        s.getRemote().sendString(msg);
-                    }
-                }
-                else if (notification.getServerMessageType() == ServerMessage.ServerMessageType.LOAD_GAME){
-                    LoadGameMessage loadGame = (LoadGameMessage) notification;
-                    s.getRemote().sendString(msg);
-                    game.setGame(loadGame.getGame());
-                }
+        Pipeline currentPipe = null;
+        for (Pipeline p : game.getSessions()){
+            if (p.getUserName().equals(excludeSession)){
+                currentPipe = p;
             }
         }
-
-    }
-
-
-    public void broadcastAll(int gameID, Session excludeSession, ServerMessage notification) throws IOException {
-        //------------- approved for connect tests 8:24 wed
-        String msg = notification.toString();
-        GameManager game = connections.get(gameID);
         if (notification.getServerMessageType() == ServerMessage.ServerMessageType.ERROR){
-            excludeSession.getRemote().sendString(msg);
+            currentPipe.getSession().getRemote().sendString(msg);
         }
-        for (Session s : game.getSessions()){
-            if (s.isOpen()){
+        for (Pipeline s : game.getSessions()){
+            if (s.getSession().isOpen()){
                 if (notification.getServerMessageType() == ServerMessage.ServerMessageType.NOTIFICATION) {
-                    s.getRemote().sendString(msg);
+                    s.getSession().getRemote().sendString(msg);
                 }
             }
         }

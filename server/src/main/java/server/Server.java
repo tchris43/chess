@@ -17,7 +17,7 @@ import service.UserService;
 
 import java.sql.SQLException;
 
-import server.websocket.webSocketHandler;
+import server.websocket.WebSocketHandler;
 
 
 public class Server {
@@ -32,7 +32,7 @@ public class Server {
             throw new RuntimeException(e.getMessage());
         }
 
-        webSocketHandler websocketHandler = new webSocketHandler(userService);
+        WebSocketHandler websocketHandler = new WebSocketHandler(userService);
 
         javalin = Javalin.create(config -> config.staticFiles.add("web"))
             .post("/user", this::registerUser)

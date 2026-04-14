@@ -10,6 +10,7 @@ import java.util.Scanner;
 public class PreLoginClient {
     private final ServerFacade server;
     private boolean loggedIn = false;
+    String authToken;
 
     public PreLoginClient(String serverUrl) throws ResponseException {
         server = new ServerFacade(serverUrl);
@@ -65,7 +66,8 @@ public class PreLoginClient {
     public String register(String... params) throws ResponseException{
         if (goodParams(params, 3)) {
             UserData registerRequest = new UserData(params[0], params[1], params[2]);
-            server.register(registerRequest);
+            LoginResult registerResult = server.register(registerRequest);
+            this.authToken = registerResult.authToken();
             System.out.printf("Logged in as %s", params[0]);
             loggedIn = true;
             return "quit";
@@ -79,7 +81,8 @@ public class PreLoginClient {
     public String login(String... params) throws ResponseException{
         if (goodParams(params, 2)) {
             LoginRequest loginRequest = new LoginRequest(params[0], params[1]);
-            server.login(loginRequest);
+            LoginResult loginResult = server.login(loginRequest);
+            this.authToken = loginResult.authToken();
             System.out.printf("Logged in as %s", params[0]);
             loggedIn = true;
             return "quit";
